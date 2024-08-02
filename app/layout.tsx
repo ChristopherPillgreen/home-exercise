@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "./components/Sidebar";
-import { ExerciseCard } from "./components/Card";
+import { ExerciseCard } from "./components/ExerciseCard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex">
         <Nav />
-        {children}
+        <div className="bg-slate-200 w-full"> {children}</div>
       </body>
     </html>
   );

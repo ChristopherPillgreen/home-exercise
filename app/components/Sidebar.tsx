@@ -1,5 +1,6 @@
 "use client";
 
+import HeartIcon from "./HeartIcon";
 import { Sidebar, SidebarLogo } from "flowbite-react";
 import {
   HiArrowSmRight,
@@ -24,7 +25,7 @@ export default function Nav() {
           <Sidebar.Item href="/exercises" icon={HiViewBoards}>
             Exercises
           </Sidebar.Item>
-          <Sidebar.Item href="/favorites" icon={HiHeart} label="3">
+          <Sidebar.Item href="/favorites" icon={HeartIcon} label="3">
             My Favorites
           </Sidebar.Item>
           <Sidebar.Item href="profile" icon={HiUser}>
