@@ -9,6 +9,7 @@ import {
   HiUser,
   HiViewBoards,
   HiHeart,
+  HiOutlineCog,
 } from "react-icons/hi";
 
 export default function Nav() {
@@ -25,11 +26,12 @@ export default function Nav() {
           <Sidebar.Item href="/exercises" icon={HiViewBoards}>
             Exercises
           </Sidebar.Item>
-          <Sidebar.Item href="/favorites" icon={HeartIcon} label="3">
-            My Favorites
-          </Sidebar.Item>
-          <Sidebar.Item href="profile" icon={HiUser}>
-            Profile
+          <Sidebar.Collapse href="/favorites" icon={HiHeart} label="Favorites">
+            <Sidebar.Item href="#">Exercises</Sidebar.Item>
+            <Sidebar.Item href="#">Plans</Sidebar.Item>
+          </Sidebar.Collapse>
+          <Sidebar.Item href="settings" icon={HiOutlineCog}>
+            Settings
           </Sidebar.Item>
           <Sidebar.Item href="sign-in" icon={HiArrowSmRight}>
             Sign In
