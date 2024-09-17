@@ -10,6 +10,7 @@ import {
   HiViewBoards,
   HiHeart,
   HiOutlineCog,
+  HiArrowSmLeft,
 } from "react-icons/hi";
 
 export default function Nav() {
@@ -30,14 +31,17 @@ export default function Nav() {
             <Sidebar.Item href="#">Exercises</Sidebar.Item>
             <Sidebar.Item href="#">Plans</Sidebar.Item>
           </Sidebar.Collapse>
-          <Sidebar.Item href="settings" icon={HiOutlineCog}>
+          <Sidebar.Item href="/settings" icon={HiOutlineCog}>
             Settings
           </Sidebar.Item>
-          <Sidebar.Item href="sign-in" icon={HiArrowSmRight}>
+          <Sidebar.Item href="/sign-in" icon={HiArrowSmRight}>
             Sign In
           </Sidebar.Item>
-          <Sidebar.Item href="" icon={HiTable}>
+          <Sidebar.Item href="/sign-up" icon={HiTable}>
             Sign Up
+          </Sidebar.Item>
+          <Sidebar.Item href="/" icon={HiArrowSmLeft}>
+            Logout
           </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
