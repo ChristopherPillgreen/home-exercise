@@ -7,9 +7,7 @@ export default function Nav() {
       <MegaMenu>
         <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4 md:space-x-8">
           <Navbar.Brand>
-            <span className="self-center whitespace-nowrap text-xl font-semibold dark:text-white">
-                KineticCare
-            </span>
+          <img alt="" src="logo.png" className="h-12 w-auto" />
           </Navbar.Brand>
           <div className="order-2 hidden items-center md:flex">
           <a

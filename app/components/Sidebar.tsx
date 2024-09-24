@@ -16,9 +16,6 @@ import {
 export default function Nav() {
   return (
     <Sidebar className="h-lvh" aria-label="Default sidebar example">
-      <Sidebar.Logo href="#" img="/logo.png">
-        TheraFit
-      </Sidebar.Logo>{" "}
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Sidebar.Collapse
