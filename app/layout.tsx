@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+<<<<<<< HEAD
 import Nav from "./components/Megamenu";
+=======
+>>>>>>> e240e5fb3c9ab42864f58104cf4224badf7fbcfe
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+<<<<<<< HEAD
       <body className="flex flex-col min-h-screen">
         <nav className="w-full p-1">
           <Nav />
@@ -24,6 +28,10 @@ export default function RootLayout({
         <div className="bg-slate-200 w-full flex-grow">
           {children}
         </div>
+=======
+      <body className="flex">
+        <div className="bg-slate-200 w-full"> {children}</div>
+>>>>>>> e240e5fb3c9ab42864f58104cf4224badf7fbcfe
       </body>
     </html>
   );
