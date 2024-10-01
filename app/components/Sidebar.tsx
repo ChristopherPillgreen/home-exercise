@@ -1,7 +1,7 @@
 "use client";
 
 import HeartIcon from "./HeartIcon";
-import { Sidebar, SidebarLogo } from "flowbite-react";
+import { Sidebar, SidebarCollapse, SidebarLogo } from "flowbite-react";
 import {
   HiArrowSmRight,
   HiChartPie,
@@ -16,33 +16,24 @@ import {
 export default function Nav() {
   return (
     <Sidebar className="h-lvh" aria-label="Default sidebar example">
-      <Sidebar.Logo href="#" img="/logo.png">
-        TheraFit
-      </Sidebar.Logo>{" "}
       <Sidebar.Items>
         <Sidebar.ItemGroup>
-          <Sidebar.Item href="/" icon={HiChartPie}>
-            Home
-          </Sidebar.Item>
-          <Sidebar.Item href="/exercises" icon={HiViewBoards}>
-            Exercises
-          </Sidebar.Item>
-          <Sidebar.Collapse href="/favorites" icon={HiHeart} label="Favorites">
-            <Sidebar.Item href="#">Exercises</Sidebar.Item>
-            <Sidebar.Item href="#">Plans</Sidebar.Item>
+          <Sidebar.Collapse
+            href="/exercises"
+            icon={HiViewBoards}
+            label="Exercises"
+          >
+            <Sidebar.Item>Cervical</Sidebar.Item>
+            <Sidebar.Item>Oral Motor</Sidebar.Item>
+            <Sidebar.Item>Shoulder</Sidebar.Item>
+            <Sidebar.Item>Elbow & Hand</Sidebar.Item>
+            <Sidebar.Item>Thoracic Lumbar</Sidebar.Item>
+            <Sidebar.Item>Ankle & Foot</Sidebar.Item>
+            <Sidebar.Item>Education</Sidebar.Item>
+            <Sidebar.Item>Special</Sidebar.Item>
+
+            <Sidebar.Item></Sidebar.Item>
           </Sidebar.Collapse>
-          <Sidebar.Item href="/settings" icon={HiOutlineCog}>
-            Settings
-          </Sidebar.Item>
-          <Sidebar.Item href="/sign-in" icon={HiArrowSmRight}>
-            Sign In
-          </Sidebar.Item>
-          <Sidebar.Item href="/sign-up" icon={HiTable}>
-            Sign Up
-          </Sidebar.Item>
-          <Sidebar.Item href="/" icon={HiArrowSmLeft}>
-            Logout
-          </Sidebar.Item>
         </Sidebar.ItemGroup>
       </Sidebar.Items>
     </Sidebar>
