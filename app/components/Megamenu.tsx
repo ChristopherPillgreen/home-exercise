@@ -19,7 +19,7 @@ export default function Nav() {
           <Button href="#">Sign up</Button>
         </div>
           <Navbar.Collapse>
-            <Navbar.Link href="/">Home</Navbar.Link>
+            <Navbar.Link href="/home">Home</Navbar.Link>
             <Navbar.Link href="/exercises">Exercises</Navbar.Link>
             <Navbar.Link href="/favorites">Favorites</Navbar.Link>
             <Navbar.Link href="/settings">Settings</Navbar.Link>

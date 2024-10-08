@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@fontsource-variable/heebo": "^5.1.0",
+    "@fontsource-variable/syne": "^5.1.0",
     "@libsql/client": "^0.8.0",
     "dotenv": "^16.4.5",
     "drizzle-orm": "^0.32.1",
