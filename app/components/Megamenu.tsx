@@ -1,23 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { Button, MegaMenu, Navbar } from 'flowbite-react';
+import { Button, MegaMenu, Navbar } from "flowbite-react";
 
 export default function Nav() {
-  const [isHiddenPage, setIsHiddenPage] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const path = window.location.pathname;
-      setIsHiddenPage(path === '/' || path === '/confirm');
-    }
-  }, []);
-
-  if (isHiddenPage) {
-    return null;
-  }
-
-
   return (
     <MegaMenu>
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4 md:space-x-8">
