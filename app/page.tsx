@@ -44,7 +44,7 @@ export default function Open() {
                               </div>
                           </div>
                       </div>
-                      <a href="/home" className="inline-block rounded-md border border-transparent px-8 py-3 text-center font-medium text-white hover:bg-indigo-700" style={{ backgroundColor: '#7076af' }}>Enter</a>
+                      <a href="/confirm" className="inline-block rounded-md border border-transparent px-8 py-3 text-center font-medium text-white hover:bg-indigo-700" style={{ backgroundColor: '#7076af' }}>Enter</a>
                   </div>
               </div>
           </div>

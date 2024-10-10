@@ -4,17 +4,19 @@ import { useEffect, useState } from 'react';
 import { Button, MegaMenu, Navbar } from 'flowbite-react';
 
 export default function Nav() {
-  const [isLandingPage, setIsLandingPage] = useState(false);
+  const [isHiddenPage, setIsHiddenPage] = useState(true);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      setIsLandingPage(window.location.pathname === '/');
+      const path = window.location.pathname;
+      setIsHiddenPage(path === '/' || path === '/confirm');
     }
   }, []);
 
-  if (isLandingPage) {
+  if (isHiddenPage) {
     return null;
   }
+
 
   return (
     <MegaMenu>
