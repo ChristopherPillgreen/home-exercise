@@ -8,8 +8,6 @@ export default async function Exercises() {
       <ExerciseCard />
       <ExerciseCard />
       <ExerciseCard />
-      <ExerciseCard />
-      <ExerciseCard />
     </div>
   );
 }

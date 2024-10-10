@@ -15,7 +15,7 @@ import {
 
 export default function Nav() {
   return (
-    <Sidebar className="h-lvh" aria-label="Default sidebar example">
+    <Sidebar className="h-screen" aria-label="Default sidebar example">
       <Sidebar.Items>
         <Sidebar.ItemGroup>
           <Sidebar.Collapse

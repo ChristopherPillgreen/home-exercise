@@ -13,7 +13,7 @@ export function SignInForm() {
           <TextInput
             id="email1"
             type="email"
-            placeholder="name@flowbite.com"
+            placeholder="johndoe@gmail.com"
             required
             className="p-4 text-lg"
           />
