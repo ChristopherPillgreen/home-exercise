@@ -20,17 +20,17 @@ export default function Nav() {
   return (
     <MegaMenu>
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4 md:space-x-8">
-        <Navbar.Brand>
+        <Navbar.Brand href="/home">
           <img alt="" src="logo.png" className="h-16 w-auto" />
         </Navbar.Brand>
         <div className="order-2 hidden items-center md:flex">
           <a
-            href="#"
+            href="/login"
             className="mr-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-gray-300 dark:text-white dark:hover:bg-gray-700 dark:focus:ring-gray-800 md:mr-2 md:px-5 md:py-2.5"
           >
             Login
           </a>
-          <Button href="#">Sign up</Button>
+          <Button href="/sign-up">Sign up</Button>
         </div>
         <Navbar.Collapse>
           <Navbar.Link href="/home">Home</Navbar.Link>
