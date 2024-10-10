@@ -33,11 +33,10 @@ export default function Nav() {
           <Button href="/sign-up">Sign up</Button>
         </div>
         <Navbar.Collapse>
-          <Navbar.Link href="/home">Home</Navbar.Link>
           <Navbar.Link href="/exercises">Exercises</Navbar.Link>
           <Navbar.Link href="/favorites">Favorites</Navbar.Link>
-          <Navbar.Link href="/settings">Settings</Navbar.Link>
           <Navbar.Link href="/about">About</Navbar.Link>
+          <Navbar.Link href="/plan">Planner</Navbar.Link>
         </Navbar.Collapse>
       </div>
     </MegaMenu>
