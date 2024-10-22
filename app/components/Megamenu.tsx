@@ -9,7 +9,7 @@ export default function Nav() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const path = window.location.pathname;
-      setIsHiddenPage(path === "/" || path === "/confirm");
+      setIsHiddenPage(path === "/" || path === "/confirm" || path === "/sign-up" || path === "/login" || path === "/planner");
     }
   }, []);
 
@@ -30,13 +30,13 @@ export default function Nav() {
           >
             Login
           </a>
-          <Button href="/sign-up">Sign up</Button>
+          <Button href="/sign-up" style={{ backgroundColor: '#af7076'}}>Sign Out</Button>
         </div>
         <Navbar.Collapse>
           <Navbar.Link href="/exercises">Exercises</Navbar.Link>
           <Navbar.Link href="/favorites">Favorites</Navbar.Link>
           <Navbar.Link href="/about">About</Navbar.Link>
-          <Navbar.Link href="/plan">Planner</Navbar.Link>
+          <Navbar.Link href="/planner">Planner</Navbar.Link>
         </Navbar.Collapse>
       </div>
     </MegaMenu>
