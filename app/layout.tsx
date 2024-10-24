@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "./components/Megamenu";
+import { PageFooter } from "./components/Foot";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,9 +22,8 @@ export default function RootLayout({
         <nav className="w-full p-1">
           <Nav />
         </nav>
-        <div className="bg-slate-200 w-full flex-grow">
-          {children}
-        </div>
+        <div className="bg-slate-200 w-full flex-grow">{children}</div>
+        <PageFooter />
       </body>
     </html>
   );
