@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from "flowbite-react";
+import { jsPDF } from "jspdf";
 import { FaQrcode, FaCommentMedical, FaPersonRunning, FaBars, FaRegFolder, FaRegBookmark } from 'react-icons/fa6';
 
 
