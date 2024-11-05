@@ -1,4 +1,4 @@
-export default function Favorites() {
+export default function profile() {
   return (
     <div>
       <p>Hello</p>

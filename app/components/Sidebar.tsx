@@ -1,7 +1,7 @@
 "use client";
 
 import { Sidebar } from "flowbite-react";
-import { HiViewBoards } from "react-icons/hi";
+import { HiHeart, HiViewBoards } from "react-icons/hi";
 import SearchForm from "./Searchbar";
 
 export default function Nav() {
@@ -24,9 +24,11 @@ export default function Nav() {
               <Sidebar.Item>Ankle & Foot</Sidebar.Item>
               <Sidebar.Item>Education</Sidebar.Item>
               <Sidebar.Item>Special</Sidebar.Item>
-
               <Sidebar.Item></Sidebar.Item>
             </Sidebar.Collapse>
+            <Sidebar.Item href="favoriteexercises" icon={HiHeart}>
+              Favorite Exercises
+            </Sidebar.Item>
           </Sidebar.ItemGroup>
         </Sidebar.Items>
       </Sidebar>

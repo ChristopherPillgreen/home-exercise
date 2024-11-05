@@ -42,6 +42,9 @@ export function SignInForm() {
         <Button type="submit" className="text-xl p-4">
           Submit
         </Button>
+        <Button href="/sign-up" color="link" className="text-lg mt-4">
+          Register Here
+        </Button>
       </form>
     </div>
   );
