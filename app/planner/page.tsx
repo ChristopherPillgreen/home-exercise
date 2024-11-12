@@ -18,7 +18,7 @@ export default function Planner() {
   const [isEditing, setIsEditing] = useState(false);
 
   // Load saved plantitle from localStorage on component mount
-  useEffect(() => {   
+  useEffect(() => {
     const savedPlantitle = localStorage.getItem("sidebarPlantitle");
     if (savedPlantitle) {
       setPlantitle(savedPlantitle);
