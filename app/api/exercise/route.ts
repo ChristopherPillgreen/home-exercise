@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { NextRequest, NextResponse } from "next/server";
 import {
   getExerciseById,
@@ -67,3 +68,5 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+=======
+>>>>>>> 5fc3de82d4b21bee4062583dc1095b895db54b2d
