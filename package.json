@@ -1,37 +1,26 @@
 {
-  "name": "home-exercise",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
   "dependencies": {
-    "@fontsource-variable/heebo": "^5.1.0",
-    "@fontsource-variable/syne": "^5.1.0",
-    "@libsql/client": "^0.8.0",
-    "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.1",
-    "flowbite": "^2.4.1",
-    "flowbite-react": "^0.10.1",
-    "jspdf": "^2.5.2",
-    "mysql2": "^3.11.3",
-    "next": "14.2.5",
-    "react": "^18",
-    "react-dom": "^18"
+    "flowbite-react": "^0.10.2",
+    "mysql2": "^3.11.4",
+    "next": "^15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sequelize": "^6.37.5",
+    "sequelize-auto-migrations-v2": "^1.2.1"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "drizzle-kit": "^0.23.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "@types/bun": "latest"
+    "@types/express": "^5.0.0",
+    "@types/next": "^8.0.7",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "sequelize-cli": "^6.6.2",
+    "sequelize-mig": "^3.1.3",
+    "typescript": "5.6.3"
   },
-  "module": "index.ts",
-  "type": "module"
+  "scripts": {
+    "migrate": "npx sequelize db:migrate",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  }
 }
