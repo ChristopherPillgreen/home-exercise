@@ -5,7 +5,7 @@ import {
   createPlan,
   updatePlan,
   deletePlan,
-} from './Plan.service';
+} from './plan.service';
 
 // GET: Retrieve a plan by ID or all plans
 export async function GET(request: NextRequest) {

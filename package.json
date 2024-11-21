@@ -1,24 +1,30 @@
 {
   "dependencies": {
+    "@mikro-orm/cli": "^6.4.0",
+    "@mikro-orm/core": "^6.4.0",
+    "@mikro-orm/mysql": "^6.4.0",
     "flowbite-react": "^0.10.2",
-    "mysql2": "^3.11.4",
     "next": "^15.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "sequelize": "^6.37.5",
-    "sequelize-auto-migrations-v2": "^1.2.1"
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/next": "^8.0.7",
     "@types/node": "^22.9.0",
     "@types/react": "^18.3.12",
-    "sequelize-cli": "^6.6.2",
-    "sequelize-mig": "^3.1.3",
     "typescript": "5.6.3"
   },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./mikro-orm.config.ts"
+    ]
+  },
   "scripts": {
-    "migrate": "npx sequelize db:migrate",
+    "db-update": "mikro-orm schema:update --run",
     "dev": "next dev",
     "build": "next build",
     "start": "next start"

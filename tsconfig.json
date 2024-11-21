@@ -1,4 +1,9 @@
 {
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  },
   "compilerOptions": {
     "lib": [
       "dom",
@@ -11,27 +16,34 @@
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+    "target": "ES2017",
+    "paths": {
+      "@entities/*": [
+        "entities/*"
+      ],
+      "@api/*": [
+        "app/api/*"
+      ]
+    },
+    "baseUrl": "./",
     "plugins": [
       {
         "name": "next"
       }
-    ],
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    },
-    "target": "ES2017"
+    ]
   },
   "include": [
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "entities/**/*",
     ".next/types/**/*.ts"
   ],
   "exclude": [

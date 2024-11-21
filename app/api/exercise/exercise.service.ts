@@ -1,10 +1,18 @@
-import Exercise from '../../../models/Exercise'; // Adjust the path as needed
+import { EntityManager,MikroORM } from '@mikro-orm/core';
+import { Exercise } from '@entities/Exercise.entity';
+import { TagExercises } from '@entities/TagExercise.entity';
+import { PlanExercise } from '@entities/PlanExercise.entity';
+import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 
 // Get all exercises
-export async function getAllExercises() {
+
+export async function getAllExercises(orm: MikroORM) {
+  const em = orm.em
+
+  console.log('getAllExercises');
   try {
-    return await Exercise.findAll({
-      include: ['tags'], // Use aliases defined in associations
+    return await em.find(Exercise, {}, {
+      populate: ['tagExercise', 'planExercises', 'favoriteExercises'],
     });
   } catch (error) {
     throw new Error(`Error fetching exercises: ${(error as Error).message}`);
@@ -12,14 +20,17 @@ export async function getAllExercises() {
 }
 
 // Get a specific exercise by ID
-export async function getExerciseById(exerciseID: number) {
+export async function getExerciseById(em: EntityManager, exerciseID: number) {
+  console.log('get by ID');
   try {
-    const exercise = await Exercise.findByPk(exerciseID, {
-      include: ['plans', 'tags'], // Use aliases defined in associations
+    const exercise = await em.findOne(Exercise, { exerciseID }, {
+      populate: ['tagExercise', 'planExercises', 'favoriteExercises'],
     });
+
     if (!exercise) {
       throw new Error('Exercise not found');
     }
+
     return exercise;
   } catch (error) {
     throw new Error(`Error fetching exercise with ID ${exerciseID}: ${(error as Error).message}`);
@@ -27,46 +38,52 @@ export async function getExerciseById(exerciseID: number) {
 }
 
 // Create a new exercise
-export async function createExercise(data: {
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseImage?: Buffer;
-}) {
+export async function createExercise(
+  
+  em: EntityManager,
+  data: { exerciseName: string; exerciseDescription: string }
+) {
   try {
-    return await Exercise.create(data);
+    console.log('createExercise');
+    const exercise = em.create(Exercise, data);
+    await em.persistAndFlush(exercise);
+    return exercise;
   } catch (error) {
     throw new Error(`Error creating exercise: ${(error as Error).message}`);
   }
 }
 
 // Update an exercise by ID
-export async function updateExercise(exerciseID: number, data: Partial<{
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseImage?: Buffer;
-}>) {
+export async function updateExercise(
+  em: EntityManager,
+  exerciseID: number,
+  data: Partial<{ exerciseName: string; exerciseDescription: string }>
+) {
   try {
-    const exercise = await Exercise.findByPk(exerciseID);
+    console.log('updateexercise');
+    const exercise = await em.findOne(Exercise, { exerciseID });
     if (!exercise) {
       throw new Error('Exercise not found');
     }
-    return await exercise.update(data);
+    Object.assign(exercise, data);
+    await em.flush();
+    return exercise;
   } catch (error) {
     throw new Error(`Error updating exercise with ID ${exerciseID}: ${(error as Error).message}`);
   }
 }
 
 // Delete an exercise by ID
-export async function deleteExercise(exerciseID: number) {
+export async function deleteExercise(em: EntityManager, exerciseID: number) {
   try {
-    const exercise = await Exercise.findByPk(exerciseID);
+    console.log('deleteExercise');
+    const exercise = await em.findOne(Exercise, { exerciseID });
     if (!exercise) {
       throw new Error('Exercise not found');
     }
-    await exercise.destroy();
+    await em.removeAndFlush(exercise);
     return { message: 'Exercise deleted successfully' };
   } catch (error) {
     throw new Error(`Error deleting exercise with ID ${exerciseID}: ${(error as Error).message}`);
   }
 }
-

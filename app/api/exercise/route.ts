@@ -1,85 +1,119 @@
-import { NextRequest, NextResponse } from "next/server";
-import { 
-  getExerciseById, 
-  getAllExercises, 
-  createExercise, 
-  updateExercise, 
-  deleteExercise 
-} from "./exercise.service"
+import { getOrm } from '../../../mikro-orm.config';
+import { NextRequest, NextResponse } from 'next/server';
+import {
+  getExerciseById,
+  getAllExercises,
+  createExercise,
+  updateExercise,
+  deleteExercise,
+} from './exercise.service';
+
+interface ExerciseData {
+  exerciseName: string;
+  exerciseDescription: string;
+}
 
 
- //GET: Retrieve an exercise by ID or all exercises.
 
-export async function GET(request: NextRequest) {
+// Helper: Parse query parameters
+function getQueryParam(request: NextRequest, param: string): string | null {
+  console.log('getQueryParam funct');
   const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  return searchParams.get(param);
+}
+
+// Helper: Handle errors
+function handleErrorResponse(error: any) {
+  console.log('in route in handleErrorResponse');
+  return NextResponse.json({ error: error.message }, { status: 500 });
+  
+}
+
+// GET: Retrieve an exercise by ID or all exercises.
+export async function GET(request: NextRequest) {
+  console.log('get function');
+  const id = getQueryParam(request, 'id');
 
   try {
+    const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = orm.em;
+
     if (id) {
-      const exercise = await getExerciseById(Number(id));
+      const exercise = await getExerciseById(em, Number(id));
       if (!exercise) {
-        return NextResponse.json({ message: "Exercise not found" }, { status: 404 });
+        return NextResponse.json(
+          { message: 'Exercise not found' },
+          { status: 404 }
+        );
       }
       return NextResponse.json(exercise, { status: 200 });
     } else {
-      const exercises = await getAllExercises();
+      const exercises = await getAllExercises(orm);
       return NextResponse.json(exercises, { status: 200 });
     }
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleErrorResponse(error);
   }
 }
 
-
- //POST: Create a new exercise.
-
+// POST: Create a new exercise.
 export async function POST(request: NextRequest) {
+  console.log('post');
   try {
-    const body = await request.json();
-    const newExercise = await createExercise(body);
+    const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = orm.em;
+
+    const body: ExerciseData = await request.json();
+    const newExercise = await createExercise(em, body);
     return NextResponse.json(newExercise, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleErrorResponse(error);
   }
 }
 
-
- //PUT: Update an existing exercise by ID.
-
+// PUT: Update an existing exercise by ID.
 export async function PUT(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  console.log('put');
+  const id = getQueryParam(request, 'id');
 
   if (!id) {
-    return NextResponse.json({ message: "ID is required for update" }, { status: 400 });
+    return NextResponse.json(
+      { message: 'ID is required for update' },
+      { status: 400 }
+    );
   }
 
   try {
-    const body = await request.json();
-    const updatedExercise = await updateExercise(Number(id), body);
+    const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = orm.em;
+
+    const body: Partial<ExerciseData> = await request.json();
+    const updatedExercise = await updateExercise(em, Number(id), body);
     return NextResponse.json(updatedExercise, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleErrorResponse(error);
   }
 }
 
-
- //DELETE: Delete an exercise by ID.
- 
+// DELETE: Delete an exercise by ID.
 export async function DELETE(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const id = searchParams.get("id");
+  console.log('delete')
+  const id = getQueryParam(request, 'id');
 
   if (!id) {
-    return NextResponse.json({ message: "ID is required for deletion" }, { status: 400 });
+    return NextResponse.json(
+      { message: 'ID is required for deletion' },
+      { status: 400 }
+    );
   }
 
   try {
-    const deleteMessage = await deleteExercise(Number(id));
+    const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = orm.em;
+
+    const deleteMessage = await deleteExercise(em, Number(id));
     return NextResponse.json(deleteMessage, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return handleErrorResponse(error);
   }
 }
-
-
