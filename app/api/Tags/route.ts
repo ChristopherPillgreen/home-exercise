@@ -1,63 +1,82 @@
-import Tag from '../../../models/Tag';
-import { Exercise } from '../../../models/Exercise';
+import { getOrm } from '../../../mikro-orm.config';
+import { NextRequest, NextResponse } from 'next/server';
+import { getAllTags, getTagById, createTag, updateTag, deleteTag } from './Tag.service';
 
-// Get all tags
-export async function getAllTags(withExercises: boolean = false) {
+// Helper: Parse query parameters
+function getQueryParam(request: NextRequest, param: string): string | null {
+  const { searchParams } = new URL(request.url);
+  return searchParams.get(param);
+}
+
+// GET: Retrieve all tags or a specific tag by ID
+export async function GET(request: NextRequest) {
+  const id = getQueryParam(request, 'id');
+  const withExercises = getQueryParam(request, 'withExercises') === 'true';
+
   try {
-    return await Tag.findAll({
-      include: withExercises ? [{ model: Exercise, as: 'exercises' }] : [],
-    });
-  } catch (error) {
-    console.error('Error fetching tags:', error);
-    throw new Error('Could not fetch tags');
+    const orm = await getOrm();
+    const em = orm.em;
+
+    if (id) {
+      const tag = await getTagById(em, Number(id), withExercises);
+      if (!tag) return NextResponse.json({ message: 'Tag not found' }, { status: 404 });
+      return NextResponse.json(tag, { status: 200 });
+    } else {
+      const tags = await getAllTags(em, withExercises);
+      return NextResponse.json(tags, { status: 200 });
+    }
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// Get a specific tag by ID
-export async function getTagById(tagID: number, withExercises: boolean = false) {
+// POST: Create a new tag
+export async function POST(request: NextRequest) {
   try {
-    const tag = await Tag.findByPk(tagID, {
-      include: withExercises ? [{ model: Exercise, as: 'exercises' }] : [],
-    });
-    if (!tag) throw new Error('Tag not found');
-    return tag;
-  } catch (error) {
-    console.error(`Error fetching tag with ID ${tagID}:`, error);
-    throw error;
+    const orm = await getOrm();
+    const em = orm.em;
+
+    const body = await request.json();
+    const tag = await createTag(em, body.tagName);
+
+    return NextResponse.json(tag, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// Create a new tag
-export async function createTag(tagName: string) {
+// PUT: Update a tag
+export async function PUT(request: NextRequest) {
+  const id = getQueryParam(request, 'id');
+  if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
+
   try {
-    return await Tag.create({ tagName });
-  } catch (error) {
-    console.error('Error creating tag:', error);
-    throw new Error('Could not create tag');
+    const orm = await getOrm();
+    const em = orm.em;
+
+    const body = await request.json();
+    const tag = await updateTag(em, Number(id), body.tagName);
+
+    return NextResponse.json(tag, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// Update an existing tag
-export async function updateTag(tagID: number, tagName: string) {
-  try {
-    const tag = await Tag.findByPk(tagID);
-    if (!tag) throw new Error('Tag not found');
-    return await tag.update({ tagName });
-  } catch (error) {
-    console.error(`Error updating tag with ID ${tagID}:`, error);
-    throw error;
-  }
-}
+// DELETE: Delete a tag
+export async function DELETE(request: NextRequest) {
+  const id = getQueryParam(request, 'id');
+  if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
 
-// Delete a tag
-export async function deleteTag(tagID: number) {
   try {
-    const tag = await Tag.findByPk(tagID);
-    if (!tag) throw new Error('Tag not found');
-    await tag.destroy();
-    return { message: 'Tag deleted successfully' };
-  } catch (error) {
-    console.error(`Error deleting tag with ID ${tagID}:`, error);
-    throw error;
+    const orm = await getOrm();
+    const em = orm.em;
+
+    const success = await deleteTag(em, Number(id));
+    if (!success) return NextResponse.json({ message: 'Tag not found' }, { status: 404 });
+
+    return NextResponse.json({ message: 'Tag deleted successfully' }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

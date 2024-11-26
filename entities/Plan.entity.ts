@@ -3,8 +3,8 @@ import { User } from './User.entity'; // Adjust the path as needed
 import { PlanExercise } from './PlanExercise.entity'
 @Entity()
 export class Plan {
-  @PrimaryKey()
-  planID!: number;
+  @PrimaryKey({ autoincrement: true})
+  planID?: number;
 
   @Property()
   frequency!: number;

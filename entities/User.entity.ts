@@ -1,10 +1,12 @@
 import { Entity, OneToMany, PrimaryKey, Property, Collection } from '@mikro-orm/core';
 import { Plan } from './Plan.entity'
 import { PlanExercise } from './PlanExercise.entity'
+import { FavoriteExercise } from './FavoriteExercise.entity';
+import FavoriteExercises from 'app/favoriteexercises/page';
 @Entity()
 export class User {
-  @PrimaryKey()
-  userID!: number;
+  @PrimaryKey({autoincrement: true})
+  userID?: number;
 
   @Property()
   userFirstName!: string;
@@ -18,9 +20,9 @@ export class User {
   @Property()
   userPassword!: string;
 
-//   @OneToMany(() => Plan, plan => plan.user)
-//   plans = new Collection<Plan>(this);
+  @OneToMany({ entity: () => 'Plan', mappedBy: 'user', lazy: true}) 
+  plans = new Collection<Plan>(this);
 
-//   @OneToMany(() => PlanExercise, planExercise => planExercise.exercise)
-//   planExercise = new Collection<PlanExercise>(this);
+  @OneToMany({ entity: () => 'FavoriteExercise', mappedBy: 'user'})
+  favoriteExercise = new Collection<FavoriteExercise>(this);
 }

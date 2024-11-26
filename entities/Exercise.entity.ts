@@ -41,7 +41,7 @@ console.log('exercise');
 @Entity()
 export class Exercise {
 
-    @PrimaryKey()
+    @PrimaryKey({autoincrement: true})
     exerciseID?: number;
 
     @Property()

@@ -1,5 +1,6 @@
-import FavoriteExercise from '../../../models/favoriteexercises';
-import Exercise from '../../../models/Exercise';
+import{ FavoriteExercise }from '@entities/FavoriteExercise.entity';
+
+import { Exercise } from '@entities/Exercise.entity';
 
 import { Op } from 'sequelize';
 

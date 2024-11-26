@@ -1,72 +1,37 @@
-//import { Tag } from '../../../models/Tag'; // Adjust the path if your models are elsewhere
-//import { Exercise } from '../../../models'; // Assuming Exercise model exists for association
-const Exercise = require('../../../models/exercise');
-const Tag = require('../../../models/Tag');
-class TagService {
-  // Fetch all tags with optional associated exercises
-  static async getAllTags(withExercises: boolean = false) {
-    try {
-      const tags = await Tag.findAll({
-        include: withExercises ? [{ model: Exercise, as: 'exercises' }] : [],
-      });
-      return tags;
-    } catch (error) {
-      throw new Error(`Error fetching tags: ${(error as Error).message}`);
-    }
-  }
+import { EntityManager } from '@mikro-orm/core';
+import { Tag } from '@entities/Tag.entity';
+import { Exercise } from '@entities/Exercise.entity';
 
-  // Get a specific tag by ID
-  static async getTagById(tagID: number, withExercises: boolean = false) {
-    try {
-      const tag = await Tag.findByPk(tagID, {
-        include: withExercises ? [{ model: Exercise, as: 'exercises' }] : [],
-      });
-      return tag;
-    } catch (error) {
-      throw new Error(`Error fetching tag with ID ${tagID}: ${(error as Error).message}`);
-    }
-  }
+// Fetch all tags, with optional associated exercises
+export const getAllTags = async (em: EntityManager, withExercises: boolean = false): Promise<Tag[]> => {
+  return await em.find(Tag, {}, { populate: withExercises ? ['exercises'] : [] });
+};
 
-  // Create a new tag
-  static async createTag(tagName: string) {
-    try {
-      const tag = await Tag.create({ tagName });
-      return tag;
-    } catch (error) {
-      throw new Error(`Error creating tag: ${(error as Error).message}`);
-    }
-  }
+// Fetch a specific tag by primary key (`tag`), with optional associated exercises
+export const getTagById = async (em: EntityManager, tag: number, withExercises: boolean = false): Promise<Tag | null> => {
+  return await em.findOne(Tag, { tag }, { populate: withExercises ? ['exercises'] : [] });
+};
 
-  // Update an existing tag
-  static async updateTag(tagID: number, tagName: string) {
-    try {
-      const tag = await Tag.findByPk(tagID);
-      if (tag) {
-        tag.tagName = tagName;
-        await tag.save();
-        return tag;
-      } else {
-        throw new Error(`Tag with ID ${tagID} not found`);
-      }
-    } catch (error) {
-      throw new Error(`Error updating tag: ${(error as Error).message}`);
-    }
-  }
+// Create a new tag
+export const createTag = async (em: EntityManager, tagName: string): Promise<Tag> => {
+  const tagEntity = em.create(Tag, { tagName });
+  await em.persistAndFlush(tagEntity);
+  return tagEntity;
+};
 
-  // Delete a tag
-  static async deleteTag(tagID: number) {
-    try {
-      const tag = await Tag.findByPk(tagID);
-      if (tag) {
-        await tag.destroy();
-        return true;
-      } else {
-        throw new Error(`Tag with ID ${tagID} not found`);
-      }
-    } catch (error) {
-      throw new Error(`Error deleting tag: ${(error as Error).message}`);
-    }
-  }
-}
+// Update an existing tag by primary key (`tag`)
+export const updateTag = async (em: EntityManager, tag: number, tagName: string): Promise<Tag | null> => {
+  const tagEntity = await getTagById(em, tag); // Use the existing function to fetch by `tag`
+  if (!tagEntity) throw new Error('Tag not found');
+  tagEntity.tagName = tagName;
+  await em.flush();
+  return tagEntity;
+};
 
-export default TagService;
+// Delete a tag by primary key (`tag`)
+export const deleteTag = async (em: EntityManager, tag: number): Promise<boolean> => {
+  const tagEntity = await getTagById(em, tag); // Use the existing function to fetch by `tag`
+  if (!tagEntity) throw new Error('Tag not found');
+  await em.removeAndFlush(tagEntity);
+  return true;
+};

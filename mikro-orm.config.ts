@@ -48,7 +48,9 @@ export const getOrm = async () => {
       driver: MySqlDriver,
       port: 3306,
       password: 'root_password',
+      allowGlobalContext: true,
     });
+    console.log('mikro-orm initialized successfully');
   }
   return orm;
 };

@@ -44,7 +44,7 @@ export async function createExercise(
   data: { exerciseName: string; exerciseDescription: string }
 ) {
   try {
-    console.log('createExercise');
+    
     const exercise = em.create(Exercise, data);
     await em.persistAndFlush(exercise);
     return exercise;
@@ -60,7 +60,7 @@ export async function updateExercise(
   data: Partial<{ exerciseName: string; exerciseDescription: string }>
 ) {
   try {
-    console.log('updateexercise');
+    
     const exercise = await em.findOne(Exercise, { exerciseID });
     if (!exercise) {
       throw new Error('Exercise not found');
@@ -76,7 +76,7 @@ export async function updateExercise(
 // Delete an exercise by ID
 export async function deleteExercise(em: EntityManager, exerciseID: number) {
   try {
-    console.log('deleteExercise');
+    
     const exercise = await em.findOne(Exercise, { exerciseID });
     if (!exercise) {
       throw new Error('Exercise not found');

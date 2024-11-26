@@ -1,80 +1,74 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {
-  getUserFavorites,
-  addFavorite,
-  removeFavorite,
-  isFavorite,
-} from './favoriteexercises.service';
+import { getOrm } from '../../../mikro-orm.config';
+import { 
+  getFavoritesByUser, 
+  addFavoriteExercise, 
+  removeFavoriteExercise } from './favoriteexercises.service';
 
-// Main handler for Favorite Exercises API
-export async function handler(request: NextRequest) {
+// Helper: Parse query parameters
+function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
-  const exerciseId = searchParams.get('exerciseId');
+  return searchParams.get(param);
+}
+
+// GET: Retrieve all favorite exercises for a user
+export async function GET(request: NextRequest) {
+  const userID = getQueryParam(request, 'userID');
+  if (!userID) {
+    return NextResponse.json({ message: 'userID is required' }, { status: 400 });
+  }
 
   try {
-    switch (request.method) {
-      case 'GET':
-        return await handleGet(userId);
-      case 'POST':
-        return await handlePost(request);
-      case 'DELETE':
-        return await handleDelete(userId, exerciseId);
-      default:
-        return NextResponse.json(
-          { message: `Method ${request.method} Not Allowed` },
-          { status: 405 }
-        );
-    }
+    const orm = await getOrm();
+    const em = orm.em;
+
+    const favorites = await getFavoritesByUser(em, Number(userID));
+    return NextResponse.json(favorites, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
 
-// Handle GET requests
-async function handleGet(userId: string | null) {
-  if (!userId) {
-    return NextResponse.json({ message: 'User ID is required' }, { status: 400 });
-  }
+// POST: Add a new favorite exercise
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { userID, exerciseID } = body;
 
-  const favorites = await getUserFavorites(Number(userId));
-  return NextResponse.json(favorites, { status: 200 });
+    if (!userID || !exerciseID) {
+      return NextResponse.json({ message: 'userID and exerciseID are required' }, { status: 400 });
+    }
+
+    const orm = await getOrm();
+    const em = orm.em;
+
+    const favorite = await addFavoriteExercise(em, Number(userID), Number(exerciseID));
+    return NextResponse.json(favorite, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
-// Handle POST requests
-async function handlePost(request: NextRequest) {
-  const data = await request.json();
-  const { userId, exerciseId } = data;
+// DELETE: Remove a favorite exercise
+export async function DELETE(request: NextRequest) {
+  const userID = getQueryParam(request, 'userID');
+  const exerciseID = getQueryParam(request, 'exerciseID');
 
-  if (!userId || !exerciseId) {
-    return NextResponse.json(
-      { message: 'User ID and Exercise ID are required' },
-      { status: 400 }
-    );
+  if (!userID || !exerciseID) {
+    return NextResponse.json({ message: 'userID and exerciseID are required' }, { status: 400 });
   }
 
-  const isAlreadyFavorite = await isFavorite(Number(userId), Number(exerciseId));
+  try {
+    const orm = await getOrm();
+    const em = orm.em;
 
-  if (isAlreadyFavorite) {
-    return NextResponse.json(
-      { message: 'Exercise is already a favorite' },
-      { status: 400 }
-    );
+    const success = await removeFavoriteExercise(em, Number(userID), Number(exerciseID));
+    if (!success) {
+      return NextResponse.json({ message: 'Favorite not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: 'Favorite removed successfully' }, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
-
-  const favorite = await addFavorite(Number(userId), Number(exerciseId));
-  return NextResponse.json(favorite, { status: 201 });
-}
-
-// Handle DELETE requests
-async function handleDelete(userId: string | null, exerciseId: string | null) {
-  if (!userId || !exerciseId) {
-    return NextResponse.json(
-      { message: 'User ID and Exercise ID are required for deletion' },
-      { status: 400 }
-    );
-  }
-
-  await removeFavorite(Number(userId), Number(exerciseId));
-  return NextResponse.json({ message: 'Favorite exercise removed' }, { status: 200 });
 }
