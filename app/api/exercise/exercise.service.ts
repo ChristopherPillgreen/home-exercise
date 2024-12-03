@@ -41,7 +41,7 @@ export async function getExerciseById(em: EntityManager, exerciseID: number) {
 export async function createExercise(
   
   em: EntityManager,
-  data: { exerciseName: string; exerciseDescription: string }
+  data: { exerciseName: string; exerciseDescription: string; image: string}
 ) {
   try {
     
