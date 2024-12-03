@@ -29,6 +29,7 @@
 //     driver: MySqlDriver, 
 //     port: 3306,
 //     password: 'root_password',
+//     allowGlobalContext: true,
 // })
 
 import { entities } from '@entities/entities';
@@ -50,7 +51,7 @@ export const getOrm = async () => {
       password: 'root_password',
       allowGlobalContext: true,
     });
-    console.log('mikro-orm initialized successfully');
+    
   }
   return orm;
 };

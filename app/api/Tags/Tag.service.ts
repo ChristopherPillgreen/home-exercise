@@ -4,12 +4,12 @@ import { Exercise } from '@entities/Exercise.entity';
 
 // Fetch all tags, with optional associated exercises
 export const getAllTags = async (em: EntityManager, withExercises: boolean = false): Promise<Tag[]> => {
-  return await em.find(Tag, {}, { populate: withExercises ? ['exercises'] : [] });
+  return await em.find(Tag, {}, { populate: withExercises ? ['tagExercises.exercise'] : [] });
 };
 
 // Fetch a specific tag by primary key (`tag`), with optional associated exercises
 export const getTagById = async (em: EntityManager, tag: number, withExercises: boolean = false): Promise<Tag | null> => {
-  return await em.findOne(Tag, { tag }, { populate: withExercises ? ['exercises'] : [] });
+  return await em.findOne(Tag, { tag }, { populate: withExercises ? ['tagExercises.exercise'] : [] });
 };
 
 // Create a new tag

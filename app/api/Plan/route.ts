@@ -6,7 +6,7 @@ import {
   createPlan,
   updatePlan,
   deletePlan,
-} from './plan.service';
+} from './Plan.service';
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
