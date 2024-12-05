@@ -50,8 +50,8 @@ export class Exercise {
     @Property()
     exerciseDescription!: string;
 
-    @Property({ type: 'blob' })
-    image!: Buffer;
+    @Property()
+    image!: string;
 
     @OneToMany({ entity: () => 'FavoriteExercise', mappedBy: 'exercise', lazy: true })
     favoriteExercises = new Collection<FavoriteExercise>(this);

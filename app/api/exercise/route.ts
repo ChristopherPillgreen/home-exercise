@@ -11,6 +11,7 @@ import {
 interface ExerciseData {
   exerciseName: string;
   exerciseDescription: string;
+  image: string;
 }
 
 

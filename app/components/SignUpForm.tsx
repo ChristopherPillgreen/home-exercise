@@ -1,20 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
-import Link from "next/link";
+import { Button, Label, TextInput } from "flowbite-react";
 
 export function SignUpForm() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (password !== repeatPassword) {
       setError("Passwords do not match");
-    } else {
-      setError("");
+      return;
+    }
+    setError("");
+
+    const userData = {
+      userFirstName: firstName,
+      userLastName: lastName,
+      userEmail: email,
+      userPassword: password,
+    };
+
+    try {
+      const response = await fetch("/api/User", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("User registered successfully:", result);
+        // Clear form fields or redirect to login page
+      } else {
+        const errorData = await response.json();
+        setError(errorData.message || "Something went wrong");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      setError("Failed to register. Please try again later.");
     }
   };
 
@@ -26,27 +58,55 @@ export function SignUpForm() {
       >
         <div>
           <div className="mb-3 block">
-            <Label htmlFor="email2" value="Your email" className="text-xl" />
+            <Label htmlFor="first-name" value="First Name" className="text-xl" />
           </div>
           <TextInput
-            id="email2"
+            id="first-name"
+            type="text"
+            placeholder="John"
+            required
+            shadow
+            className="p-4 text-lg"
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+          />
+        </div>
+        <div>
+          <div className="mb-3 block">
+            <Label htmlFor="last-name" value="Last Name" className="text-xl" />
+          </div>
+          <TextInput
+            id="last-name"
+            type="text"
+            placeholder="Doe"
+            required
+            shadow
+            className="p-4 text-lg"
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+          />
+        </div>
+        <div>
+          <div className="mb-3 block">
+            <Label htmlFor="email" value="Email" className="text-xl" />
+          </div>
+          <TextInput
+            id="email"
             type="email"
             placeholder="johndoe@gmail.com"
             required
             shadow
             className="p-4 text-lg"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div>
           <div className="mb-3 block">
-            <Label
-              htmlFor="password2"
-              value="Your password"
-              className="text-xl"
-            />
+            <Label htmlFor="password" value="Password" className="text-xl" />
           </div>
           <TextInput
-            id="password2"
+            id="password"
             type="password"
             required
             shadow
@@ -59,7 +119,7 @@ export function SignUpForm() {
           <div className="mb-3 block">
             <Label
               htmlFor="repeat-password"
-              value="Repeat password"
+              value="Repeat Password"
               className="text-xl"
             />
           </div>
@@ -75,8 +135,8 @@ export function SignUpForm() {
         </div>
         {error && <p className="text-red-500">{error}</p>}
 
-        <Button type="submit" className="text-xl p-4">
-          Register new account
+        <Button href="login"type="submit" className="text-xl p-4">
+          Register New Account
         </Button>
       </form>
     </div>
