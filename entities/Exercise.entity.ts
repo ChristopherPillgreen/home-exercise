@@ -36,11 +36,9 @@ import { TagExercises } from './TagExercise.entity';
 import { FavoriteExercise } from './FavoriteExercise.entity';
 import { PlanExercise } from './PlanExercise.entity';
 
-console.log('exercise');
 
 @Entity()
 export class Exercise {
-
     @PrimaryKey({autoincrement: true})
     exerciseID?: number;
 

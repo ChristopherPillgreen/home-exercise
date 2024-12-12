@@ -1,4 +1,4 @@
-import { getOrm } from '../../../mikro-orm.config';
+import { orm } from 'mikro-orm.config';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllTags, getTagById, createTag, updateTag, deleteTag } from './Tag.service';
 
@@ -14,8 +14,7 @@ export async function GET(request: NextRequest) {
   const withExercises = getQueryParam(request, 'withExercises') === 'true';
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     if (id) {
       const tag = await getTagById(em, Number(id), withExercises);
@@ -33,8 +32,7 @@ export async function GET(request: NextRequest) {
 // POST: Create a new tag
 export async function POST(request: NextRequest) {
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const body = await request.json();
     const tag = await createTag(em, body.tagName);
@@ -51,8 +49,7 @@ export async function PUT(request: NextRequest) {
   if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const body = await request.json();
     const tag = await updateTag(em, Number(id), body.tagName);
@@ -69,8 +66,7 @@ export async function DELETE(request: NextRequest) {
   if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const success = await deleteTag(em, Number(id));
     if (!success) return NextResponse.json({ message: 'Tag not found' }, { status: 404 });

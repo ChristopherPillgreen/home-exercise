@@ -1,5 +1,5 @@
 import { Entity, OneToMany, PrimaryKey, Property, Collection } from '@mikro-orm/core';
-import { Plan } from './Plan.entity'
+
 import { PlanExercise } from './PlanExercise.entity'
 import { FavoriteExercise } from './FavoriteExercise.entity';
 import FavoriteExercises from 'app/favoriteexercises/page';
@@ -26,3 +26,4 @@ export class User {
   @OneToMany({ entity: () => 'FavoriteExercise', mappedBy: 'user'})
   favoriteExercise = new Collection<FavoriteExercise>(this);
 }
+import { Plan } from './Plan.entity'

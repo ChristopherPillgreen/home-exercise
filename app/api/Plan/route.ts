@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrm } from '../../../mikro-orm.config';
+//import { getOrm } from '../../../mikro-orm.config';
+import { orm } from 'mikro-orm.config';
 import {
   getPlanById,
   getAllPlans,
@@ -19,8 +20,8 @@ export async function GET(request: NextRequest) {
   const id = getQueryParam(request, 'id');
 
   try {
-    const orm = await getOrm(); // Initialize Mikro-ORM
-    const em = orm.em;
+    //const orm = await getOrm(); // Initialize Mikro-ORM
+    const em = (await orm).em.fork();
 
     if (id) {
       const plan = await getPlanById(em, Number(id));
@@ -40,8 +41,8 @@ export async function GET(request: NextRequest) {
 // POST: Create a new plan
 export async function POST(request: NextRequest) {
   try {
-    const orm = await getOrm(); // Initialize Mikro-ORM
-    const em = orm.em;
+    //const orm = await getOrm(); // Initialize Mikro-ORM
+    const em = (await orm).em.fork();
 
     const body = await request.json();
     const { userID, ...planData } = body;
@@ -66,8 +67,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm(); // Initialize Mikro-ORM
-    const em = orm.em;
+    //const orm = await getOrm(); // Initialize Mikro-ORM
+    const em = (await orm).em.fork();
 
     const body = await request.json();
     const updatedPlan = await updatePlan(em, Number(id), body);
@@ -91,8 +92,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm(); // Initialize Mikro-ORM
-    const em = orm.em;
+    //const orm = await getOrm(); // Initialize Mikro-ORM
+    const em = (await orm).em.fork();
 
     const success = await deletePlan(em, Number(id));
     if (!success) {

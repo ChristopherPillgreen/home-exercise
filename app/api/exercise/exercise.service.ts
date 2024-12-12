@@ -6,8 +6,7 @@ import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 
 // Get all exercises
 
-export async function getAllExercises(orm: MikroORM) {
-  const em = orm.em
+export async function getAllExercises(em: EntityManager) {
 
   console.log('getAllExercises');
   try {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrm } from '../../../mikro-orm.config';
+import { orm } from 'mikro-orm.config';
 import {
   getTagsForExercise,
   getExercisesForTag,
@@ -23,8 +23,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     if (exerciseID) {
       const tags = await getTagsForExercise(em, Number(exerciseID));
@@ -48,8 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'exerciseID and tagID are required' }, { status: 400 });
     }
 
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const tagExercise = await addTagToExercise(em, Number(exerciseID), Number(tagID));
     return NextResponse.json(tagExercise, { status: 201 });
@@ -68,8 +66,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const success = await removeTagFromExercise(em, Number(exerciseID), Number(tagID));
     if (!success) {

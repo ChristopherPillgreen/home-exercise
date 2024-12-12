@@ -1,8 +1,8 @@
 {
   "dependencies": {
-    "@mikro-orm/cli": "^6.4.0",
-    "@mikro-orm/core": "^6.4.0",
-    "@mikro-orm/mysql": "^6.4.0",
+    "@mikro-orm/cli": "6.4.0",
+    "@mikro-orm/core": "6.4.0",
+    "@mikro-orm/mysql": "6.4.0",
     "flowbite-react": "^0.10.2",
     "next": "^15.0.3",
     "react": "^18.3.1",

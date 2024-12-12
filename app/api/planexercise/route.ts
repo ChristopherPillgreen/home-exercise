@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrm } from '../../../mikro-orm.config';
+import { orm } from 'mikro-orm.config';
 import {
   getPlanExercises,
   addExerciseToPlan,
@@ -21,8 +21,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const exercises = await getPlanExercises(em, Number(planID));
     return NextResponse.json(exercises, { status: 200 });
@@ -41,8 +40,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'planID and exerciseID are required' }, { status: 400 });
     }
 
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const newPlanExercise = await addExerciseToPlan(em, Number(planID), Number(exerciseID), exerciseData);
     return NextResponse.json(newPlanExercise, { status: 201 });
@@ -62,8 +60,7 @@ export async function PUT(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const updatedPlanExercise = await updatePlanExercise(em, Number(planID), Number(exerciseID), body);
     return NextResponse.json(updatedPlanExercise, { status: 200 });
@@ -82,8 +79,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    const em = (await orm).em.fork();
 
     const success = await removeExerciseFromPlan(em, Number(planID), Number(exerciseID));
     if (!success) {

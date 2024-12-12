@@ -1,4 +1,3 @@
-import { getOrm } from '../../../mikro-orm.config';
 import { NextRequest, NextResponse } from 'next/server';
 import {
   getExerciseById,
@@ -7,6 +6,7 @@ import {
   updateExercise,
   deleteExercise,
 } from './exercise.service';
+import { orm } from 'mikro-orm.config';
 
 interface ExerciseData {
   exerciseName: string;
@@ -36,8 +36,7 @@ export async function GET(request: NextRequest) {
   const id = getQueryParam(request, 'id');
 
   try {
-    const orm = await getOrm(); // Retrieve the MikroORM instance
-    const em = orm.em;
+    const em = (await orm).em.fork(); // Retrieve the MikroORM instance
 
     if (id) {
       const exercise = await getExerciseById(em, Number(id));
@@ -49,7 +48,7 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json(exercise, { status: 200 });
     } else {
-      const exercises = await getAllExercises(orm);
+      const exercises = await getAllExercises(em);
       return NextResponse.json(exercises, { status: 200 });
     }
   } catch (error: any) {
@@ -61,8 +60,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   console.log('post');
   try {
-    const orm = await getOrm(); // Retrieve the MikroORM instance
-    const em = orm.em;
+    //const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = (await orm).em.fork();
 
     const body: ExerciseData = await request.json();
     const newExercise = await createExercise(em, body);
@@ -85,8 +84,8 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm(); // Retrieve the MikroORM instance
-    const em = orm.em;
+    //const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = (await orm).em.fork();
 
     const body: Partial<ExerciseData> = await request.json();
     const updatedExercise = await updateExercise(em, Number(id), body);
@@ -109,8 +108,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm(); // Retrieve the MikroORM instance
-    const em = orm.em;
+    //const orm = await getOrm(); // Retrieve the MikroORM instance
+    const em = (await orm).em.fork();
 
     const deleteMessage = await deleteExercise(em, Number(id));
     return NextResponse.json(deleteMessage, { status: 200 });

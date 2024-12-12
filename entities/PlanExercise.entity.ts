@@ -1,14 +1,14 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
-import { Plan } from './Plan.entity';
+
 import { Exercise } from './Exercise.entity';
+
+
+import { Plan } from './Plan.entity';
 
 @Entity()
 export class PlanExercise {
-  @ManyToOne(() => Plan, { primary: true, lazy: true })
-  plan!: Plan;
-
-  @ManyToOne(() => Exercise, { primary: true, lazy: true })
-  exercise!: Exercise;
+  @PrimaryKey({ autoincrement: true })
+  id!: number
 
   @Property()
   sequenceNum!: number;
@@ -24,4 +24,10 @@ export class PlanExercise {
 
   @Property()
   time!: number;
+
+  @ManyToOne(() => Plan, { primary: true, lazy: true })
+  plan!: Plan;
+
+  @ManyToOne(() => Exercise, { primary: true, lazy: true })
+  exercise!: Exercise;
 }

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrm } from '../../../mikro-orm.config';
+import { orm } from 'mikro-orm.config';
+//import { getOrm } from '../../../mikro-orm.config';
 import { 
   getFavoritesByUser, 
   addFavoriteExercise, 
   removeFavoriteExercise } from './favoriteexercises.service';
+  
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -19,8 +21,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+
+    const em = (await orm).em.fork();
 
     const favorites = await getFavoritesByUser(em, Number(userID));
     return NextResponse.json(favorites, { status: 200 });
@@ -39,8 +41,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'userID and exerciseID are required' }, { status: 400 });
     }
 
-    const orm = await getOrm();
-    const em = orm.em;
+    //const orm = await getOrm();
+    const em = (await orm).em.fork();
 
     const favorite = await addFavoriteExercise(em, Number(userID), Number(exerciseID));
     return NextResponse.json(favorite, { status: 201 });
@@ -59,8 +61,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const orm = await getOrm();
-    const em = orm.em;
+    //const orm = await getOrm();
+    const em = (await orm).em.fork();
 
     const success = await removeFavoriteExercise(em, Number(userID), Number(exerciseID));
     if (!success) {

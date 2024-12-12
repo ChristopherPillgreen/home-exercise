@@ -9,13 +9,13 @@ export class Plan {
   @Property()
   frequency!: number;
 
-  @ManyToOne(() => User, { nullable: false })
-  user!: User;
-
   @Property({ type: 'boolean' })
   favorites!: boolean;
 
-  @OneToMany(() => PlanExercise, planExercise => planExercise.plan)
+  @ManyToOne(() => User, { nullable: false })
+  user!: User;
+
+  @OneToMany({ entity: () => "PlanExercise", mappedBy: 'plan', lazy: true })
   planExercises = new Collection<PlanExercise>(this);
 
 }
