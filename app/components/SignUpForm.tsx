@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
+import { useRouter } from "next/navigation";
 
 export function SignUpForm() {
   const [firstName, setFirstName] = useState("");
@@ -11,6 +12,8 @@ export function SignUpForm() {
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState("");
 
+  const router = useRouter();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -18,6 +21,7 @@ export function SignUpForm() {
       setError("Passwords do not match");
       return;
     }
+
     setError("");
 
     const userData = {
@@ -39,7 +43,8 @@ export function SignUpForm() {
       if (response.ok) {
         const result = await response.json();
         console.log("User registered successfully:", result);
-        // Clear form fields or redirect to login page
+
+        router.push("/login");
       } else {
         const errorData = await response.json();
         setError(errorData.message || "Something went wrong");
@@ -54,88 +59,94 @@ export function SignUpForm() {
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <form
         onSubmit={handleSubmit}
-        className="flex w-full max-w-lg flex-col gap-6 p-8 bg-white rounded-lg shadow-lg"
+        className="flex w-full max-w-sm flex-col gap-4 p-6 bg-white rounded-lg shadow-lg"
       >
         <div>
-          <div className="mb-3 block">
-            <Label htmlFor="first-name" value="First Name" className="text-xl" />
-          </div>
+          <Label
+            htmlFor="first-name"
+            value="First Name"
+            className="text-sm font-medium"
+          />
           <TextInput
             id="first-name"
             type="text"
             placeholder="John"
             required
             shadow
-            className="p-4 text-lg"
+            className="p-2 text-sm"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
           />
         </div>
         <div>
-          <div className="mb-3 block">
-            <Label htmlFor="last-name" value="Last Name" className="text-xl" />
-          </div>
+          <Label
+            htmlFor="last-name"
+            value="Last Name"
+            className="text-sm font-medium"
+          />
           <TextInput
             id="last-name"
             type="text"
             placeholder="Doe"
             required
             shadow
-            className="p-4 text-lg"
+            className="p-2 text-sm"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
           />
         </div>
         <div>
-          <div className="mb-3 block">
-            <Label htmlFor="email" value="Email" className="text-xl" />
-          </div>
+          <Label
+            htmlFor="email"
+            value="Email"
+            className="text-sm font-medium"
+          />
           <TextInput
             id="email"
             type="email"
             placeholder="johndoe@gmail.com"
             required
             shadow
-            className="p-4 text-lg"
+            className="p-2 text-sm"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
         <div>
-          <div className="mb-3 block">
-            <Label htmlFor="password" value="Password" className="text-xl" />
-          </div>
+          <Label
+            htmlFor="password"
+            value="Password"
+            className="text-sm font-medium"
+          />
           <TextInput
             id="password"
             type="password"
             required
             shadow
-            className="p-4 text-lg"
+            className="p-2 text-sm"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
         <div>
-          <div className="mb-3 block">
-            <Label
-              htmlFor="repeat-password"
-              value="Repeat Password"
-              className="text-xl"
-            />
-          </div>
+          <Label
+            htmlFor="repeat-password"
+            value="Repeat Password"
+            className="text-sm font-medium"
+          />
           <TextInput
             id="repeat-password"
             type="password"
             required
             shadow
-            className="p-4 text-lg"
+            className="p-2 text-sm"
             value={repeatPassword}
             onChange={(e) => setRepeatPassword(e.target.value)}
           />
         </div>
-        {error && <p className="text-red-500">{error}</p>}
+        {error && <p className="text-red-500 text-sm">{error}</p>}
 
-        <Button href="login"type="submit" className="text-xl p-4">
+        <Button type="submit" className="text-sm p-3 mt-4">
           Register New Account
         </Button>
       </form>
