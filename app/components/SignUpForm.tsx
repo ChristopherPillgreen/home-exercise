@@ -11,6 +11,7 @@ export function SignUpForm() {
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const router = useRouter();
 
@@ -23,6 +24,7 @@ export function SignUpForm() {
     }
 
     setError("");
+    setSuccess("");
 
     const userData = {
       userFirstName: firstName,
@@ -40,18 +42,23 @@ export function SignUpForm() {
         body: JSON.stringify(userData),
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.error || "An error occurred");
+      } else {
         const result = await response.json();
-        console.log("User registered successfully:", result);
+        setSuccess("User created successfully!");
+        // Optionally, reset the form fields
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setRepeatPassword("");
 
         router.push("/login");
-      } else {
-        const errorData = await response.json();
-        setError(errorData.message || "Something went wrong");
       }
-    } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to register. Please try again later.");
+    } catch (error) {
+      setError("An error occurred while creating the user");
     }
   };
 
@@ -145,6 +152,7 @@ export function SignUpForm() {
           />
         </div>
         {error && <p className="text-red-500 text-sm">{error}</p>}
+        {success && <p className="text-green-500 text-sm">{success}</p>}
 
         <Button type="submit" className="text-sm p-3 mt-4">
           Register New Account

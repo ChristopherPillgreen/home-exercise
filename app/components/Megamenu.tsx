@@ -36,7 +36,7 @@ export default function Nav() {
           >
             Login
           </a>
-          <Button href="/sign-up" style={{ backgroundColor: "#af7076" }}>
+          <Button href="/login" style={{ backgroundColor: "#af7076" }}>
             Sign Out
           </Button>
         </div>
