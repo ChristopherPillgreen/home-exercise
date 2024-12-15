@@ -4,7 +4,7 @@ import { PlanExercise } from './PlanExercise.entity'
 @Entity()
 export class Plan {
   @PrimaryKey({ autoincrement: true})
-  planID?: number;
+  planID!: number;
 
   @Property()
   frequency!: number;
@@ -15,7 +15,7 @@ export class Plan {
   @ManyToOne(() => User, { nullable: false })
   user!: User;
 
-  @OneToMany({ entity: () => "PlanExercise", mappedBy: 'plan', lazy: true })
+  @OneToMany({ entity: () => "PlanExercise", mappedBy: 'plan', eager: true })
   planExercises = new Collection<PlanExercise>(this);
 
 }

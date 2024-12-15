@@ -18,21 +18,21 @@ interface ExerciseData {
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
-  console.log('getQueryParam funct');
+  //console.log('getQueryParam funct');
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
 // Helper: Handle errors
 function handleErrorResponse(error: any) {
-  console.log('in route in handleErrorResponse');
+  //console.log('in route in handleErrorResponse');
   return NextResponse.json({ error: error.message }, { status: 500 });
   
 }
 
 // GET: Retrieve an exercise by ID or all exercises.
 export async function GET(request: NextRequest) {
-  console.log('get function');
+  //console.log('get function');
   const id = getQueryParam(request, 'id');
 
   try {

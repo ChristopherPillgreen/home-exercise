@@ -9,6 +9,8 @@ import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 export async function getAllExercises(em: EntityManager) {
 
   console.log('getAllExercises');
+  //console.log("Exercises returned by API:", await em.find(Exercise, {}));
+
   try {
     return await em.find(Exercise, {}, {
       populate: ['tagExercise', 'planExercises', 'favoriteExercises'],
@@ -16,6 +18,7 @@ export async function getAllExercises(em: EntityManager) {
   } catch (error) {
     throw new Error(`Error fetching exercises: ${(error as Error).message}`);
   }
+  
 }
 
 // Get a specific exercise by ID

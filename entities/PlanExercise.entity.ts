@@ -25,9 +25,9 @@ export class PlanExercise {
   @Property()
   time!: number;
 
-  @ManyToOne(() => Plan, { primary: true, lazy: true })
+  @ManyToOne(() => Plan, { eager: true })
   plan!: Plan;
 
-  @ManyToOne(() => Exercise, { primary: true, lazy: true })
+  @ManyToOne(() => Exercise, { eager: true })
   exercise!: Exercise;
 }
