@@ -1,73 +1,148 @@
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
+
 import { Plan } from '@entities/Plan.entity';
 import { User } from '@entities/User.entity';
-import { orm } from "mikro-orm.config";
+
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { Exercise } from '@entities/Exercise.entity';
 
-export const createPlan = async (em: EntityManager, userID: number, data: { frequency: number; favorites:boolean}) => {
 
-
+export const createPlan = async (
+  em: EntityManager,
+  userID: number,
+  data: { frequency: number; favorites: boolean }
+) => {
   // Fetch the user to associate with the plan
   const user = await em.findOne(User, { userID });
   if (!user) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 
+  // Exclude planID from the required fields
+  const planData: { frequency: number; favorites: boolean; user: User } = {
+    frequency: data.frequency,
+    favorites: data.favorites,
+    user,
+  };
+
   // Create a new plan associated with the user
-  //console.log(em.getMetadata().get('Plan'));
-  const plan = em.create(Plan, { 
-    frequency: data.frequency, 
-    favorites: data.favorites, 
-    user });
+  const plan = em.create(Plan, planData as any);
   await em.persistAndFlush(plan);
 
   return plan;
 };
 
-export const addExerciseToPlan = async (em: EntityManager, planID: number, exerciseID: number, data: Partial<PlanExercise>) => {
-  //const em = (await orm).em.fork();
-  console.log('Fetching plan and exercise... ');
-  // Fetch the plan and populate exercises if needed
-  const plan = await em.findOne(Plan, { planID }, { populate: ["planExercises.exercise"] });
-  const exercise = await em.findOne(Exercise, { exerciseID });
+export const removeExerciseFromPlan = async (
+  em: EntityManager,
+  planID: number,
+  exerciseID: number
+) => {
+  // Find the PlanExercise entry
+  const planExercise = await em.findOne(PlanExercise, {
+    plan: {planID},
+    exercise: {exerciseID},
+  });
 
+  if (!planExercise) {
+    throw new Error('Exercise not found in the plan');
+  }
+
+  // Remove the PlanExercise entry
+  await em.removeAndFlush(planExercise);
+
+  return { message: 'Exercise removed from the plan successfully' };
+};
+export const addExerciseToPlan = async (
+  em: EntityManager,
+  planID: number,
+  exerciseID: number,
+  data: { sequenceNum?: number; reps?: number; sets?: number; duration?: number; time?: number }
+) => {
+  // Fetch the plan
+  const plan = await em.findOne(Plan, { planID });
   if (!plan) {
-    throw new Error("Plan not found");
-  }
-  if (!exercise) {
-    throw new Error("Exercise not found");
+    throw new Error('Plan not found');
   }
 
-  console.log('Plan:', plan);
-  console.log('Exercise', exercise);
+  // Fetch the exercise
+  const exercise = await em.findOne(Exercise, { exerciseID });
+  if (!exercise) {
+    throw new Error('Exercise not found');
+  }
 
   // Check if the exercise is already in the plan
-  const existing = plan.planExercises.getItems().find((pe) => pe.exercise.exerciseID === exerciseID);
-  if (existing) {
-    throw new Error("Exercise is already added to the plan");
+  const existingExercise = plan.planExercises.getItems().find((pe) => pe.exercise.exerciseID === exerciseID);
+  if (existingExercise) {
+    throw new Error('Exercise is already in the plan');
   }
 
-  console.log('Creating new planexercise..')
-
-  // Create a new PlanExercise instance
+  // Create a new PlanExercise entry
   const planExercise = em.create(PlanExercise, {
+    plan,
+    exercise,
     sequenceNum: data.sequenceNum ?? 1,
     reps: data.reps ?? 10,
     sets: data.sets ?? 3,
-    duration: data.duration ?? 60,
+    duration: data.duration ?? 0,
     time: data.time ?? 0,
-    plan,
-    exercise,
   });
 
-  console.log('planexercise: ', planExercise);
+  // Add the new PlanExercise to the plan's collection
+  plan.planExercises.add(planExercise);
 
-  // Persist and flush the new PlanExercise
+  // Persist the changes
   await em.persistAndFlush(planExercise);
 
   return planExercise;
-}
+};
+
+// export const addExerciseToPlan = async (
+//   em: EntityManager, 
+//   planID: number, 
+//   exerciseID: number, 
+//   data: { sequenceNum?: number; reps?: number; sets?: number; duration?: number; time?: number }) => {
+//   //const em = (await orm).em.fork();
+//   console.log('Fetching plan and exercise... ');
+//   // Fetch the plan and populate exercises if needed
+//   const plan = await em.findOne(Plan, { planID }, { populate: ["planExercises.exercise"] });
+//   const exercise = await em.findOne(Exercise, { exerciseID });
+
+//   if (!plan) {
+//     throw new Error("Plan not found");
+//   }
+//   if (!exercise) {
+//     throw new Error("Exercise not found");
+//   }
+
+//   console.log('Plan:', plan);
+//   console.log('Exercise', exercise);
+
+//   // Check if the exercise is already in the plan
+//   const existing = plan.planExercises.getItems().find((pe) => pe.exercise.exerciseID === exerciseID);
+//   if (existing) {
+//     throw new Error("Exercise is already added to the plan");
+//   }
+
+//   console.log('Creating new planexercise..')
+
+//   // Create a new PlanExercise instance
+//   const planExercise = em.create(PlanExercise, {
+//     sequenceNum: data.sequenceNum ?? 1,
+//     reps: data.reps ?? 10,
+//     sets: data.sets ?? 3,
+//     duration: data.duration ?? 60,
+//     time: data.time ?? 0,
+//     plan,
+//     exercise,
+//   });
+
+//   console.log('planexercise: ', planExercise);
+
+//   // Persist and flush the new PlanExercise
+//   await em.persistAndFlush(planExercise);
+
+//   return planExercise;
+// }
 /**
  * Get all exercises for a specific plan
  */
