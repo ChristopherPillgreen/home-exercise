@@ -18,10 +18,10 @@ export default function ContactPage() {
           </h2>
 
           <p className="text-gray-700 mb-2">
-            <strong>Email:</strong> [Insert Email Address]
+            <strong>Email:</strong> chrisp@southern.edu
           </p>
           <p className="text-gray-700 mb-2">
-            <strong>Phone:</strong> [Insert Phone Number]
+            <strong>Phone:</strong> 123-456-7890
           </p>
         </div>
 
@@ -30,10 +30,10 @@ export default function ContactPage() {
             Business Hours
           </h2>
           <p className="text-gray-700 mb-2">
-            <strong>Monday - Friday:</strong> 9:00 AM - 6:00 PM
+            <strong>Monday - Friday:</strong> 9:00 AM - 4:00 PM
           </p>
           <p className="text-gray-700 mb-2">
-            <strong>Saturday:</strong> 10:00 AM - 4:00 PM
+            <strong>Saturday:</strong> Closed
           </p>
           <p className="text-gray-700 mb-2">
             <strong>Sunday:</strong> Closed
