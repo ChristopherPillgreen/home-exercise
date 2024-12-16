@@ -56,22 +56,8 @@ export default function Planner() {
                 <span onClick={() => setIsEditing(true)}>{plantitle}</span>
               )}
             </Sidebar.Item>
-            <Sidebar.Item
-              href="#"
-              icon={FaRegFolder}
-              label="3"
-              labelColor="dark"
-            >
-              Load Plans
-            </Sidebar.Item>
             <Sidebar.Item href="#" icon={FaPersonRunning}>
-              Add Exercises
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaCommentMedical}>
-              Add Comments
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaBars}>
-              Change Layout
+              Edit Exercises
             </Sidebar.Item>
             <Sidebar.Item href="#" icon={FaQrcode}>
               Save & Export
