@@ -8,6 +8,7 @@ import {
   updatePlan,
   deletePlan,
   addExerciseToPlan,
+  removeExerciseFromPlan
 } from './Plan.service';
 
 console.log('in route for plan');
@@ -67,31 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
-// PUT: Update an existing plan by ID
-// export async function PUT(request: NextRequest) {
-//   const id = getQueryParam(request, 'id');
-  
-//   if (!id) {
-//     return NextResponse.json({ message: 'ID is required for update' }, { status: 400 });
-//   }
 
-//   try {
-//     console.log('in put');
-//     //const orm = await getOrm(); // Initialize Mikro-ORM
-//     const em = (await orm).em.fork();
-
-//     const body = await request.json();
-//     const updatedPlan = await updatePlan(em, Number(id), body);
-
-//     if (!updatedPlan) {
-//       return NextResponse.json({ message: 'Plan not found' }, { status: 404 });
-//     }
-
-//     return NextResponse.json(updatedPlan, { status: 200 });
-//   } catch (error: any) {
-//     return NextResponse.json({ error: error.message }, { status: 500 });
-//   }
-// }
 
 export async function PUT(request: NextRequest) {
   try {
@@ -107,7 +84,7 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-
+    
     // Add exercise to the plan
     const result = await addExerciseToPlan(em, planID, exerciseID, {
       sequenceNum,
@@ -123,17 +100,66 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Delete a plan by ID
-export async function DELETE(request: NextRequest) {
-  const id = getQueryParam(request, 'id');
+// // DELETE: Delete a plan by ID
+// export async function DELETE(request: NextRequest) {
+//   const id = getQueryParam(request, 'id');
 
-  if (!id) {
-    return NextResponse.json({ message: 'ID is required for deletion' }, { status: 400 });
+//   if (!id) {
+//     return NextResponse.json({ message: 'ID is required for deletion' }, { status: 400 });
+//   }
+
+//   try {
+//     //const orm = await getOrm(); // Initialize Mikro-ORM
+//     const em = (await orm).em.fork();
+
+//     const success = await deletePlan(em, Number(id));
+//     if (!success) {
+//       return NextResponse.json({ message: 'Plan not found' }, { status: 404 });
+//     }
+
+//     return NextResponse.json({ message: 'Plan deleted successfully' }, { status: 200 });
+//   } catch (error: any) {
+//     return NextResponse.json({ error: error.message }, { status: 500 });
+//   }
+  
+// }
+
+export async function DELETE(request: NextRequest) {
+  console.log("in delete");
+  const url = new URL(request.url);
+  const path = url.pathname;
+
+  const em = (await orm).em.fork();
+
+  // Handle deleting an exercise from a plan
+  if (path.endsWith('/exercise')) {
+    try {
+      
+      const body = await request.json();
+      const { planID, exerciseID } = body;
+
+      if (!planID || !exerciseID) {
+        return NextResponse.json(
+          { message: 'planID and exerciseID are required' },
+          { status: 400 }
+        );
+      }
+
+      const result = await removeExerciseFromPlan(em, planID, exerciseID);
+      return NextResponse.json(result, { status: 200 });
+    } catch (error: any) {
+      return NextResponse.json({ message: error.message }, { status: 500 });
+    }
   }
 
+  // Handle deleting an entire plan
   try {
-    //const orm = await getOrm(); // Initialize Mikro-ORM
-    const em = (await orm).em.fork();
+    console.log("in DELETE", path);
+    const id = url.searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ message: 'ID is required for deletion' }, { status: 400 });
+    }
 
     const success = await deletePlan(em, Number(id));
     if (!success) {
@@ -142,7 +168,6 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ message: 'Plan deleted successfully' }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ message: error.message }, { status: 500 });
   }
-  
 }
