@@ -1,14 +1,13 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 
-import { Exercise } from './Exercise.entity';
+import { Exercise } from "./Exercise.entity";
 
-
-import { Plan } from './Plan.entity';
+import { Plan } from "./Plan.entity";
 
 @Entity()
 export class PlanExercise {
   @PrimaryKey({ autoincrement: true })
-  id!: number
+  id!: number;
 
   @Property()
   sequenceNum!: number;

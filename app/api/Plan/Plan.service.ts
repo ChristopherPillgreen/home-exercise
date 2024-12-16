@@ -1,11 +1,10 @@
-import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
+import { EntityManager, RequiredEntityData } from "@mikro-orm/core";
 
-import { Plan } from '@entities/Plan.entity';
-import { User } from '@entities/User.entity';
+import { Plan } from "@entities/Plan.entity";
+import { User } from "@entities/User.entity";
 
-import { PlanExercise } from '@entities/PlanExercise.entity';
-import { Exercise } from '@entities/Exercise.entity';
-
+import { PlanExercise } from "@entities/PlanExercise.entity";
+import { Exercise } from "@entities/Exercise.entity";
 
 export const createPlan = async (
   em: EntityManager,
@@ -15,7 +14,7 @@ export const createPlan = async (
   // Fetch the user to associate with the plan
   const user = await em.findOne(User, { userID });
   if (!user) {
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
 
   // Exclude planID from the required fields
@@ -39,41 +38,49 @@ export const removeExerciseFromPlan = async (
 ) => {
   // Find the PlanExercise entry
   const planExercise = await em.findOne(PlanExercise, {
-    plan: {planID},
-    exercise: {exerciseID},
+    plan: { planID },
+    exercise: { exerciseID },
   });
 
   if (!planExercise) {
-    throw new Error('Exercise not found in the plan');
+    throw new Error("Exercise not found in the plan");
   }
 
   // Remove the PlanExercise entry
   await em.removeAndFlush(planExercise);
 
-  return { message: 'Exercise removed from the plan successfully' };
+  return { message: "Exercise removed from the plan successfully" };
 };
 export const addExerciseToPlan = async (
   em: EntityManager,
   planID: number,
   exerciseID: number,
-  data: { sequenceNum?: number; reps?: number; sets?: number; duration?: number; time?: number }
+  data: {
+    sequenceNum?: number;
+    reps?: number;
+    sets?: number;
+    duration?: number;
+    time?: number;
+  }
 ) => {
   // Fetch the plan
   const plan = await em.findOne(Plan, { planID });
   if (!plan) {
-    throw new Error('Plan not found');
+    throw new Error("Plan not found");
   }
 
   // Fetch the exercise
   const exercise = await em.findOne(Exercise, { exerciseID });
   if (!exercise) {
-    throw new Error('Exercise not found');
+    throw new Error("Exercise not found");
   }
 
   // Check if the exercise is already in the plan
-  const existingExercise = plan.planExercises.getItems().find((pe) => pe.exercise.exerciseID === exerciseID);
+  const existingExercise = plan.planExercises
+    .getItems()
+    .find((pe) => pe.exercise.exerciseID === exerciseID);
   if (existingExercise) {
-    throw new Error('Exercise is already in the plan');
+    throw new Error("Exercise is already in the plan");
   }
 
   // Create a new PlanExercise entry
@@ -97,9 +104,9 @@ export const addExerciseToPlan = async (
 };
 
 // export const addExerciseToPlan = async (
-//   em: EntityManager, 
-//   planID: number, 
-//   exerciseID: number, 
+//   em: EntityManager,
+//   planID: number,
+//   exerciseID: number,
 //   data: { sequenceNum?: number; reps?: number; sets?: number; duration?: number; time?: number }) => {
 //   //const em = (await orm).em.fork();
 //   console.log('Fetching plan and exercise... ');
@@ -146,11 +153,18 @@ export const addExerciseToPlan = async (
 /**
  * Get all exercises for a specific plan
  */
-export const getExercisesForPlan = async (em: EntityManager, planID: number) => {
+export const getExercisesForPlan = async (
+  em: EntityManager,
+  planID: number
+) => {
   //const em = (await orm).em.fork();
 
   // Fetch the plan and populate exercises
-  const plan = await em.findOne(Plan, { planID }, { populate: ["planExercises.exercise"] });
+  const plan = await em.findOne(
+    Plan,
+    { planID },
+    { populate: ["planExercises.exercise"] }
+  );
 
   if (!plan) {
     throw new Error("Plan not found");
@@ -165,23 +179,27 @@ export const getPlanById = async (
   planID: number
 ): Promise<Plan | null> => {
   // Fetch plan by ID with populated relationships
-  return await em.findOne(Plan, { planID }, { populate: ['user', 'planExercises'] });
+  return await em.findOne(
+    Plan,
+    { planID },
+    { populate: ["user", "planExercises"] }
+  );
 };
 
 export const getAllPlans = async (em: EntityManager): Promise<Plan[]> => {
   // Fetch all plans with user relationships
-  return await em.find(Plan, {}, { populate: ['user'] });
+  return await em.find(Plan, {}, { populate: ["user"] });
 };
 
 export const updatePlan = async (
   em: EntityManager,
   planID: number,
-  data: Partial<Omit<Plan, 'planID' | 'user'>>
+  data: Partial<Omit<Plan, "planID" | "user">>
 ): Promise<Plan | null> => {
   // Fetch the plan to update
   const plan = await getPlanById(em, planID);
   if (!plan) {
-    throw new Error('Plan not found');
+    throw new Error("Plan not found");
   }
 
   // Update the plan with new data
@@ -190,20 +208,17 @@ export const updatePlan = async (
   return plan;
 };
 
-export const deletePlan = async (em: EntityManager, planID: number) => {
-  const exercises = await em.find(PlanExercise, { id: planID });
-  console.log(`Found ${exercises.length} PlanExercise entries associated with Plan ID: ${planID}`);
-
-  if (exercises.length > 0) {
-    console.log("PlanExercise entries:", exercises);
-    await em.remove(exercises); // Stage deletion
-    await em.flush(); // Ensure deletion is executed immediately
-    console.log(`Deleted all associated PlanExercise entries for Plan ID: ${planID}`);
+export const deletePlan = async (
+  em: EntityManager,
+  planID: number
+): Promise<boolean> => {
+  // Fetch the plan to delete
+  const plan = await getPlanById(em, planID);
+  if (!plan) {
+    throw new Error("Plan not found");
   }
 
-  console.log(`Attempting to delete Plan with ID: ${planID}`);
-  const result = await em.nativeDelete(Plan, { planID });
-  console.log(`Delete result for Plan: ${result}`);
-
-  return result > 0; // Returns true if a plan was deleted
+  // Remove the plan
+  await em.removeAndFlush(plan);
+  return true;
 };
