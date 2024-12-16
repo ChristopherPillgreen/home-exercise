@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -9,6 +10,24 @@ type Exercise = {
   exerciseName: string;
   exerciseDescription: string;
   image: string;
+};
+const handleAddToPlan = async (exerciseID: number) => {
+  try {
+    const response = await fetch("http://localhost:3000/api/plan/addExercise", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ exerciseID, planID: 1 }), // Replace `1` with the actual plan ID
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add exercise to plan");
+    }
+
+    alert("Exercise added to plan!");
+  } catch (err) {
+    console.error("Error adding exercise to plan:", err);
+    alert("Failed to add exercise to plan.");
+  }
 };
 
 export default function Exercises() {
@@ -76,21 +95,23 @@ export default function Exercises() {
   }
 
   return (
-    <div className="flex flex-wrap justify-center gap-4 px-4">
-      <Nav />
-      {exercises.map((exercise) => {
-        return (
-          <ExerciseCard
-            key={exercise.exerciseID}
-            exercise={{
-              exerciseID: exercise.exerciseID,
-              exerciseName: exercise.exerciseName,
-              exerciseDescription: exercise.exerciseDescription,
-              image: exercise.image,
-            }}
-          />
-        );
-      })}
-    </div>
+    <div className="block flex-wrap gap-4 justify-center px-4">
+  <Nav />
+  {exercises.map((exercise) => {
+
+    return (
+      <ExerciseCard
+        key={exercise.exerciseID}
+        exercise={{
+          exerciseID: exercise.exerciseID,
+          exerciseName: exercise.exerciseName,
+          exerciseDescription: exercise.exerciseDescription,
+          image: exercise.image,
+        }}
+        onAdd={() => handleAddToPlan(exercise.exerciseID)}
+      />
+    );
+  })}
+</div>
   );
 }
