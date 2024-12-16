@@ -2,86 +2,77 @@
 
 import React, { useState, useEffect } from "react";
 import { Sidebar } from "flowbite-react";
-import { HiHeart } from "react-icons/hi";
-import { jsPDF } from "jspdf";
-import {
-  FaQrcode,
-  FaCommentMedical,
-  FaPersonRunning,
-  FaBars,
-  FaRegFolder,
-  FaRegBookmark,
-} from "react-icons/fa6";
+
+type Plan = {
+  planID: number;
+  planTitle: string;
+  planDescription: string;
+};
 
 export default function Planner() {
-  const [plantitle, setPlantitle] = useState("Click to change title");
-  const [isEditing, setIsEditing] = useState(false);
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Load saved plantitle from localStorage on component mount
   useEffect(() => {
-    const savedPlantitle = localStorage.getItem("sidebarPlantitle");
-    if (savedPlantitle) {
-      setPlantitle(savedPlantitle);
-    }
+    const fetchPlans = async () => {
+      try {
+        const response = await fetch("http://localhost:3000/api/Plan");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch plans: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Fetched plans data:", data);
+
+        const transformedData = data.map((plan: any) => ({
+          planID: plan.planID || plan.id,
+          planTitle: plan.planTitle || plan.title,
+          planDescription: plan.planDescription || plan.description,
+        }));
+
+        console.log("Transformed plans data:", transformedData);
+        setPlans(transformedData);
+      } catch (err) {
+        console.error("Error fetching plans:", err);
+        setError("Failed to fetch plans.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPlans();
   }, []);
 
-  // Function to handle saving the plantitle to localStorage
-  const savePlantitle = () => {
-    localStorage.setItem("sidebarPlantitle", plantitle);
-    setIsEditing(false);
-  };
+  if (loading) return <div>Loading plans...</div>;
+  if (error) return <div>{error}</div>;
+  if (plans.length === 0) return <div>No plans available.</div>;
 
   return (
     <div className="flex h-screen">
       <Sidebar className="flex items-center">
         <Sidebar.Items>
           <Sidebar.ItemGroup>
-            <Sidebar.Item href="/home">
-              <img
-                src="/logo.png"
-                alt="Logo"
-                style={{ width: "100px", marginRight: "10px" }}
-              />
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaRegBookmark}>
-              {isEditing ? (
-                <input
-                  type="text"
-                  value={plantitle}
-                  onChange={(e) => setPlantitle(e.target.value)}
-                  onBlur={savePlantitle}
-                  autoFocus
-                />
-              ) : (
-                <span onClick={() => setIsEditing(true)}>{plantitle}</span>
-              )}
-            </Sidebar.Item>
-            <Sidebar.Item
-              href="#"
-              icon={FaRegFolder}
-              label="3"
-              labelColor="dark"
-            >
-              Load Plans
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaPersonRunning}>
-              Add Exercises
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaCommentMedical}>
-              Add Comments
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaBars}>
-              Change Layout
-            </Sidebar.Item>
-            <Sidebar.Item href="#" icon={FaQrcode}>
-              Save & Export
-            </Sidebar.Item>
-            <Sidebar.Item href="favoriteplans" icon={HiHeart}>
-              Favorite Plans
-            </Sidebar.Item>
+            <Sidebar.Item href="/home">Home</Sidebar.Item>
           </Sidebar.ItemGroup>
         </Sidebar.Items>
       </Sidebar>
+      <div className="flex-1 p-6">
+        <h1 className="text-3xl font-bold">Your Plans</h1>
+        <ul className="mt-4 space-y-4">
+          {plans.map((plan, index) => (
+            <li key={plan.planID || index} className="p-4 border rounded-lg shadow-md">
+              <h2 className="text-xl font-bold">
+                {plan.planTitle || "No Title Available"}
+              </h2>
+              <p className="text-gray-600">
+                {plan.planDescription || "No Description Available"}
+              </p>
+              <p className="text-sm text-gray-400">Plan ID: {plan.planID || "N/A"}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }

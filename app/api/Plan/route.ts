@@ -125,7 +125,7 @@ export async function PUT(request: NextRequest) {
 // }
 
 export async function DELETE(request: NextRequest) {
-  console.log("in delete");
+ 
   const url = new URL(request.url);
   const path = url.pathname;
 
