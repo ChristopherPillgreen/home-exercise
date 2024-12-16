@@ -25,7 +25,7 @@ export class PlanExercise {
   @Property()
   time!: number;
 
-  @ManyToOne(() => Plan, { eager: true })
+  @ManyToOne(() => Plan, { onDelete: 'cascade' } as any)
   plan!: Plan;
 
   @ManyToOne(() => Exercise, { eager: true })

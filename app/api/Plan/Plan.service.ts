@@ -190,14 +190,20 @@ export const updatePlan = async (
   return plan;
 };
 
-export const deletePlan = async (em: EntityManager, planID: number): Promise<boolean> => {
-  // Fetch the plan to delete
-  const plan = await getPlanById(em, planID);
-  if (!plan) {
-    throw new Error('Plan not found');
+export const deletePlan = async (em: EntityManager, planID: number) => {
+  const exercises = await em.find(PlanExercise, { id: planID });
+  console.log(`Found ${exercises.length} PlanExercise entries associated with Plan ID: ${planID}`);
+
+  if (exercises.length > 0) {
+    console.log("PlanExercise entries:", exercises);
+    await em.remove(exercises); // Stage deletion
+    await em.flush(); // Ensure deletion is executed immediately
+    console.log(`Deleted all associated PlanExercise entries for Plan ID: ${planID}`);
   }
 
-  // Remove the plan
-  await em.removeAndFlush(plan);
-  return true;
+  console.log(`Attempting to delete Plan with ID: ${planID}`);
+  const result = await em.nativeDelete(Plan, { planID });
+  console.log(`Delete result for Plan: ${result}`);
+
+  return result > 0; // Returns true if a plan was deleted
 };
