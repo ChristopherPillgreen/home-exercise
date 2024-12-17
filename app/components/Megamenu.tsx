@@ -13,8 +13,7 @@ export default function Nav() {
         path === "/" ||
           path === "/confirm" ||
           path === "/sign-up" ||
-          path === "/login" ||
-          path === "/planner"
+          path === "/login"
       );
     }
   }, []);
