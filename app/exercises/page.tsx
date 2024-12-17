@@ -95,7 +95,7 @@ export default function Exercises() {
   }
 
   return (
-    <div className="block flex-wrap gap-4 justify-center px-4">
+    <div className="flex flex-wrap gap-4 justify-center px-4">
   <Nav />
   {exercises.map((exercise) => {
 
