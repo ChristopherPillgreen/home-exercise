@@ -64,7 +64,7 @@ export default function GettingStarted() {
           <div className="text-center mt-8">
             <a
               href="/planner"
-              className="inline-block rounded-md px-8 py-3 text-center font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+              className="inline-block rounded-md px-8 py-3 text-center font-medium text-white bg-[#7874AC] hover:bg-[#3C3C3C] hover:text-white"
             >
               Start Creating A Plan
             </a>

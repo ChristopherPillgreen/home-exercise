@@ -1,16 +1,16 @@
 "use client";
-import { Circle } from "react-shapes";
+import { Circle, Polyline, Triangle } from "react-shapes";
 import Link from "next/link";
 
 export default function Home() {
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <div className="relative flex justify-center items-center">
-        <Circle
+      <Circle
           r={window.innerWidth/4}
           fill={{ color: "#7874AC" }} // Translucent black
-          strokeWidth={5}
-        />
+      />
+      </div>
         <div className="absolute flex flex-col items-center">
           <h1 className="text-6xl font-bold text-white mb-8">
             Welcome to Kineticare
@@ -43,6 +43,5 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </div>
   );
 }

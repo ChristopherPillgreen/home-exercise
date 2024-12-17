@@ -17,8 +17,9 @@ export default function Questions() {
               </summary>
               <div className="mt-2 text-gray-600">
                 <p>
-                  This platform helps you create and share exercise routines,
-                  track progress, and save your favorite plans.
+                  This platform helps you create and share exercise routines. Sharing routines has never
+                  been easier with our mobile app that allows you to scan QR codes and import routines directly
+                  into patients phones.
                 </p>
               </div>
             </details>
@@ -27,11 +28,11 @@ export default function Questions() {
           <div className="border-b pb-4">
             <details className="group">
               <summary className="cursor-pointer text-xl font-semibold text-gray-700">
-                How do I save my favorite plans?
+                How do I save my plans?
               </summary>
               <div className="mt-2 text-gray-600">
                 <p>
-                  You can save your favorite plans by clicking the heart icon
+                  You can save your plans by clicking the save icon
                   next to each plan.
                 </p>
               </div>
@@ -45,8 +46,9 @@ export default function Questions() {
               </summary>
               <div className="mt-2 text-gray-600">
                 <p>
-                  Yes! You can export your plans to a PDF or CSV format by
-                  clicking the "Save and Export" button in the sidebar.
+                  Yes! You can export your plans to a PDF by
+                  clicking the "Save and Export" button in the sidebar. You can also send your plans
+                  to our mobile app by generating a QR code and scanning it with your mobile device's camera app.
                 </p>
               </div>
             </details>
