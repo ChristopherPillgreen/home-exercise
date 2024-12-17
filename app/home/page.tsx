@@ -7,9 +7,8 @@ export default function Home() {
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <div className="relative flex justify-center items-center">
         <Circle
-          r={500}
-          fill={{ color: "rgba(0, 0, 0, 0.5)" }} // Translucent black
-          stroke={{ color: "#7874AC" }}
+          r={window.innerWidth/4}
+          fill={{ color: "#7874AC" }} // Translucent black
           strokeWidth={5}
         />
         <div className="absolute flex flex-col items-center">
@@ -19,25 +18,25 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-6">
             <Link
               href="/start"
-              className="block py-5 px-10 bg-[#7874AC] text-white text-2xl font-semibold rounded-lg hover:bg-[#6b6a8f] transition duration-300"
+              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Getting Started
             </Link>
             <Link
               href="/questions"
-              className="flex justify-center items-center py-5 px-10 bg-[#7874AC] text-white text-2xl font-semibold rounded-lg hover:bg-[#6b6a8f] transition duration-300"
+              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Questions
             </Link>
             <Link
               href="/about"
-              className="flex justify-center items-center py-5 px-10 bg-[#7874AC] text-white text-2xl font-semibold rounded-lg hover:bg-[#6b6a8f] transition duration-300"
+              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="flex justify-center items-center py-5 px-10 bg-[#7874AC] text-white text-2xl font-semibold rounded-lg hover:bg-[#6b6a8f] transition duration-300"
+              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Contact Us
             </Link>
