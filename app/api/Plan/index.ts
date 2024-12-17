@@ -7,6 +7,7 @@ import {
   getAllPlans,
   getExercisesForPlan,
 } from './Plan.service';
+import { PlanExercise } from '@entities/PlanExercise.entity';
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -52,21 +53,35 @@ export async function POST(request: NextRequest) {
 
 // PUT: Add exercise to a plan
 export async function PUT(request: NextRequest) {
-//     console.log("put handler is triggered");
-//   const em = (await orm).em.fork();
-//   const body = await request.json();
+    console.log("put handler is triggered");
+  const em = (await orm).em.fork();
+  const body = await request.json();
 
-//     console.log("body", body);
-//   const { planID, exerciseID, ...data } = body;
+    console.log("body", body);
+  const { planID, exerciseID, ...data } = body;
 
-//   try {
-//     const updatedPlanExercise = await addExerciseToPlan(em, planID, exerciseID, data);
-//     return NextResponse.json(updatedPlanExercise, { status: 200 });
-//   } catch (error: any) {
-//     return NextResponse.json({ error: error.message }, { status: 500 });
-//   }
-console.log('Simple PUT handler');
-  return NextResponse.json({ message: 'Test success' }, { status: 200 });
+  // try {
+  //   const updatedPlanExercise = await addExerciseToPlan(em, planID, exerciseID, data);
+  //   return NextResponse.json(updatedPlanExercise, { status: 200 });
+  // } catch (error: any) {
+  //   return NextResponse.json({ error: error.message }, { status: 500 });
+  // }
+  if (!planID || !exerciseID) {
+    return NextResponse.json(
+      { message: 'Both planID and exerciseID are required' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Call the service function to add the exercise to the plan
+    const updatedPlanExercise = await addExerciseToPlan(em, Number(planID), Number(exerciseID), data);
+
+    // Respond with the updated plan
+    return NextResponse.json(updatedPlanExercise, { status: 200 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
 }
 
