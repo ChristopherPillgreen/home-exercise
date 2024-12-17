@@ -7,7 +7,7 @@ export default function Home() {
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 relative">
       <div className="relative flex justify-center items-center">
         <Circle
-          r={window.innerWidth/4}
+          r={window.innerWidth / 4}
           fill={{ color: "#7874AC" }} // Translucent black
           strokeWidth={5}
         />

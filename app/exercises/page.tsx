@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,13 +10,17 @@ type Exercise = {
   exerciseDescription: string;
   image: string;
 };
-const handleAddToPlan = async (exerciseID: number) => {
+
+const handleAddToPlan = async (exerciseID: number, planID: number) => {
   try {
-    const response = await fetch("http://localhost:3000/api/plan/addExercise", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ exerciseID, planID: 1 }), // Replace `1` with the actual plan ID
-    });
+    const response = await fetch(
+      "http://localhost:3000/api/planexercise/addExerciseToPlan",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ exerciseID, planID }),
+      }
+    );
 
     if (!response.ok) {
       throw new Error("Failed to add exercise to plan");
@@ -34,6 +37,9 @@ export default function Exercises() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Assuming planID is passed in from parent or set dynamically
+  const planID = 1; // Replace with actual planID from your context or props
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -95,23 +101,22 @@ export default function Exercises() {
   }
 
   return (
-    <div className="flex flex-wrap gap-4 justify-center px-4">
-  <Nav />
-  {exercises.map((exercise) => {
-
-    return (
-      <ExerciseCard
-        key={exercise.exerciseID}
-        exercise={{
-          exerciseID: exercise.exerciseID,
-          exerciseName: exercise.exerciseName,
-          exerciseDescription: exercise.exerciseDescription,
-          image: exercise.image,
-        }}
-        onAdd={() => handleAddToPlan(exercise.exerciseID)}
-      />
-    );
-  })}
-</div>
+    <div className="flex flex-wrap gap-4 px-4">
+      <Nav />
+      {exercises.map((exercise) => {
+        return (
+          <ExerciseCard
+            key={exercise.exerciseID}
+            exercise={{
+              exerciseID: exercise.exerciseID,
+              exerciseName: exercise.exerciseName,
+              exerciseDescription: exercise.exerciseDescription,
+              image: exercise.image,
+            }}
+            onAdd={() => handleAddToPlan(exercise.exerciseID, planID)} // Pass planID dynamically
+          />
+        );
+      })}
+    </div>
   );
 }

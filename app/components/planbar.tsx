@@ -3,17 +3,30 @@
 import { useState } from "react";
 import { Sidebar } from "flowbite-react";
 import { HiHeart, HiArrowCircleDown, HiOutlinePencil } from "react-icons/hi";
+import { ExerciseCard } from "./ExerciseCard";
 
-export default function PlanBar() {
-  const [planName, setPlanName] = useState("Name Your Plan Here"); // Default value
+type Exercise = {
+  exerciseID: number;
+  exerciseName: string;
+  exerciseDescription: string;
+  image: string;
+  onAdd: (exerciseID: number) => void;
+};
+
+type PlanBarProps = {
+  exercises: Exercise[];
+};
+
+export default function PlanBar({ exercises }: PlanBarProps) {
+  const [planName, setPlanName] = useState("Name Your Plan Here");
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setPlanName(event.target.value); // Update plan name as user types
+    setPlanName(event.target.value);
   };
 
   return (
-    <div>
-      <Sidebar className="h-lvh" aria-label="Default sidebar example">
+    <div className="flex">
+      <Sidebar className="h-screen" aria-label="Plan Sidebar">
         <Sidebar.Items>
           <Sidebar.ItemGroup>
             <Sidebar.Item icon={HiOutlinePencil}>
@@ -35,6 +48,20 @@ export default function PlanBar() {
           </Sidebar.ItemGroup>
         </Sidebar.Items>
       </Sidebar>
+
+      <div className="flex flex-wrap gap-4 p-4">
+        {exercises.length === 0 ? (
+          <div>No exercises found.</div>
+        ) : (
+          exercises.map((exercise) => (
+            <ExerciseCard
+              key={exercise.exerciseID}
+              exercise={exercise}
+              onAdd={() => exercise.onAdd(exercise.exerciseID)}
+            />
+          ))
+        )}
+      </div>
     </div>
   );
 }
