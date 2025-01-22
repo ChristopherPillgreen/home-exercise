@@ -29,7 +29,7 @@ services:
                 - mysql
 
     phpmyadmin:
-        image: phpmyadmin:5.2.0
+        image: phpmyadmin:latest
         container_name: phpmyadmin
         links:
             - mysql
