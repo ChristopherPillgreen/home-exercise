@@ -8,6 +8,7 @@ type Exercise = {
   exerciseName: string;
   exerciseDescription: string;
   image: string;
+  onAdd: (exerciseID: number) => void;
 };
 
 export default function Planner() {
