@@ -24,9 +24,9 @@ function getQueryParam(request: NextRequest, param: string): string | null {
 }
 
 // Helper: Handle errors
-function handleErrorResponse(error: any) {
+function handleErrorResponse(error: unknown) {
   //console.log('in route in handleErrorResponse');
-  return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ error, status: 500 });
   
 }
 
@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
       const exercises = await getAllExercises(em);
       return NextResponse.json(exercises, { status: 200 });
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleErrorResponse(error);
   }
 }
@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     const body: ExerciseData = await request.json();
     const newExercise = await createExercise(em, body);
     return NextResponse.json(newExercise, { status: 201 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleErrorResponse(error);
   }
 }
@@ -90,7 +90,7 @@ export async function PUT(request: NextRequest) {
     const body: Partial<ExerciseData> = await request.json();
     const updatedExercise = await updateExercise(em, Number(id), body);
     return NextResponse.json(updatedExercise, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleErrorResponse(error);
   }
 }
@@ -113,7 +113,7 @@ export async function DELETE(request: NextRequest) {
 
     const deleteMessage = await deleteExercise(em, Number(id));
     return NextResponse.json(deleteMessage, { status: 200 });
-  } catch (error: any) {
+  } catch (error: unknown) {
     return handleErrorResponse(error);
   }
 }

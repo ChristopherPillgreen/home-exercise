@@ -1,8 +1,5 @@
-import { EntityManager,MikroORM } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/core';
 import { Exercise } from '@entities/Exercise.entity';
-import { TagExercises } from '@entities/TagExercise.entity';
-import { PlanExercise } from '@entities/PlanExercise.entity';
-import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 
 // Get all exercises
 

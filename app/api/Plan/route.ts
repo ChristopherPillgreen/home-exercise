@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-//import { getOrm } from '../../../mikro-orm.config';
+
 import { orm } from 'mikro-orm.config';
 import {
   getPlanById,
   getAllPlans,
   createPlan,
-  updatePlan,
   deletePlan,
   addExerciseToPlan,
   removeExerciseFromPlan
@@ -37,8 +36,8 @@ export async function GET(request: NextRequest) {
       const plans = await getAllPlans(em);
       return NextResponse.json(plans, { status: 200 });
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -63,9 +62,9 @@ export async function POST(request: NextRequest) {
     const newPlan = await createPlan(em, userID, { frequency, favorites });
     return NextResponse.json(newPlan, { status: 201 });
 
-  } catch (error: any) {
-    console.error('Error in POST /api/Plan:', error.message);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error('Error in POST /api/Plan:', error);
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -95,8 +94,8 @@ export async function PUT(request: NextRequest) {
     });
 
     return NextResponse.json(result, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -147,8 +146,8 @@ export async function DELETE(request: NextRequest) {
 
       const result = await removeExerciseFromPlan(em, planID, exerciseID);
       return NextResponse.json(result, { status: 200 });
-    } catch (error: any) {
-      return NextResponse.json({ message: error.message }, { status: 500 });
+    } catch (error) {
+      return NextResponse.json({ error }, { status: 500 });
     }
   }
 
@@ -167,7 +166,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Plan deleted successfully' }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ message: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }

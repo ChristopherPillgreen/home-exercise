@@ -7,7 +7,7 @@ import {
   getAllPlans,
   getExercisesForPlan,
 } from './Plan.service';
-import { PlanExercise } from '@entities/PlanExercise.entity';
+
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -31,8 +31,8 @@ export async function GET(request: NextRequest) {
       const plans = await getAllPlans(em);
       return NextResponse.json(plans, { status: 200 });
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
   try {
     const newPlan = await createPlan(em, userID, data);
     return NextResponse.json(newPlan, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -60,12 +60,6 @@ export async function PUT(request: NextRequest) {
     console.log("body", body);
   const { planID, exerciseID, ...data } = body;
 
-  // try {
-  //   const updatedPlanExercise = await addExerciseToPlan(em, planID, exerciseID, data);
-  //   return NextResponse.json(updatedPlanExercise, { status: 200 });
-  // } catch (error: any) {
-  //   return NextResponse.json({ error: error.message }, { status: 500 });
-  // }
   if (!planID || !exerciseID) {
     return NextResponse.json(
       { message: 'Both planID and exerciseID are required' },
@@ -79,8 +73,8 @@ export async function PUT(request: NextRequest) {
 
     // Respond with the updated plan
     return NextResponse.json(updatedPlanExercise, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 
 }
@@ -97,7 +91,7 @@ export async function GET_EXERCISES(request: NextRequest) {
   try {
     const exercises = await getExercisesForPlan(em, Number(planID));
     return NextResponse.json(exercises, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }

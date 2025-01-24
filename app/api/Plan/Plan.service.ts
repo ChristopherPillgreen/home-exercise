@@ -1,4 +1,4 @@
-import { EntityManager, RequiredEntityData } from "@mikro-orm/core";
+import { EntityManager} from "@mikro-orm/core";
 
 import { Plan } from "@entities/Plan.entity";
 import { User } from "@entities/User.entity";

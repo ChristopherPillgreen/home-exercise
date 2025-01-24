@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Tag } from '@entities/Tag.entity';
-import { Exercise } from '@entities/Exercise.entity';
+//import { Exercise } from '@entities/Exercise.entity';
 
 // Fetch all tags, with optional associated exercises
 export const getAllTags = async (em: EntityManager, withExercises: boolean = false): Promise<Tag[]> => {

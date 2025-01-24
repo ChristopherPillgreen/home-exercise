@@ -25,8 +25,8 @@ export async function GET(request: NextRequest) {
 
     const exercises = await getPlanExercises(em, Number(planID));
     return NextResponse.json(exercises, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -44,8 +44,8 @@ export async function POST(request: NextRequest) {
 
     const newPlanExercise = await addExerciseToPlan(em, Number(planID), Number(exerciseID), exerciseData);
     return NextResponse.json(newPlanExercise, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -64,8 +64,8 @@ export async function PUT(request: NextRequest) {
 
     const updatedPlanExercise = await updatePlanExercise(em, Number(planID), Number(exerciseID), body);
     return NextResponse.json(updatedPlanExercise, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -87,7 +87,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Exercise removed from plan successfully' }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error  }, { status: 500 });
   }
 }

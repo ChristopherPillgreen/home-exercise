@@ -24,8 +24,8 @@ export async function GET(request: NextRequest) {
       const tags = await getAllTags(em, withExercises);
       return NextResponse.json(tags, { status: 200 });
     }
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error  }, { status: 500 });
   }
 }
 
@@ -38,8 +38,8 @@ export async function POST(request: NextRequest) {
     const tag = await createTag(em, body.tagName);
 
     return NextResponse.json(tag, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -55,8 +55,8 @@ export async function PUT(request: NextRequest) {
     const tag = await updateTag(em, Number(id), body.tagName);
 
     return NextResponse.json(tag, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
 
@@ -72,7 +72,7 @@ export async function DELETE(request: NextRequest) {
     if (!success) return NextResponse.json({ message: 'Tag not found' }, { status: 404 });
 
     return NextResponse.json({ message: 'Tag deleted successfully' }, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error ) {
+    return NextResponse.json({ error  }, { status: 500 });
   }
 }
