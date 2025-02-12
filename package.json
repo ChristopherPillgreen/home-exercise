@@ -1,30 +1,33 @@
 {
-  "name": "home-exercise",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
   "dependencies": {
-    "@libsql/client": "^0.8.0",
-    "dotenv": "^16.4.5",
-    "drizzle-orm": "^0.32.1",
-    "flowbite": "^2.4.1",
-    "flowbite-react": "^0.10.1",
-    "next": "14.2.5",
-    "react": "^18",
-    "react-dom": "^18"
+    "@mikro-orm/cli": "^6.4.4",
+    "@mikro-orm/core": "^6.4.4",
+    "@mikro-orm/mysql": "^6.4.4",
+    "@mikro-orm/reflection": "^6.4.5",
+    "flowbite-react": "^0.10.2",
+    "next": "^15.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "drizzle-kit": "^0.23.1",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "@types/express": "^5.0.0",
+    "@types/next": "^8.0.7",
+    "@types/node": "^22.9.0",
+    "@types/react": "^18.3.12",
+    "typescript": "5.6.3"
+  },
+  "mikro-orm": {
+    "useTsNode": true,
+    "configPaths": [
+      "./mikro-orm.config.ts"
+    ]
+  },
+  "scripts": {
+    "db-update": "mikro-orm schema:update --run",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   }
 }
