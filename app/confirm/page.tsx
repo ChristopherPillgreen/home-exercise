@@ -20,7 +20,7 @@ export default function Confirm() {
         </p>
         <div className="flex justify-center space-x-4">
           <a
-            href="/login"
+            href="/home"
             className="inline-block text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-all duration-300"
             style={{ backgroundColor: "#7076af" }}
           >

@@ -5,7 +5,7 @@ import { ExerciseCard } from "../components/ExerciseCard";
 import Nav from "../components/Sidebar";
 
 type Exercise = {
-  exerciseID: number; // Matches your backend entity
+  exerciseID: number;
   exerciseName: string;
   exerciseDescription: string;
   image: string;
@@ -110,7 +110,7 @@ export default function Exercises() {
             exercise={{
               exerciseID: exercise.exerciseID,
               exerciseName: exercise.exerciseName,
-              exerciseDescription: exercise.exerciseDescription,
+              exerciseDescription: '',
               image: exercise.image,
             }}
             onAdd={() => handleAddToPlan(exercise.exerciseID, planID)} // Pass planID dynamically
