@@ -11,28 +11,6 @@ type Exercise = {
   image: string;
 };
 
-const handleAddToPlan = async (exerciseID: number, planID: number) => {
-  try {
-    const response = await fetch(
-      "http://localhost:3000/api/planexercise/addExerciseToPlan",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exerciseID, planID }),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to add exercise to plan");
-    }
-
-    alert("Exercise added to plan!");
-  } catch (err) {
-    console.error("Error adding exercise to plan:", err);
-    alert("Failed to add exercise to plan.");
-  }
-};
-
 export default function Exercises() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,7 +91,6 @@ export default function Exercises() {
               exerciseDescription: '',
               image: exercise.image,
             }}
-            onAdd={() => handleAddToPlan(exercise.exerciseID, planID)} // Pass planID dynamically
           />
         );
       })}
