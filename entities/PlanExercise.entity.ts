@@ -1,32 +1,38 @@
 import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 
 import { Exercise } from "./Exercise.entity";
-
+import type { Rel } from "@mikro-orm/core"
 import { Plan } from "./Plan.entity";
 
-@Entity()
+@Entity({ tableName: 'plan_exercise'})
 export class PlanExercise {
-  @PrimaryKey({ autoincrement: true })
+
+  static entityName = 'plan_exercise';
+  @PrimaryKey({ type: "int", autoincrement: true })
   id!: number;
 
-  @Property()
+  @Property({type: "int" })
   sequenceNum!: number;
 
-  @Property()
+  @Property({type: "int"})
   reps!: number;
 
-  @Property()
+  @Property({type: "int"})
   sets!: number;
 
-  @Property()
+  @Property({type: "int"})
   duration!: number;
 
-  @Property()
+  @Property({type: "int"})
   time!: number;
 
-  @ManyToOne(() => Plan, { onDelete: 'cascade' } as any)
-  plan!: Plan;
+  @Property({type: "string"})
+  description?: string;
 
-  @ManyToOne(() => Exercise, { eager: true })
-  exercise!: Exercise;
+  @ManyToOne({ entity: () => Plan, deleteRule: "cascade" })
+  plan!: Rel<Plan>;
+
+  @ManyToOne({ entity: () => Exercise, eager: true })
+  exercise!: Rel<Exercise>;
 }
+

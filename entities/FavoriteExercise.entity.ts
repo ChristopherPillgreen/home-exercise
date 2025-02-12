@@ -1,15 +1,18 @@
 import { Entity, ManyToOne, PrimaryKey } from '@mikro-orm/core';
+import type { Rel } from "@mikro-orm/core"
 import { User } from './User.entity';
 import { Exercise } from './Exercise.entity';
 
-@Entity()
+@Entity({ tableName: 'favorite_exercise'})
 export class FavoriteExercise {
-  @PrimaryKey({ autoincrement: true })
+  static entityName = 'favorite_exercise';
+  @PrimaryKey({ type: "int", autoincrement: true })
   id!: number
 
   @ManyToOne(() => User, { primary: true, lazy: true })
-  user!: User;
+  user!: Rel<User>;
 
   @ManyToOne(() => Exercise, { primary: true, lazy: true })
-  exercise!: Exercise;
+  exercise!: Rel<Exercise>;
 }
+

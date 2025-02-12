@@ -1,5 +1,5 @@
 import { loginUser } from "./login.service"; // Adjust the import path if needed
-import { orm } from "mikro-orm.config";
+import { getOrm } from "mikro-orm.config";
 import { NextRequest, NextResponse } from "next/server";
 
 function handleErrorResponse(error: any) {
@@ -13,7 +13,7 @@ function handleErrorResponse(error: any) {
 // POST: Login a user
 export async function POST(request: NextRequest) {
   try {
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
     const {
       userEmail,
       userPassword,

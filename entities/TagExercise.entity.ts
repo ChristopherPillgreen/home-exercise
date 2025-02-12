@@ -1,14 +1,17 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne } from '@mikro-orm/core';
 import { Exercise } from './Exercise.entity';
 import { Tag } from './Tag.entity';
+import type { Rel } from "@mikro-orm/core"
 
-@Entity()
+@Entity({ tableName: 'tag_exercises'})
 export class TagExercises {
-    @ManyToOne({ entity: 'Exercise', primary: true, lazy: true })
-    exercise!: Exercise;
-    
-    @ManyToOne({ entity: 'Tag', primary: true, lazy: true })
-    tag!: Tag;
-    
+
+    static entityName = 'tag_exercises';
+    @ManyToOne(() => Exercise, { primary: true, lazy: true })
+    exercise!: Rel<Exercise>;
+
+    @ManyToOne(() => Tag, { primary: true, lazy: true })
+    tag!: Rel<Tag>;
+
 }
 

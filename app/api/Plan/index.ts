@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { orm } from 'mikro-orm.config';
+import { getOrm } from 'mikro-orm.config';
 import {
   createPlan,
   addExerciseToPlan,
@@ -17,7 +17,7 @@ function getQueryParam(request: NextRequest, param: string): string | null {
 
 // GET: Fetch a plan by ID or all plans
 export async function GET(request: NextRequest) {
-  const em = (await orm).em.fork();
+  const em = (await getOrm()).em.fork()
   const id = getQueryParam(request, 'id');
 
   try {
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 
 // POST: Create a new plan
 export async function POST(request: NextRequest) {
-  const em = (await orm).em.fork();
+  const em = (await getOrm()).em.fork()
   const body = await request.json();
 
   const { userID, ...data } = body;
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 // PUT: Add exercise to a plan
 export async function PUT(request: NextRequest) {
     console.log("put handler is triggered");
-  const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
   const body = await request.json();
 
     console.log("body", body);
@@ -87,7 +87,7 @@ export async function PUT(request: NextRequest) {
 
 // GET: Fetch exercises for a specific plan
 export async function GET_EXERCISES(request: NextRequest) {
-  const em = (await orm).em.fork();
+  const em = (await getOrm()).em.fork()
   const planID = getQueryParam(request, 'planID');
 
   if (!planID) {

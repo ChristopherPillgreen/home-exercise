@@ -1,5 +1,6 @@
 import { EntityManager, RequiredEntityData } from "@mikro-orm/core";
 import { User } from "@entities/User.entity";
+import internal from "stream";
 
 export const createUser = async (
   em: EntityManager,
@@ -8,6 +9,7 @@ export const createUser = async (
     userLastName: string;
     userEmail: string;
     userPassword: string;
+    //plans: []
   }
 ): Promise<User> => {
   const user = em.create(User, data); // Create a new user entity

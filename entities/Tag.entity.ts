@@ -1,11 +1,12 @@
 import { Entity, OneToMany, PrimaryKey, Property, Collection } from '@mikro-orm/core';
 import { TagExercises } from './TagExercise.entity'
-@Entity()
+@Entity({ tableName: 'tag'})
 export class Tag {
-  @PrimaryKey({autoincrement: true})
+  static entityName = 'tag';
+  @PrimaryKey({type: "int", autoincrement: true})
   tag?: number;
 
-  @Property()
+  @Property({type: "string"})
   tagName!: string;
 
   @OneToMany(() => TagExercises, tagExercises => tagExercises.tag)

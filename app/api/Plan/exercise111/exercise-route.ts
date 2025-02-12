@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { orm } from 'mikro-orm.config';
+import { getOrm } from 'mikro-orm.config';
 import { removeExerciseFromPlan } from '../Plan.service';
 
 export async function DELETE(request: NextRequest) {
   try {
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
     const body = await request.json();
     const { planID, exerciseID } = body;
 

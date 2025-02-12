@@ -1,5 +1,5 @@
 //import { getOrm } from '../../../mikro-orm.config';
-import { orm } from "mikro-orm.config";
+import { getOrm } from "mikro-orm.config";
 import { NextRequest, NextResponse } from "next/server";
 import {
   getUserById,
@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
 
   try {
     //const orm = await getOrm(); // Retrieve the MikroORM instance
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
 
     console.log("EntityManager:", em);
     console.log("Fetching users with id:", id);
@@ -67,7 +67,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   console.log("post");
   try {
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
 
     const body: UserData = await request.json();
     const newUser = await createUser(em, {
@@ -95,7 +95,7 @@ export async function PUT(request: NextRequest) {
   }
 
   try {
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
 
     const body: Partial<UserData> = await request.json();
     const updatedUser = await updateUser(em, Number(id), body);
@@ -118,7 +118,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const em = (await orm).em.fork();
+    const em = (await getOrm()).em.fork()
 
     const deleteMessage = await deleteUser(em, Number(id));
     return NextResponse.json(deleteMessage, { status: 200 });
