@@ -19,7 +19,7 @@ export default function EditPlanPage() {
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const response = await fetch(`/api/PlanExercises?planID=${planID}`);
+        const response = await fetch(`/api/planexercise?planID=${planID}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -46,7 +46,7 @@ export default function EditPlanPage() {
       <h1 className="text-2xl font-bold mb-4">Exercises for Plan {planID}</h1>
 
       <button
-        onClick={() => router.push(`/plans/${planID}/exercises/`)}
+        onClick={() => router.push(`/plans/${planID}/exercises`)} // Updated to go to /plans/[planID]/exercises
         className="bg-green-500 text-white py-2 px-4 rounded mb-4"
       >
         Add Exercises

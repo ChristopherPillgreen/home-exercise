@@ -60,7 +60,7 @@ export default function PlansPage() {
       }
 
       const data = await response.json();
-      router.push(`/plans/edit/${data.planID}`);
+      router.push(`/plans/${data.planID}`);
     } catch (error) {
       console.error("Error creating plan:", error);
       setError("Failed to create plan.");
@@ -86,7 +86,7 @@ export default function PlansPage() {
           <div
             key={plan.planID}
             className="border p-4 rounded shadow cursor-pointer hover:bg-gray-100 transition"
-            onClick={() => router.push(`/plans/edit/${plan.planID}`)}
+            onClick={() => router.push(`/plans/${plan.planID}`)}
           >
             <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
             <p className="text-gray-600">{plan.planDescription}</p>

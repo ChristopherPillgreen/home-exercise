@@ -1,9 +1,11 @@
-"use client";
+"use client"; // Make sure it's client-side rendered
 
 import { useEffect, useState } from "react";
 import { Button, MegaMenu, Navbar } from "flowbite-react";
+import { signIn, signOut, useSession } from "next-auth/react"; // Import the signIn, signOut, and useSession functions from next-auth
 
 export default function Nav() {
+  const { data: session } = useSession(); // Get the user's session status
   const [isHiddenPage, setIsHiddenPage] = useState(true);
 
   useEffect(() => {
@@ -22,6 +24,14 @@ export default function Nav() {
     return null;
   }
 
+  const handleGoogleSignIn = () => {
+    signIn("google"); // Redirects the user to Google login
+  };
+
+  const handleLogout = () => {
+    signOut(); // Signs out the user
+  };
+
   return (
     <MegaMenu>
       <div className="mx-auto flex max-w-screen-xl flex-wrap items-center justify-between p-4 md:space-x-8">
@@ -29,10 +39,15 @@ export default function Nav() {
           <img alt="" src="logo.png" className="h-16 w-auto" />
         </Navbar.Brand>
         <div className="order-2 hidden items-center md:flex">
-          
-          <Button href="/login" style={{ backgroundColor: "#af7076" }}>
-            Sign in with Google
-          </Button>
+          {session ? (
+            <Button onClick={handleLogout} style={{ backgroundColor: "#af7076" }}>
+              Logout
+            </Button>
+          ) : (
+            <Button onClick={handleGoogleSignIn} style={{ backgroundColor: "#af7076" }}>
+              Sign in with Google
+            </Button>
+          )}
         </div>
         <Navbar.Collapse>
           <Navbar.Link href="/plans">Plans</Navbar.Link>
