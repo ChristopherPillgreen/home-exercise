@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExerciseCard } from "../components/ExerciseCard";
-import Nav from "../components/Sidebar";
+import { ExerciseCard } from "../../../components/ExerciseCard";
+import Nav from "../../../components/Sidebar";
 
 type Exercise = {
   exerciseID: number;

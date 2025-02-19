@@ -36,6 +36,9 @@ export class Plan {
   @Property({ type: 'boolean' })
   favorites!: boolean;
 
+  @Property({ type: 'string' })
+  planName!: string;
+
   @ManyToOne(() => User, { nullable: false })
   user?: Rel<User>;
 

@@ -35,7 +35,7 @@ export default function Nav() {
           </Button>
         </div>
         <Navbar.Collapse>
-          <Navbar.Link href="/exercises">Exercises</Navbar.Link>
+          <Navbar.Link href="/plans">Plans</Navbar.Link>
           <Navbar.Link href="/about">About</Navbar.Link>
           <Navbar.Link href="/planner">Planner</Navbar.Link>
         </Navbar.Collapse>

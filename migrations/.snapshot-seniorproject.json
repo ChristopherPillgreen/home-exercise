@@ -1,0 +1,608 @@
+{
+  "namespaces": [],
+  "tables": [
+    {
+      "columns": {
+        "exercise_id": {
+          "name": "exercise_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "exercise_name": {
+          "name": "exercise_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "exercise_description": {
+          "name": "exercise_description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "image": {
+          "name": "image",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "exercise",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "exercise_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "tag": {
+          "name": "tag",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "tag_name": {
+          "name": "tag_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "tag",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "tag"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "exercise_exercise_id": {
+          "name": "exercise_exercise_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "tag_tag": {
+          "name": "tag_tag",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "tag_exercises",
+      "indexes": [
+        {
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "composite": false,
+          "keyName": "tag_exercises_exercise_exercise_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tag_tag"
+          ],
+          "composite": false,
+          "keyName": "tag_exercises_tag_tag_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "exercise_exercise_id",
+            "tag_tag"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "tag_exercises_exercise_exercise_id_foreign": {
+          "constraintName": "tag_exercises_exercise_exercise_id_foreign",
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "localTableName": "tag_exercises",
+          "referencedColumnNames": [
+            "exercise_id"
+          ],
+          "referencedTableName": "exercise",
+          "updateRule": "cascade"
+        },
+        "tag_exercises_tag_tag_foreign": {
+          "constraintName": "tag_exercises_tag_tag_foreign",
+          "columnNames": [
+            "tag_tag"
+          ],
+          "localTableName": "tag_exercises",
+          "referencedColumnNames": [
+            "tag"
+          ],
+          "referencedTableName": "tag",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "user_first_name": {
+          "name": "user_first_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_last_name": {
+          "name": "user_last_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_email": {
+          "name": "user_email",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_password": {
+          "name": "user_password",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        }
+      },
+      "name": "user",
+      "indexes": [
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "user_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "plan_id": {
+          "name": "plan_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "frequency": {
+          "name": "frequency",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "favorites": {
+          "name": "favorites",
+          "type": "tinyint(1)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1,
+          "mappedType": "boolean"
+        },
+        "plan_name": {
+          "name": "plan_name",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "user_user_id": {
+          "name": "user_user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "plan",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_user_id"
+          ],
+          "composite": false,
+          "keyName": "plan_user_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "plan_id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "plan_user_user_id_foreign": {
+          "constraintName": "plan_user_user_id_foreign",
+          "columnNames": [
+            "user_user_id"
+          ],
+          "localTableName": "plan",
+          "referencedColumnNames": [
+            "user_id"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "sequence_num": {
+          "name": "sequence_num",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "reps": {
+          "name": "reps",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "sets": {
+          "name": "sets",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "duration": {
+          "name": "duration",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "time": {
+          "name": "time",
+          "type": "int",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 255,
+          "mappedType": "string"
+        },
+        "plan_plan_id": {
+          "name": "plan_plan_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "exercise_exercise_id": {
+          "name": "exercise_exercise_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "plan_exercise",
+      "indexes": [
+        {
+          "columnNames": [
+            "plan_plan_id"
+          ],
+          "composite": false,
+          "keyName": "plan_exercise_plan_plan_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "composite": false,
+          "keyName": "plan_exercise_exercise_exercise_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "plan_exercise_plan_plan_id_foreign": {
+          "constraintName": "plan_exercise_plan_plan_id_foreign",
+          "columnNames": [
+            "plan_plan_id"
+          ],
+          "localTableName": "plan_exercise",
+          "referencedColumnNames": [
+            "plan_id"
+          ],
+          "referencedTableName": "plan",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "plan_exercise_exercise_exercise_id_foreign": {
+          "constraintName": "plan_exercise_exercise_exercise_id_foreign",
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "localTableName": "plan_exercise",
+          "referencedColumnNames": [
+            "exercise_id"
+          ],
+          "referencedTableName": "exercise",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "user_user_id": {
+          "name": "user_user_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "exercise_exercise_id": {
+          "name": "exercise_exercise_id",
+          "type": "int",
+          "unsigned": true,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        }
+      },
+      "name": "favorite_exercise",
+      "indexes": [
+        {
+          "columnNames": [
+            "user_user_id"
+          ],
+          "composite": false,
+          "keyName": "favorite_exercise_user_user_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "composite": false,
+          "keyName": "favorite_exercise_exercise_exercise_id_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "PRIMARY",
+          "columnNames": [
+            "id",
+            "user_user_id",
+            "exercise_exercise_id"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "favorite_exercise_user_user_id_foreign": {
+          "constraintName": "favorite_exercise_user_user_id_foreign",
+          "columnNames": [
+            "user_user_id"
+          ],
+          "localTableName": "favorite_exercise",
+          "referencedColumnNames": [
+            "user_id"
+          ],
+          "referencedTableName": "user",
+          "updateRule": "cascade"
+        },
+        "favorite_exercise_exercise_exercise_id_foreign": {
+          "constraintName": "favorite_exercise_exercise_exercise_id_foreign",
+          "columnNames": [
+            "exercise_exercise_id"
+          ],
+          "localTableName": "favorite_exercise",
+          "referencedColumnNames": [
+            "exercise_id"
+          ],
+          "referencedTableName": "exercise",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    }
+  ],
+  "nativeEnums": {}
+}
