@@ -1,6 +1,6 @@
  
 import { NextRequest, NextResponse } from "next/server";
-import { getOrm } from 'mikro-orm.config'; // Adjust the path to your Mikro-ORM configuration
+import { getOrm } from 'mikroOrmConfig'; // Adjust the path to your Mikro-ORM configuration
 import {
   getPlanById,
   getAllPlans,

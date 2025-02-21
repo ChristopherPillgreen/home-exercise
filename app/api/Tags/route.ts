@@ -1,4 +1,4 @@
-import { getOrm } from 'mikro-orm.config';
+import { getOrm } from 'mikroOrmConfig';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllTags, getTagById, createTag, updateTag, deleteTag } from './Tag.service';
 

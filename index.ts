@@ -8,7 +8,7 @@
 // console.log(MetadataStorage.getMetadata());
 
 import { MikroORM } from "@mikro-orm/mysql";
-import config from "./mikro-orm.config"; // Ensure this points to your ORM configuration file
+import config from "./mikroOrmConfig"; // Ensure this points to your ORM configuration file
 import { MySqlMikroORM } from "node_modules/@mikro-orm/mysql/MySqlMikroORM";
 
 let orm: MikroORM | undefined;
