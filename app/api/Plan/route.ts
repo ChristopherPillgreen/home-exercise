@@ -6,6 +6,7 @@ import {
   getPlanById,
   getAllPlans,
   getExercisesForPlan,
+  getPlansByUserId,
 } from './Plan.service';
 import { PlanExercise } from '@entities/PlanExercise.entity';
 
@@ -19,6 +20,8 @@ function getQueryParam(request: NextRequest, param: string): string | null {
 export async function GET(request: NextRequest) {
   const em = (await getOrm()).em.fork()
   const id = getQueryParam(request, 'id');
+  const userID = getQueryParam(request, 'userID');
+
 
   try {
     if (id) {
@@ -27,6 +30,9 @@ export async function GET(request: NextRequest) {
         return NextResponse.json({ message: 'Plan not found' }, { status: 404 });
       }
       return NextResponse.json(plan, { status: 200 });
+    } else if (userID) {
+      const plans = await getPlansByUserId(em, Number(userID))
+      return NextResponse.json(plans, {status: 200});
     } else {
       const plans = await getAllPlans(em);
       return NextResponse.json(plans, { status: 200 });
@@ -86,18 +92,5 @@ export async function PUT(request: NextRequest) {
 }
 
 // GET: Fetch exercises for a specific plan
-export async function GET_EXERCISES(request: NextRequest) {
-  const em = (await getOrm()).em.fork()
-  const planID = getQueryParam(request, 'planID');
 
-  if (!planID) {
-    return NextResponse.json({ message: 'planID is required' }, { status: 400 });
-  }
 
-  try {
-    const exercises = await getExercisesForPlan(em, Number(planID));
-    return NextResponse.json(exercises, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}

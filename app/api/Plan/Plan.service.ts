@@ -103,6 +103,13 @@ export const addExerciseToPlan = async (
   return planExercise;
 };
 
+export const getPlansByUserId = async (
+  em: EntityManager,
+  userID: number
+): Promise<Plan[]> => {
+  return await em.find(Plan, { user: {userID } }, { populate: ["user"]});
+}
+
 // export const addExerciseToPlan = async (
 //   em: EntityManager,
 //   planID: number,
