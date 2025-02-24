@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getOrm } from 'mikroOrmConfig';
+import { getOrm } from 'mikro-orm.config';
 import { removeExerciseFromPlan } from '../Plan.service';
 
 export async function DELETE(request: NextRequest) {

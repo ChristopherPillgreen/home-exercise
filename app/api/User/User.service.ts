@@ -5,6 +5,7 @@ import internal from "stream";
 export const createUser = async (
   em: EntityManager,
   data: {
+    userID: string;
     userFirstName: string;
     userLastName: string;
     userEmail: string;
@@ -20,7 +21,7 @@ export const createUser = async (
 // Get a User by ID
 export const getUserById = async (
   em: EntityManager,
-  userID: number
+  userID: string
 ): Promise<User | null> => {
   return await em.findOne(User, { userID }, { populate: ["plans"] });
 };
@@ -34,7 +35,7 @@ export const getAllUsers = async (em: EntityManager): Promise<User[]> => {
 // Update a User
 export const updateUser = async (
   em: EntityManager,
-  userID: number,
+  userID: string,
   data: Partial<User>
 ): Promise<User | null> => {
   const user = await getUserById(em, userID);
@@ -47,7 +48,7 @@ export const updateUser = async (
 // Delete a User
 export const deleteUser = async (
   em: EntityManager,
-  userID: number
+  userID: string
 ): Promise<boolean> => {
   const user = await getUserById(em, userID);
   if (!user) return false;

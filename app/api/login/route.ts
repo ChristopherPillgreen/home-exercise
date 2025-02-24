@@ -1,5 +1,5 @@
 import { loginUser } from "./login.service"; // Adjust the import path if needed
-import { getOrm } from "mikroOrmConfig";
+import { getOrm } from "mikro-orm.config";
 import { NextRequest, NextResponse } from "next/server";
 
 function handleErrorResponse(error: any) {

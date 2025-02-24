@@ -3,7 +3,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { JWT } from "next-auth/jwt";
 import { Session, Account, Profile } from "next-auth";
 import { User } from "@entities/User.entity";
-import { getOrm } from "mikroOrmConfig";
+import { getOrm } from "mikro-orm.config";
 
 // Extend the session and user interfaces to include extra fields
 declare module "next-auth" {
@@ -42,38 +42,48 @@ const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        const { email, name } = user;
-        const nameParts = name ? name.split(" ") : [];
-        const firstName = nameParts.slice(0, -1).join(" ");
-        const lastName = nameParts[nameParts.length - 1] || "";
+    async signIn({ user, account, profile }) {
+  if (account?.provider === "google") {
+    const { email, name } = user;
+    const nameParts = name ? name.split(" ") : [];
+    const firstName = nameParts.slice(0, -1).join(" ");
+    const lastName = nameParts[nameParts.length - 1] || "";
 
-        try {
-          // Get MikroORM instance and fork the EntityManager for context-specific actions
-          const orm = await getOrm();
-          const em = orm.em.fork();  // Fork EntityManager to avoid global context issues
+    try {
+      // Get MikroORM instance and fork the EntityManager for context-specific actions
+      const orm = await getOrm();
+      const em = orm.em.fork(); // Fork EntityManager to avoid global context issues
 
-          // Check if user exists in DB
-          const existingUser = await em.findOne(User, { userEmail: email });
+      // Use profile.sub as the unique Google ID for the user
+      const userID = profile?.sub; // This should be the Google user ID
 
-          if (!existingUser) {
-            // Create a new user in the database
-            const newUser = em.create(User, {
-              userEmail: email || "",
-              userFirstName: firstName,
-              userLastName: lastName,
-              userPassword: "defaultPassword", // Handle default password appropriately
-            });
-            await em.persistAndFlush(newUser);
-          }
-        } catch (error) {
-          console.error("Error checking/creating user:", error);
-          return false; // Reject login if there's a DB error
-        }
+      if (!userID) {
+        console.error("Google ID (profile.sub) is missing");
+        return false; // Reject login if Google ID is not available
       }
-      return true; // Allow login
-    },
+
+      // Check if user exists in DB
+      const existingUser = await em.findOne(User, { userEmail: email });
+
+      if (!existingUser) {
+        // Create a new user in the database
+        const newUser = em.create(User, {
+          userID: userID, // Use profile.sub here as userID
+          userEmail: email || "",
+          userFirstName: firstName,
+          userLastName: lastName,
+          userPassword: "defaultPassword", // Handle default password appropriately
+        });
+        await em.persistAndFlush(newUser);
+      }
+    } catch (error) {
+      console.error("Error checking/creating user:", error);
+      return false; // Reject login if there's a DB error
+    }
+  }
+  return true; // Allow login
+},
+
 
     async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {

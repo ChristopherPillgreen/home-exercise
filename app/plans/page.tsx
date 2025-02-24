@@ -1,4 +1,4 @@
-"use client";
+'use client'; // Add this line to mark the component as a client component
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -12,22 +12,33 @@ type Plan = {
 };
 
 export default function PlansPage() {
+  const { data: session, status } = useSession();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
+    if (status === "loading") return; // Wait for session to load
+    if (!session?.user) {
+      setError("You must be logged in to view plans.");
+      setLoading(false);
+      return;
+    }
+
+    console.log("Session User ID:", session.user.id); // Log the user ID from session
+
     const fetchPlans = async () => {
       try {
-        const response = await fetch("/api/Plan");
-
+        // Construct the API URL with the correct userID from session
+        const response = await fetch(`/api/Plan?userID=${session.user.id}`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        setPlans(data);
+        setPlans(data); // Set the fetched plans
       } catch (err) {
         console.error("Error fetching plans:", err);
         setError("Failed to fetch plans.");
@@ -37,9 +48,14 @@ export default function PlansPage() {
     };
 
     fetchPlans();
-  }, []);
+  }, [session, status]);
 
   const handleCreatePlan = async () => {
+    if (!session?.user) {
+      alert("You must be logged in to create a plan.");
+      return;
+    }
+
     const planName = prompt("Enter a name for your new plan:");
 
     if (!planName) {
@@ -53,7 +69,7 @@ export default function PlansPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ planName }),
+        body: JSON.stringify({ planName, userID: session.user.id }), // Attach userID
       });
 
       if (!response.ok) {
@@ -73,7 +89,7 @@ export default function PlansPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Available Plans</h1>
+      <h1 className="text-2xl font-bold mb-4">Your Plans</h1>
 
       <button
         onClick={handleCreatePlan}

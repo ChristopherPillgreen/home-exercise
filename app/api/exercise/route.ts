@@ -6,7 +6,7 @@ import {
   updateExercise,
   deleteExercise,
 } from './exercise.service';
-import { getOrm } from 'mikroOrmConfig';
+import { getOrm } from 'mikro-orm.config';
 
 interface ExerciseData {
   exerciseName: string;
