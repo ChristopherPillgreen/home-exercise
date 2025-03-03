@@ -30,14 +30,14 @@ export class Plan {
   @PrimaryKey({ type: "int", autoincrement: true })
   planID!: number;
 
-  @Property({ type: "int" })
-  frequency!: number;
+  @Property({ type: "int", nullable: true })
+  frequency?: number;
 
-  @Property({ type: 'boolean' })
-  favorites!: boolean;
+  @Property({ type: 'boolean', nullable: true })
+  favorites?: boolean;
 
-  @Property({ type: 'string' })
-  planName!: string;
+  @Property({ type: 'string', nullable: true })
+  planName?: string;
 
   @ManyToOne(() => User, { nullable: false })
   user?: Rel<User>;

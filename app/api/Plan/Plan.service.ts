@@ -69,6 +69,7 @@ export const addExerciseToPlan = async (
     throw new Error("Plan not found");
   }
 
+  console.log("Reps: ", data.reps);
   // Fetch the exercise
   const exercise = await em.findOne(Exercise, { exerciseID });
   if (!exercise) {

@@ -11,22 +11,22 @@ export class PlanExercise {
   @PrimaryKey({ type: "int", autoincrement: true })
   id!: number;
 
-  @Property({type: "int" })
-  sequenceNum!: number;
+  @Property({type: "int", nullable: true })
+  sequenceNum?: number;
 
-  @Property({type: "int"})
-  reps!: number;
+  @Property({type: "int", nullable: true})
+  reps?: number;
 
-  @Property({type: "int"})
-  sets!: number;
+  @Property({type: "int", nullable: true})
+  sets?: number;
 
-  @Property({type: "int"})
-  duration!: number;
+  @Property({type: "int", nullable: true})
+  duration?: number;
 
-  @Property({type: "int"})
-  time!: number;
+  @Property({type: "int", nullable: true})
+  time?: number;
 
-  @Property({type: "string"})
+  @Property({type: "string", nullable: true})
   description?: string;
 
   @ManyToOne({ entity: () => Plan, deleteRule: "cascade" })
