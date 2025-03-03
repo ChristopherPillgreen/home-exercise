@@ -4,15 +4,22 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 type Exercise = {
-  exerciseID: number;
-  exerciseName: string;
-  description: string;
+  id: number;
+  sequenceNum: number;
+  reps: number;
+  sets: number;
+  duration: number;
+  time: string;
+  description: string; // Plan_exercise description
+  exerciseName: string; // Exercise table name
+  exerciseDescription: string; // Exercise description
 };
 
 export default function EditPlanPage() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const router = useRouter();
   const { planID } = useParams(); // Get planID from URL
 
@@ -38,6 +45,30 @@ export default function EditPlanPage() {
     fetchExercises();
   }, [planID]);
 
+  const savePlan = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch("/api/savePlan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planID, exercises }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save plan");
+      }
+
+      alert("Plan saved successfully!");
+    } catch (err) {
+      console.error("Error saving plan:", err);
+      alert("Failed to save plan.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   if (loading) return <div className="text-center mt-4">Loading exercises...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
@@ -46,10 +77,18 @@ export default function EditPlanPage() {
       <h1 className="text-2xl font-bold mb-4">Exercises for Plan {planID}</h1>
 
       <button
-        onClick={() => router.push(`/plans/${planID}/exercises`)} // Updated to go to /plans/[planID]/exercises
+        onClick={() => router.push(`/plans/${planID}/exercises`)}
         className="bg-green-500 text-white py-2 px-4 rounded mb-4"
       >
         Add Exercises
+      </button>
+
+      <button
+        onClick={savePlan}
+        disabled={saving}
+        className={`ml-4 bg-blue-500 text-white py-2 px-4 rounded mb-4 ${saving ? "opacity-50 cursor-not-allowed" : ""}`}
+      >
+        {saving ? "Saving..." : "Save Plan"}
       </button>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -57,9 +96,18 @@ export default function EditPlanPage() {
           <p>No exercises added yet.</p>
         ) : (
           exercises.map((exercise) => (
-            <div key={exercise.exerciseID} className="border p-4 rounded shadow">
+            <div key={exercise.id} className="border p-4 rounded shadow">
               <h2 className="text-xl font-semibold mt-2">{exercise.exerciseName}</h2>
-              <p className="text-gray-600">{exercise.description}</p>
+              <p className="text-gray-600 italic">{exercise.exerciseDescription}</p>
+
+              <div className="mt-2 text-sm text-gray-700">
+                <p><strong>Sequence:</strong> {exercise.sequenceNum}</p>
+                <p><strong>Reps:</strong> {exercise.reps}</p>
+                <p><strong>Sets:</strong> {exercise.sets}</p>
+                <p><strong>Duration:</strong> {exercise.duration} min</p>
+                <p><strong>Time:</strong> {exercise.time}</p>
+                <p><strong>Description:</strong> {exercise.description}</p>
+              </div>
             </div>
           ))
         )}

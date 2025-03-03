@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json(plan, { status: 200 });
     } else if (userID) {
-      const plans = await getPlansByUserId(em, Number(userID))
+      const plans = await getPlansByUserId(em, userID);
       return NextResponse.json(plans, {status: 200});
     } else {
       const plans = await getAllPlans(em);
