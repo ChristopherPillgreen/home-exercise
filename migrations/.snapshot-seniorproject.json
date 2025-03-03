@@ -191,13 +191,13 @@
       "columns": {
         "user_id": {
           "name": "user_id",
-          "type": "int",
-          "unsigned": true,
-          "autoincrement": true,
-          "primary": true,
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
           "nullable": false,
-          "length": null,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
         },
         "user_first_name": {
           "name": "user_first_name",
@@ -235,13 +235,23 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 255,
           "mappedType": "string"
         }
       },
       "name": "user",
       "indexes": [
+        {
+          "columnNames": [
+            "user_email"
+          ],
+          "composite": false,
+          "keyName": "user_user_email_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
         {
           "keyName": "PRIMARY",
           "columnNames": [
@@ -301,13 +311,13 @@
         },
         "user_user_id": {
           "name": "user_user_id",
-          "type": "int",
-          "unsigned": true,
+          "type": "varchar(255)",
+          "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
         }
       },
       "name": "plan",
@@ -520,13 +530,13 @@
         },
         "user_user_id": {
           "name": "user_user_id",
-          "type": "int",
-          "unsigned": true,
+          "type": "varchar(255)",
+          "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
         },
         "exercise_exercise_id": {
           "name": "exercise_exercise_id",

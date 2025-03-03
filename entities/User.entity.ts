@@ -46,8 +46,8 @@ import { Plan } from "./Plan.entity"; // Ensure this import is correct
 export class User {
 
   static entityName = 'user';
-  @PrimaryKey({ type: "int", autoincrement: true })
-  userID?: number;
+  @PrimaryKey({ type: "string"})
+  userID!: string;
 
   @Property({type: "string"})
   userFirstName!: string;
@@ -55,11 +55,11 @@ export class User {
   @Property({type: "string"})
   userLastName!: string;
 
-  @Property({type: "string"})
+  @Property({type: "string", unique: true})
   userEmail!: string;
   
 
-  @Property({type: "string"})
+  @Property({type: "string", nullable: true})
   userPassword!: string;
 
   @OneToMany(() => Plan, (plan) => plan.user)
