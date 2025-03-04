@@ -89,27 +89,52 @@ export default function PlansPage() {
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Your Plans</h1>
-
-      <button
-        onClick={handleCreatePlan}
-        className="bg-blue-500 text-white py-2 px-4 rounded mb-4"
-      >
-        Create a New Plan
-      </button>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {plans.map((plan) => (
-          <div
-            key={plan.planID}
-            className="border p-4 rounded shadow cursor-pointer hover:bg-gray-100 transition"
-            onClick={() => router.push(`/plans/${plan.planID}`)}
-          >
-            <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
-            <p className="text-gray-600">{plan.planDescription}</p>
+      <div className="flex items-center justify-between mb-4">
+       <h1 className="text-[#7874ac] text-3xl py-2 px-4 font-bold">Your Plans</h1>
+        <button
+          onClick={handleCreatePlan}
+          className="bg-[#74ac85] text-white py-2 px-4 rounded"
+        >
+          Create a New Plan
+        </button>
+      </div>
+      <div>
+          <div className="flex flex-wrap justify-between gap-4">
+            <button
+              className="absolute left-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
+            >
+                  ←
+            </button>
+            {Array.from({ length: 8 }, (_, index) => {
+              const plan = plans[index];
+              return (
+                <div
+                  key={plan ? plan.planID : `dummy-${index}`}
+                  className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
+                  onClick={() => plan && router.push(`/plans/${plan.planID}`)}
+                >
+                {plan ? (
+                    <>
+                      <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
+                      <p className="text-gray-600">{plan.planDescription}</p>
+                    </>
+                  ) : (
+                    <>
+                      <h2 className="text-xl font-semibold mt-2"></h2>
+                      <p className="text-gray-600"></p>
+                    </>
+                )}
+              </div>
+              );
+            })}
+            <button
+            className="absolute right-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
+            >
+            →
+            </button>
           </div>
-        ))}
       </div>
     </div>
   );
 }
+
