@@ -10,8 +10,18 @@ export const getPlanExercises = async (
   const plan = await em.findOne(Plan, { planID });
   if (!plan) throw new Error("Plan not found");
 
-  return await em.find(PlanExercise, { plan }, { populate: ["exercise"] });
+  // Fetch PlanExercise with populated Exercise relation
+  const planExercises = await em.find(PlanExercise, { plan }, { populate: ["exercise"] });
+
+  // Add the exercise name to each PlanExercise
+  return planExercises.map((planExercise) => ({
+    ...planExercise,
+    exerciseName: planExercise.exercise.exerciseName, 
+    exerciseDescription: planExercise.exercise.exerciseDescription,
+    exerciseImage: planExercise.exercise.image,
+  }));
 };
+
 
 export const addExerciseToPlan = async (
   em: EntityManager,
@@ -25,10 +35,19 @@ export const addExerciseToPlan = async (
   if (!plan) throw new Error("Plan not found");
   if (!exercise) throw new Error("Exercise not found");
 
-  const planExercise = em.create(PlanExercise, { ...data, plan, exercise });
+  // Automatically set the description field from exerciseDescription if it's not provided
+  const planExerciseData = {
+    ...data,
+    plan,
+    exercise,
+    description: data.description || exercise.exerciseDescription, // Set default to exerciseDescription
+  };
+
+  const planExercise = em.create(PlanExercise, planExerciseData);
   await em.persistAndFlush(planExercise);
   return planExercise;
 };
+
 
 export const updatePlanExercise = async (
   em: EntityManager,

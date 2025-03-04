@@ -9,7 +9,7 @@ import { Exercise } from "@entities/Exercise.entity";
 export const createPlan = async (
   em: EntityManager,
   userID: string,
-  data: { frequency: number; favorites: boolean }
+  data: { frequency: number; favorites: boolean; planName : string }
 ) => {
   // Fetch the user to associate with the plan
   const user = await em.findOne(User, { userID });
@@ -18,10 +18,11 @@ export const createPlan = async (
   }
 
   // Exclude planID from the required fields
-  const planData: { frequency: number; favorites: boolean; user: User } = {
+  const planData: { frequency: number; favorites: boolean; user: User; planName : string } = {
     frequency: data.frequency,
     favorites: data.favorites,
     user,
+    planName: data.planName,
   };
 
   // Create a new plan associated with the user
@@ -69,22 +70,13 @@ export const addExerciseToPlan = async (
     throw new Error("Plan not found");
   }
 
-  console.log("Reps: ", data.reps);
-  // Fetch the exercise
+  // Fetch the exercise (we assume it exists based on your clarification)
   const exercise = await em.findOne(Exercise, { exerciseID });
   if (!exercise) {
     throw new Error("Exercise not found");
   }
 
-  // Check if the exercise is already in the plan
-  const existingExercise = plan.planExercises
-    .getItems()
-    .find((pe) => pe.exercise.exerciseID === exerciseID);
-  if (existingExercise) {
-    throw new Error("Exercise is already in the plan");
-  }
-
-  // Create a new PlanExercise entry
+  // Create a new PlanExercise entry without checking for duplicates
   const planExercise = em.create(PlanExercise, {
     plan,
     exercise,
@@ -95,14 +87,15 @@ export const addExerciseToPlan = async (
     time: data.time ?? 0,
   });
 
-  // Add the new PlanExercise to the plan's collection
+  // Add the new PlanExercise to the plan's collection (no check for duplicates)
   plan.planExercises.add(planExercise);
 
   // Persist the changes
-  await em.persistAndFlush(planExercise);
+  await em.persistAndFlush(plan);
 
   return planExercise;
 };
+
 
 export const getPlansByUserId = async (
   em: EntityManager,

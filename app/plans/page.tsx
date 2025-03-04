@@ -51,38 +51,38 @@ export default function PlansPage() {
   }, [session, status]);
 
   const handleCreatePlan = async () => {
-    if (!session?.user) {
-      alert("You must be logged in to create a plan.");
-      return;
+  if (!session?.user) {
+    alert("You must be logged in to create a plan.");
+    return;
+  }
+
+  const planName = prompt("Enter a name for your new plan:");
+
+  if (!planName) {
+    alert("Plan name is required!");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/Plan", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ planName, userID: session.user.id }), // Attach planName and userID
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    const planName = prompt("Enter a name for your new plan:");
-
-    if (!planName) {
-      alert("Plan name is required!");
-      return;
-    }
-
-    try {
-      const response = await fetch("/api/Plan", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ planName, userID: session.user.id }), // Attach userID
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      router.push(`/plans/${data.planID}`);
-    } catch (error) {
-      console.error("Error creating plan:", error);
-      setError("Failed to create plan.");
-    }
-  };
+    const data = await response.json();
+    router.push(`/plans/${data.planID}`); // Navigate to the new plan's page
+  } catch (error) {
+    console.error("Error creating plan:", error);
+    setError("Failed to create plan.");
+  }
+};
 
   if (loading) return <div className="text-center mt-4">Loading plans...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;

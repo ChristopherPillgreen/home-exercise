@@ -35,3 +35,4 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 migrations/Migration20250224190307.ts
+migrations/Migration20250303203702.ts

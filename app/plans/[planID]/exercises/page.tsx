@@ -16,15 +16,15 @@ export default function Exercises() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { planID } = useParams(); // Dynamically get the plan ID from the URL
+  const { planID } = useParams(); // Get plan ID from URL
 
   useEffect(() => {
     const fetchExercises = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/exercise");
+        const response = await fetch("/api/exercise");
 
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -40,33 +40,36 @@ export default function Exercises() {
     fetchExercises();
   }, []);
 
-const handleAddExercise = async (exerciseID: number) => {
-  try {
-    const planIDNumber = Number(planID); // Ensure it's a number
-    const response = await fetch(`/api/Plan/exercise111`, {
-      method: "POST",  // Use POST to add the exercise
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ planID: planIDNumber, exerciseID }),
-    });
+  const handleAddExercise = async (exerciseID: number) => {
+    try {
+      const planIDNumber = Number(planID);
+      if (isNaN(planIDNumber)) {
+        alert("Invalid Plan ID.");
+        return;
+      }
 
-    if (!response.ok) {
-      throw new Error("Failed to add exercise to plan.");
+      const response = await fetch(`/api/planexercise`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planID: planIDNumber, exerciseID }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add exercise to plan.");
+      }
+
+      alert("Exercise added successfully!");
+    } catch (err) {
+      console.error("Error adding exercise:", err);
+      alert("Failed to add exercise.");
     }
-
-    alert("Exercise added successfully!");
-  } catch (err) {
-    console.error("Error adding exercise:", err);
-    alert("Failed to add exercise.");
-  }
-};
-
-
+  };
 
   if (loading) {
     return (
-      <div className="flex flex-wrap px-px h-full">
+      <div className="flex flex-wrap px-4 h-full">
         <Nav />
         <div>Loading exercises...</div>
       </div>
@@ -75,7 +78,7 @@ const handleAddExercise = async (exerciseID: number) => {
 
   if (error) {
     return (
-      <div className="flex flex-wrap px-px h-full">
+      <div className="flex flex-wrap px-4 h-full">
         <Nav />
         <div>{error}</div>
       </div>
@@ -84,7 +87,7 @@ const handleAddExercise = async (exerciseID: number) => {
 
   if (exercises.length === 0) {
     return (
-      <div className="flex flex-wrap px-px h-full">
+      <div className="flex flex-wrap px-4 h-full">
         <Nav />
         <div>No exercises found.</div>
       </div>
