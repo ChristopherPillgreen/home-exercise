@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { isNamedExports } from "typescript";
 
 type Plan = {
   planID: number;
@@ -17,6 +18,10 @@ export default function PlansPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const [query, setQuery] = useState(""); // for search functionality
+  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null); // for highlighting selected plan
+  const [removeMode, setRemoveMode] = useState(false); // ability to remove plan
+
 
   useEffect(() => {
     if (status === "loading") return; // Wait for session to load
@@ -49,6 +54,16 @@ export default function PlansPage() {
 
     fetchPlans();
   }, [session, status]);
+
+  const handlePlanClick = (plan: Plan) => {
+    if (removeMode) {
+      setRemoveMode(false);
+      setSelectedPlan(plan);
+    } else {
+      setRemoveMode(true);
+      setSelectedPlan(plan);
+    }
+  };
 
   const handleCreatePlan = async () => {
   if (!session?.user) {
@@ -84,19 +99,65 @@ export default function PlansPage() {
   }
 };
 
-  if (loading) return <div className="text-center mt-4">Loading plans...</div>;
-  if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
+const handleRemovePlan = async () => {
+  if (!selectedPlan) return;
+
+  try {
+    const response = await fetch(`/api/Plan/${selectedPlan.planID}`, {
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to remove plan!`);
+    }
+
+    setPlans(plans.filter(plan => plan.planID !== selectedPlan.planID));
+    setSelectedPlan(null);
+    setRemoveMode(false);
+  } catch (error) {
+    console.error('Error removing plan:', error);
+    setError('Failed to remove plan.');
+  }
+};
+
+const toggleRemoveMode = () => {
+  setRemoveMode(!removeMode);
+  setSelectedPlan(null); // Deselect any selected plan
+};
+
+if (loading) return <div className="text-center mt-4">Loading plans...</div>;
+if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
-       <h1 className="text-[#7874ac] text-3xl py-2 px-4 font-bold">Your Plans</h1>
-        <button
-          onClick={handleCreatePlan}
-          className="bg-[#74ac85] text-white py-2 px-4 rounded"
-        >
-          Create a New Plan
-        </button>
+        <h1 className="text-[#7874ac] text-3xl py-2 px-4 font-bold">
+          Your Plans
+        </h1>
+        <div className="flex items-center p-4 w-full max-w-md ml-auto">
+          <button
+            onClick={removeMode ? toggleRemoveMode : handleCreatePlan}
+            className="flex-1 ml-5 bg-[#74ac85] text-white py-2 px-4 rounded"
+          >
+            {removeMode ? 'Cancel Remove' : 'Create a New Plan'}
+          </button>
+
+          {removeMode && selectedPlan && (
+            <button
+              onClick={handleRemovePlan}
+              className="flex-1 ml-5 bg-red-500 text-white py-2 px-4 rounded"
+            >
+              Remove Plan
+            </button>
+          )}
+          <input
+            type="text"
+            placeholder="Search..."
+            className="ml-5 py-2 px-4 rounded border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+        </div>
       </div>
       <div>
           <div className="flex flex-wrap justify-between gap-4">
@@ -111,7 +172,8 @@ export default function PlansPage() {
                 <div
                   key={plan ? plan.planID : `dummy-${index}`}
                   className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
-                  onClick={() => plan && router.push(`/plans/${plan.planID}`)}
+                  onClick={() => handlePlanClick(plan)}
+                  onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)} 
                 >
                 {plan ? (
                     <>
