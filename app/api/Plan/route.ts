@@ -7,8 +7,10 @@ import {
   getAllPlans,
   getExercisesForPlan,
   getPlansByUserId,
+  deletePlan
 } from './Plan.service';
 import { PlanExercise } from '@entities/PlanExercise.entity';
+import { EntityManager } from '@mikro-orm/mysql';
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest) {
       }
       return NextResponse.json(plan, { status: 200 });
     } else if (userID) {
-      const plans = await getPlansByUserId(em, Number(userID))
+      const plans = await getPlansByUserId(em, String(userID))
       return NextResponse.json(plans, {status: 200});
     } else {
       const plans = await getAllPlans(em);
@@ -89,6 +91,33 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
+}
+
+export async function DELETE(request: NextRequest){
+  try {
+    const {searchParams} = new URL(request.url);
+    const planIDParam = searchParams.get('planID');
+
+    if (!planIDParam) {
+      return NextResponse.json({ error: 'Plan ID is required' }, { status: 400 });
+    }
+
+    const planID = Number(planIDParam);
+    if (isNaN(planID)) {
+      return NextResponse.json({ error: 'Invalid plan ID' }, { status: 400 });
+    }
+
+    const em = (await getOrm()).em.fork()
+
+    await deletePlan(em, planID);
+
+    return NextResponse.json({ success: true }, {status:200});
+
+
+
+  } catch(error: any) {
+    return NextResponse.json({ error: error.message || 'Internal Server Error' }, {status: 500})
+  }
 }
 
 // GET: Fetch exercises for a specific plan
