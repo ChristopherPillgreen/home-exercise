@@ -46,11 +46,20 @@ export default function EditPlanPage() {
     fetchExercises();
   }, [planID]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, exerciseId: number, field: string) => {
+    const newExercises = exercises.map((exercise) =>
+      exercise.id === exerciseId
+        ? { ...exercise, [field]: e.target.value }
+        : exercise
+    );
+    setExercises(newExercises);
+  };
+
   const savePlan = async () => {
     setSaving(true);
     try {
-      const response = await fetch("/api/savePlan", {
-        method: "POST",
+      const response = await fetch("/api/Plan", {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
@@ -106,12 +115,64 @@ export default function EditPlanPage() {
               /> {/* Display exerciseImage */}
 
               <div className="mt-2 text-sm text-gray-700">
-                <p><strong>Sequence:</strong> {exercise.sequenceNum}</p>
-                <p><strong>Reps:</strong> {exercise.reps}</p>
-                <p><strong>Sets:</strong> {exercise.sets}</p>
-                <p><strong>Duration:</strong> {exercise.duration} </p>
-                <p><strong>Time:</strong> {exercise.time}</p>
-                <p><strong>Description:</strong> {exercise.description}</p>
+                <div>
+                  <strong>Sequence:</strong>
+                  <input
+                    type="number"
+                    value={exercise.sequenceNum}
+                    onChange={(e) => handleInputChange(e, exercise.id, "sequenceNum")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
+
+                <div>
+                  <strong>Reps:</strong>
+                  <input
+                    type="number"
+                    value={exercise.reps}
+                    onChange={(e) => handleInputChange(e, exercise.id, "reps")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
+
+                <div>
+                  <strong>Sets:</strong>
+                  <input
+                    type="number"
+                    value={exercise.sets}
+                    onChange={(e) => handleInputChange(e, exercise.id, "sets")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
+
+                <div>
+                  <strong>Duration:</strong>
+                  <input
+                    type="number"
+                    value={exercise.duration}
+                    onChange={(e) => handleInputChange(e, exercise.id, "duration")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
+
+                <div>
+                  <strong>Time:</strong>
+                  <input
+                    type="text"
+                    value={exercise.time}
+                    onChange={(e) => handleInputChange(e, exercise.id, "time")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
+
+                <div>
+                  <strong>Description:</strong>
+                  <textarea
+                    value={exercise.description}
+                    onChange={(e) => handleInputChange(e, exercise.id, "description")}
+                    className="border rounded p-2 w-full"
+                  />
+                </div>
               </div>
             </div>
           ))
