@@ -1,4 +1,4 @@
-"use client"; // Make sure it's client-side rendered
+"use client";
 
 import { useEffect, useState } from "react";
 import { Button, MegaMenu, Navbar } from "flowbite-react";
@@ -44,7 +44,7 @@ export default function Nav() {
               Logout
             </Button>
           ) : (
-            <Button onClick={handleGoogleSignIn} style={{ backgroundColor: "#af7076" }}>
+            <Button onClick={handleGoogleSignIn} style={{ backgroundColor: "#74ac85" }}>
               Sign in with Google
             </Button>
           )}
@@ -52,7 +52,6 @@ export default function Nav() {
         <Navbar.Collapse>
           <Navbar.Link href="/plans">Plans</Navbar.Link>
           <Navbar.Link href="/about">About</Navbar.Link>
-          <Navbar.Link href="/planner">Planner</Navbar.Link>
         </Navbar.Collapse>
       </div>
     </MegaMenu>

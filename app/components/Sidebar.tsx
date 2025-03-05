@@ -26,10 +26,7 @@ export default function Nav() {
               <Sidebar.Item>Special</Sidebar.Item>
               <Sidebar.Item></Sidebar.Item>
             </Sidebar.Collapse>
-            <Sidebar.Item href="favoriteexercises" icon={HiHeart}>
-              Favorite Exercises
-            </Sidebar.Item>
-            <Sidebar.Item href="currentplan" icon={HiClipboard}>
+            <Sidebar.Item href="plans/" icon={HiClipboard}>
               Current Plan
             </Sidebar.Item>
           </Sidebar.ItemGroup>

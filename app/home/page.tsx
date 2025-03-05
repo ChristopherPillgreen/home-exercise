@@ -7,7 +7,7 @@ export default function Home() {
       <div className="relative flex justify-center items-center">
       </div>
         <div className="absolute flex flex-col items-center">
-          <h1 className="text-6xl font-bold text-white mb-8">
+          <h1 className="text-6xl font-bold text-[#7874AC] mb-8">
             Welcome to Kineticare
           </h1>
           <div className="grid grid-cols-2 gap-6">

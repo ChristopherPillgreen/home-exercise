@@ -49,10 +49,14 @@ export async function POST(request: NextRequest) {
   const em = (await getOrm()).em.fork()
   const body = await request.json();
 
-  const { userID, ...data } = body;
+  const { userID, planName, ...data } = body;
+
+  if (!planName) {
+    return NextResponse.json({ error: "Plan name is required" }, { status: 400 });
+  }
 
   try {
-    const newPlan = await createPlan(em, userID, data);
+    const newPlan = await createPlan(em, userID, { ...data, planName });
     return NextResponse.json(newPlan, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
