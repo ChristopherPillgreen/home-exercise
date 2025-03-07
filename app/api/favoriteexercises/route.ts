@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
 
     const em = (await getOrm()).em.fork();
 
-    const favorites = await getFavoritesByUser(em, Number(userID));
+    const favorites = await getFavoritesByUser(em, String(userID));
     return NextResponse.json(favorites, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
     //const orm = await getOrm();
     const em = (await getOrm()).em.fork()
 
-    const favorite = await addFavoriteExercise(em, Number(userID), Number(exerciseID));
+    const favorite = await addFavoriteExercise(em, String(userID), Number(exerciseID));
     return NextResponse.json(favorite, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -64,7 +64,7 @@ export async function DELETE(request: NextRequest) {
     //const orm = await getOrm();
     const em = (await getOrm()).em.fork()
 
-    const success = await removeFavoriteExercise(em, Number(userID), Number(exerciseID));
+    const success = await removeFavoriteExercise(em, String(userID), Number(exerciseID));
     if (!success) {
       return NextResponse.json({ message: 'Favorite not found' }, { status: 404 });
     }

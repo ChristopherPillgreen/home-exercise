@@ -9,6 +9,7 @@ import {
   addExerciseToPlan,
   removeExerciseFromPlan,
 } from "../app/api/Plan/Plan.service";
+import { parseIsolatedEntityName } from "typescript";
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     const em = (await getOrm()).em.fork()
     
     const body = await request.json();
-    const { userID, frequency, favorites } = body;
+    const { userID, frequency, favorites, planName } = body;
 
     if (!userID || typeof frequency !== "number" || typeof favorites !== "boolean") {
       return NextResponse.json(
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newPlan = await createPlan(em, userID, { frequency, favorites });
+    const newPlan = await createPlan(em, userID, { frequency, favorites, planName });
     return NextResponse.json(newPlan, { status: 201 });
   } catch (error: any) {
     return handleErrorResponse(error);

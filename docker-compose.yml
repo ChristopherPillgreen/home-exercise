@@ -1,44 +1,107 @@
+# version: '3'
+
+# networks:
+#     mysql-phpmyadmin:
+#         name: mysql-phpmyadmin
+#         # use the bridge driver
+#         driver: bridge
+
+# volumes:
+#     mysqldata:
+
+
+# services:
+#     mysql:
+#         image: mysql:8.0
+#         container_name: mysql
+#         environment:
+#             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+#             MYSQL_DATABASE: ${MYSQL_DATABASE}
+#             MYSQL_USER: ${MYSQL_USER}
+#             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+#         ports:
+#             - "3306:3306"
+#         volumes:
+#             - mysqldata:/var/lib/mysql
+#         networks:
+#             mysql-phpmyadmin:
+#                 aliases:
+#                 - mysql
+
+#     phpmyadmin:
+#         image: phpmyadmin:5.2.0
+#         container_name: phpmyadmin
+#         links:
+#             - mysql
+#         environment:
+#             PMA_HOST: mysql
+#             PMA_PORT: 3306
+#         ports:
+#             - 8081:80
+#         networks:
+#             mysql-phpmyadmin:
+#                 aliases:
+#                 - phpmyadmin
+
 version: '3'
 
 networks:
-    mysql-phpmyadmin:
-        name: mysql-phpmyadmin
-        # use the bridge driver
-        driver: bridge
+  mysql-phpmyadmin:
+    name: mysql-phpmyadmin
+    driver: bridge
 
 volumes:
-    mysqldata:
-
+  mysqldata:
 
 services:
-    mysql:
-        image: mysql:8.0
-        container_name: mysql
-        environment:
-            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-            MYSQL_DATABASE: ${MYSQL_DATABASE}
-            MYSQL_USER: ${MYSQL_USER}
-            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-        ports:
-            - "3306:3306"
-        volumes:
-            - mysqldata:/var/lib/mysql
-        networks:
-            mysql-phpmyadmin:
-                aliases:
-                - mysql
+  mysql:
+    image: mysql:8.0
+    container_name: mysqlprod
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysqldata:/var/lib/mysql
+    networks:
+      mysql-phpmyadmin:
+        aliases:
+          - mysql
 
-    phpmyadmin:
-        image: phpmyadmin:5.2.0
-        container_name: phpmyadmin
-        links:
-            - mysql
-        environment:
-            PMA_HOST: mysql
-            PMA_PORT: 3306
-        ports:
-            - 8081:80
-        networks:
-            mysql-phpmyadmin:
-                aliases:
-                - phpmyadmin
+  phpmyadmin:
+    image: phpmyadmin:5.2.0
+    container_name: phpmyadminprod
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8081:80"
+    networks:
+      mysql-phpmyadmin:
+        aliases:
+          - phpmyadmin
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_HOST=mysql        # Use the Docker service alias for MySQL
+      - MYSQL_PORT=3306
+      # Update the DATABASE_URL as needed for MikroORM:
+      - DATABASE_URL=mysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}
+    networks:
+      - mysql-phpmyadmin
+    depends_on:
+      - mysql

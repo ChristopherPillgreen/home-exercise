@@ -10,6 +10,7 @@ import {
 } from "./User.service";
 
 interface UserData {
+  userID: string;
   userFirstName: string;
   userLastName: string;
   userEmail: string;
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest) {
     console.log("Fetching users with id:", id);
 
     if (id) {
-      const user = await getUserById(em, Number(id));
+      const user = await getUserById(em, String(id));
       if (!user) {
         console.log("User not found for id:", id);
         return NextResponse.json(
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
 
     const body: UserData = await request.json();
     const newUser = await createUser(em, {
+      userID: body.userID,
       userFirstName: body.userFirstName,
       userLastName: body.userLastName,
       userEmail: body.userEmail,
@@ -98,7 +100,7 @@ export async function PUT(request: NextRequest) {
     const em = (await getOrm()).em.fork()
 
     const body: Partial<UserData> = await request.json();
-    const updatedUser = await updateUser(em, Number(id), body);
+    const updatedUser = await updateUser(em, String(id), body);
     return NextResponse.json(updatedUser, { status: 200 });
   } catch (error: any) {
     return handleErrorResponse(error);
@@ -120,7 +122,7 @@ export async function DELETE(request: NextRequest) {
   try {
     const em = (await getOrm()).em.fork()
 
-    const deleteMessage = await deleteUser(em, Number(id));
+    const deleteMessage = await deleteUser(em, String(id));
     return NextResponse.json(deleteMessage, { status: 200 });
   } catch (error: any) {
     return handleErrorResponse(error);

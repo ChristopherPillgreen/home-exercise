@@ -3,8 +3,19 @@ const webpack = require('webpack');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  webpack: (config, { isServer }) => {
+  // swcMinify: true,
+  // compiler: {
+  //   keepClassNames: true,
+  // },
+  output: 'standalone',
+  
+  webpack: (config, { dev, isServer }) => {
     // Provide fallbacks for both server and client builds
+    
+    config.optimization.minimize = false;
+    
+    
+    
     config.resolve.fallback = {
       ...config.resolve.fallback,
       oracledb: false,
@@ -24,3 +35,14 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
+
+
+// /** @type {import('next').NextConfig} */
+// module.exports = {
+//   webpack: (config, { dev, isServer }) => {
+//     // Provide fallbacks for both server and client builds
+    
+//     config.optimization.minimize = false;
+//     return config;
+//   },
+// };

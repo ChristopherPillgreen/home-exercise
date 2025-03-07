@@ -64,12 +64,19 @@ const config: Options<MySqlDriver> = {
     User,
   ], // Entity paths during development
   
-  dbName: 'seniorproject',
-  host: 'localhost',
-  user: 'root',
-  password: 'root_password',
+  // dbName: 'seniorproject',
+  // host: '127.0.0.1',
+  // user: 'root',
+  // password: 'root_password',
+  // driver: MySqlDriver,
+  // port: 3306,
+  // debug: true,
+  dbName: process.env.MYSQL_DATABASE || 'seniorproject',
+  host: process.env.MYSQL_HOST || '127.0.0.1',
+  user: process.env.MYSQL_USER || 'root',
+  password: process.env.MYSQL_PASSWORD || 'root_password',
   driver: MySqlDriver,
-  port: 3306,
+  port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306,
   debug: true,
 };
 
