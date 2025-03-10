@@ -3,6 +3,7 @@ import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
 import { Exercise } from "./Exercise.entity";
 import type { Rel } from "@mikro-orm/core"
 import { Plan } from "./Plan.entity";
+import { User } from "./User.entity";
 
 @Entity({ tableName: 'plan_exercise'})
 export class PlanExercise {
@@ -34,5 +35,8 @@ export class PlanExercise {
 
   @ManyToOne({ entity: () => Exercise, eager: true })
   exercise!: Rel<Exercise>;
+
+  @ManyToOne({ entity: () => User, eager:true})
+  user!: Rel<User>;
 }
 
