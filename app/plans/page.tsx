@@ -31,8 +31,6 @@ export default function PlansPage() {
       return;
     }
 
-    console.log("Session User ID:", session.user.id); // Log the user ID from session
-
     const fetchPlans = async () => {
       try {
         // Construct the API URL with the correct userID from session

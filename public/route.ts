@@ -53,16 +53,16 @@ export async function POST(request: NextRequest) {
     const em = (await getOrm()).em.fork()
     
     const body = await request.json();
-    const { userID, frequency, favorites } = body;
+    const { userID, frequency, favorites, planName } = body;
 
-    if (!userID || typeof frequency !== "number" || typeof favorites !== "boolean") {
+    if (!userID || typeof frequency !== "number" || typeof favorites !== "boolean" || !planName) {
       return NextResponse.json(
-        { message: "Invalid request data. Ensure userID, frequency, and favorites are provided." },
+        { message: "Invalid request data. Ensure userID, frequency, favorites, and planName are provided." },
         { status: 400 }
       );
     }
 
-    const newPlan = await createPlan(em, userID, { frequency, favorites });
+    const newPlan = await createPlan(em, userID, { frequency, favorites, planName });
     return NextResponse.json(newPlan, { status: 201 });
   } catch (error: any) {
     return handleErrorResponse(error);
