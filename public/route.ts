@@ -9,6 +9,7 @@ import {
   addExerciseToPlan,
   removeExerciseFromPlan,
 } from "../app/api/Plan/Plan.service";
+import { parseIsolatedEntityName } from "typescript";
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {

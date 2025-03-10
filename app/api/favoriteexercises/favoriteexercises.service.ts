@@ -3,8 +3,8 @@ import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 import { User } from '@entities/User.entity';
 import { Exercise } from '@entities/Exercise.entity';
 
-export const getFavoritesByUser = async (em: EntityManager, userID: number): Promise<FavoriteExercise[]> => {
-  const user = await em.findOne(User, { userID: userID.toString() });
+export const getFavoritesByUser = async (em: EntityManager, userID: string): Promise<FavoriteExercise[]> => {
+  const user = await em.findOne(User, { userID });
   if (!user) throw new Error('User not found');
 
   return await em.find(FavoriteExercise, { user }, { populate: ['exercise'] });
@@ -12,7 +12,7 @@ export const getFavoritesByUser = async (em: EntityManager, userID: number): Pro
 
 export const addFavoriteExercise = async (
   em: EntityManager,
-  userID: number,
+  userID: string,
   exerciseID: number
 ): Promise<FavoriteExercise> => {
   const user = await em.findOne(User, { userID: userID.toString() });
@@ -28,7 +28,7 @@ export const addFavoriteExercise = async (
 
 export const removeFavoriteExercise = async (
   em: EntityManager,
-  userID: number,
+  userID: string,
   exerciseID: number
 ): Promise<boolean> => {
   const favorite = await em.findOne(FavoriteExercise, { user: { userID: userID.toString() }, exercise: { exerciseID } });
