@@ -36,7 +36,7 @@ export class PlanExercise {
   @ManyToOne({ entity: () => Exercise, eager: true })
   exercise!: Rel<Exercise>;
 
-  @ManyToOne({ entity: () => User, eager:true})
-  user!: Rel<User>;
+  // @ManyToOne({ entity: () => User, eager: true})
+  // user!: Rel<User>;
 }
 

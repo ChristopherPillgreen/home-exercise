@@ -80,11 +80,13 @@ export const addExerciseToPlan = async (
   const planExercise = em.create(PlanExercise, {
     plan,
     exercise,
+    user: plan.user!,
     sequenceNum: data.sequenceNum ?? 1,
     reps: data.reps ?? 10,
     sets: data.sets ?? 3,
     duration: data.duration ?? 0,
     time: data.time ?? 0,
+    
   });
 
   // Add the new PlanExercise to the plan's collection (no check for duplicates)
