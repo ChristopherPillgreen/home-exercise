@@ -60,7 +60,7 @@ export default function Exercises() {
         throw new Error("Failed to add exercise to plan.");
       }
 
-      alert("Exercise added successfully!");
+      // alert("Exercise added successfully!");
     } catch (err) {
       console.error("Error adding exercise:", err);
       alert("Failed to add exercise.");

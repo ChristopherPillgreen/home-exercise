@@ -69,6 +69,41 @@ export const updatePlanExercise = async (
   await em.persistAndFlush(planExercise);
   return planExercise;
 };
+// export const updatePlanExercise = async (
+//   em: EntityManager,
+//   id: number,  // The primary key (ID) of the PlanExercise entry
+//   userID: string,
+//   planID: number,
+//   exerciseID: number,
+//   data: Partial<Omit<PlanExercise, "plan" | "exercise">>
+// ): Promise<PlanExercise | null> => {
+//   console.log("Received PlanExercise id:", id);  // Log the incoming PlanExercise ID
+
+//   // Fetch the PlanExercise entry using its primary key (id)
+//   const planExercise = await em.findOne(PlanExercise, { id }, { populate: ["plan", "exercise"] });
+
+//   console.log("PlanExercise found:", planExercise);
+
+//   // If PlanExercise is not found or doesn't have the associated plan or user
+//   if (!planExercise || !planExercise.plan || !planExercise.plan.user) {
+//     throw new Error("PlanExercise not found or unauthorized access");
+//   }
+
+//   // Ensure the userID in the plan matches the given userID
+//   if (planExercise.plan.user.userID !== userID) {
+//     throw new Error("Unauthorized access");
+//   }
+
+//   // Update the PlanExercise with the provided data
+//   em.assign(planExercise, data);
+
+//   // Persist and flush the changes
+//   await em.persistAndFlush(planExercise);
+
+//   return planExercise;
+// };
+  
+
 
 export const removeExerciseFromPlan = async (
   em: EntityManager,

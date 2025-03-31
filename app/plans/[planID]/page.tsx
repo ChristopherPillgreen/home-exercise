@@ -78,7 +78,7 @@ export default function EditPlanPage() {
     ));
   };
 
-const handleDeleteExercise = async (exerciseID: number) => {
+const handleDeleteExercise = async (exerciseID: number, id: number) => {
   try {
     const response = await fetch(`/api/planexercise?planID=${planID}&exerciseID=${exerciseID}`, {
       method: "DELETE",           
@@ -90,7 +90,8 @@ const handleDeleteExercise = async (exerciseID: number) => {
     if (response.ok) {
       console.log('Exercise deleted successfully');
       // Update the UI to remove the exercise using the id from planexercise table
-      setPlanExercises(planExercises.filter((exercise) => exercise.id !== exerciseID));
+      setPlanExercises(planExercises.filter((exercise) => exercise.id !== id));
+
     } else {
       console.error('Failed to delete exercise');
     }
@@ -122,6 +123,14 @@ const savePlan = async () => {
     if (!response.ok) throw new Error("Failed to save plan");
     alert("Plan saved successfully!");
   } catch (err: any) {
+    console.log(
+  planExercises.map((ex: PlanExercise) => ({
+    id: ex.id,  // This should be the primary key of plan_exercise
+    planID: ex.plan?.planID,  // This should be the plan's ID
+    exerciseID: ex.exercise?.exerciseID,  // This should be the exercise's ID
+  }))
+);
+
     console.error("Error saving plan:", err);
     alert("Failed to save plan.");
   } finally {
@@ -228,7 +237,7 @@ const savePlan = async () => {
 
                 {/* Delete Button */}
                 <button
-                  onClick={() => handleDeleteExercise(exercise.exercise.exerciseID)}
+                  onClick={() => handleDeleteExercise(exercise.exercise.exerciseID, exercise.id)}
                   className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
                 >
                   Delete
