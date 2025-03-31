@@ -7,8 +7,8 @@ import {
   getAllPlans,
   getExercisesForPlan,
   getPlansByUserId,
-  deletePlan, 
-  removeExerciseFromPlan
+  deletePlan,
+  updatePlan
 } from './Plan.service';
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -46,6 +46,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
+
 // POST: Create a new plan
 export async function POST(request: NextRequest) {
   const em = (await getOrm()).em.fork()
@@ -65,7 +66,8 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Add exercise to a plan
+// PUT: Update an existing plan or add an exercise to a plan
+
 export async function PUT(request: NextRequest) {
   console.log("PUT handler triggered");
   const em = (await getOrm()).em.fork();
@@ -106,7 +108,8 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   }
-} 
+}
+
 
 export async function DELETE(request: NextRequest){
   try {
