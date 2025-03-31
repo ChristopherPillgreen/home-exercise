@@ -8,11 +8,11 @@ import {
   getExercisesForPlan,
   getPlansByUserId,
   deletePlan,
-  updatePlan
+  updatePlan,
+  removeExerciseFromPlan
 } from './Plan.service';
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { EntityManager } from '@mikro-orm/mysql';
-import { updatePlan } from './Plan.service';
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {

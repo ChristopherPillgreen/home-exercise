@@ -64,28 +64,40 @@ export async function POST(request: NextRequest) {
 
 // PUT: Update an exercise in a plan
 export async function PUT(request: NextRequest) {
-  const session = await getServerSession(authOptions); // Move session retrieval inside the function
+  const session = await getServerSession(authOptions);
 
   if (!session || !session.user) {
     return NextResponse.json({ message: 'User is not authenticated' }, { status: 401 });
   }
 
-  const planID = getQueryParam(request, 'planID');
-  const exerciseID = getQueryParam(request, 'exerciseID');
+  const body = await request.json();
+  const { planID, exercises } = body;
 
-  if (!planID || !exerciseID) {
-    return NextResponse.json({ message: 'planID and exerciseID are required' }, { status: 400 });
+  if (!planID || !Array.isArray(exercises) || exercises.length === 0) {
+    return NextResponse.json({ message: 'planID and exercises are required' }, { status: 400 });
   }
 
   try {
-    const body = await request.json();
     const em = (await getOrm()).em.fork();
-    const updatedPlanExercise = await updatePlanExercise(em, Number(planID), Number(exerciseID), session.user.id, body);
-    return NextResponse.json(updatedPlanExercise, { status: 200 });
+    const updatedExercises = [];
+
+    for (const exercise of exercises) {
+      const updatedPlanExercise = await updatePlanExercise(
+        em,
+        Number(planID),
+        exercise.exerciseID,
+        session.user.id,
+        { ...exercise } // Spread all properties of exercise into update
+      );
+      updatedExercises.push(updatedPlanExercise);
+    }
+
+    return NextResponse.json(updatedExercises, { status: 200 });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
 
 // DELETE: Remove an exercise from a plan
 export async function DELETE(request: NextRequest) {

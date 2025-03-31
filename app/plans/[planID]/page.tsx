@@ -3,7 +3,34 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
-type Exercise = {
+// type Exercise = {
+//   id: number;
+//   sequenceNum: number;
+//   reps: number;
+//   sets: number;
+//   duration: number;
+//   time: string;
+//   description: string;
+//   exerciseID: number;
+//   exerciseName: string;
+//   exerciseDescription: string;
+//   exerciseImage: string;
+// };
+
+interface PlanExercise {
+  exercise: {
+    exerciseID: number;
+    exerciseName: string;
+    exerciseDescription: string;
+    image: string;
+  };
+  plan: {
+    planID: number;
+    frequency: number;
+    favorites: boolean;
+    planName: string;
+    
+  };
   id: number;
   sequenceNum: number;
   reps: number;
@@ -11,14 +38,10 @@ type Exercise = {
   duration: number;
   time: string;
   description: string;
-  exerciseID: number;
-  exerciseName: string;
-  exerciseDescription: string;
-  exerciseImage: string;
-};
+  };
 
 export default function EditPlanPage() {
-  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [planExercises, setPlanExercises] = useState<PlanExercise[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -31,7 +54,8 @@ export default function EditPlanPage() {
         const response = await fetch(`/api/planexercise?planID=${planID}`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        setExercises(data);
+        setPlanExercises(data);
+        console.log("Fetched exercises:", data);
       } catch (err: any) {
         console.error("Error fetching exercises:", err);
         setError(err.message || "Failed to fetch exercises.");
@@ -49,15 +73,15 @@ export default function EditPlanPage() {
   }, [planID]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, exerciseId: number, field: string) => {
-    setExercises(exercises.map((exercise) =>
+    setPlanExercises(planExercises.map((exercise) =>
       exercise.id === exerciseId ? { ...exercise, [field]: e.target.value } : exercise
     ));
   };
 
-const handleDeleteExercise = async (exerciseID: number, planExerciseId: number) => {
+const handleDeleteExercise = async (exerciseID: number) => {
   try {
-    const response = await fetch(`/api/planexercise?planID=${planID}&exerciseID=${planExerciseId}`, {
-      method: "DELETE",
+    const response = await fetch(`/api/planexercise?planID=${planID}&exerciseID=${exerciseID}`, {
+      method: "DELETE",           
       headers: {
         "Content-Type": "application/json",
       },
@@ -66,7 +90,7 @@ const handleDeleteExercise = async (exerciseID: number, planExerciseId: number) 
     if (response.ok) {
       console.log('Exercise deleted successfully');
       // Update the UI to remove the exercise using the id from planexercise table
-      setExercises(exercises.filter((exercise) => exercise.id !== planExerciseId));
+      setPlanExercises(planExercises.filter((exercise) => exercise.id !== exerciseID));
     } else {
       console.error('Failed to delete exercise');
     }
@@ -75,23 +99,37 @@ const handleDeleteExercise = async (exerciseID: number, planExerciseId: number) 
   }
 };
 
-  const savePlan = async () => {
-    setSaving(true);
-    try {
-      const response = await fetch("/api/Plan", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planID, exercises }),
-      });
-      if (!response.ok) throw new Error("Failed to save plan");
-      alert("Plan saved successfully!");
-    } catch (err: any) {
-      console.error("Error saving plan:", err);
-      alert("Failed to save plan.");
-    } finally {
-      setSaving(false);
-    }
-  };
+const savePlan = async () => {
+  setSaving(true);
+  try {
+    const response = await fetch("/api/planexercise", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        planID,
+        exercises: planExercises.map((ex: PlanExercise) => ({
+          exerciseID: ex.exercise.exerciseID,
+          sequenceNum: ex.sequenceNum,
+          reps: ex.reps,
+          sets: ex.sets,
+          duration: ex.duration,
+          time: ex.time,
+          description: ex.description,
+        })),
+      }),
+    });
+
+    if (!response.ok) throw new Error("Failed to save plan");
+    alert("Plan saved successfully!");
+  } catch (err: any) {
+    console.error("Error saving plan:", err);
+    alert("Failed to save plan.");
+  } finally {
+    setSaving(false);
+  }
+};
+
+
 
   if (loading) return <div className="text-center mt-4">Loading exercises...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
@@ -116,15 +154,15 @@ const handleDeleteExercise = async (exerciseID: number, planExerciseId: number) 
       </button>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {exercises.length === 0 ? (
+        {planExercises.length === 0 ? (
           <p>No exercises added yet.</p>
         ) : (
-          exercises.map((exercise) => (
+          planExercises.map((exercise: PlanExercise) => (
             <div key={exercise.id} className="border p-4 rounded shadow relative">
-              <h2 className="text-xl font-semibold mt-2">{exercise.exerciseName}</h2>
+              <h2 className="text-xl font-semibold mt-2">{exercise.exercise.exerciseName}</h2>
               <img
-                src={exercise.exerciseImage}
-                alt={exercise.exerciseName}
+                src={exercise.exercise.image}
+                alt={exercise.exercise.exerciseName}
                 className="w-full h-48 object-cover mt-2 rounded"
               />
 
@@ -190,7 +228,7 @@ const handleDeleteExercise = async (exerciseID: number, planExerciseId: number) 
 
                 {/* Delete Button */}
                 <button
-                  onClick={() => handleDeleteExercise(exercise.exerciseID, exercise.id)}
+                  onClick={() => handleDeleteExercise(exercise.exercise.exerciseID)}
                   className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded"
                 >
                   Delete
