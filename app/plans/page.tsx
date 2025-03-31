@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { isNamedExports } from "typescript";
 
 type Plan = {
   planID: number;
@@ -21,7 +20,7 @@ export default function PlansPage() {
   const [query, setQuery] = useState(""); // for search functionality
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null); // for highlighting selected plan
   const [removeMode, setRemoveMode] = useState(false); // ability to remove plan
-
+  const [showConfirmation, setShowConfirmation] = useState(false); // control the confirmation modal
 
   useEffect(() => {
     if (status === "loading") return; // Wait for session to load
@@ -64,67 +63,78 @@ export default function PlansPage() {
   };
 
   const handleCreatePlan = async () => {
-  if (!session?.user) {
-    alert("You must be logged in to create a plan.");
-    return;
-  }
-
-  const planName = prompt("Enter a name for your new plan:");
-
-  if (!planName) {
-    alert("Plan name is required!");
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/Plan", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ planName, userID: session.user.id }), // Attach planName and userID
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!session?.user) {
+      alert("You must be logged in to create a plan.");
+      return;
     }
 
-    const data = await response.json();
-    router.push(`/plans/${data.planID}`); // Navigate to the new plan's page
-  } catch (error) {
-    console.error("Error creating plan:", error);
-    setError("Failed to create plan.");
-  }
-};
+    const planName = prompt("Enter a name for your new plan:");
 
-const handleRemovePlan = async () => {
-  if (!selectedPlan) return;
-
-  try {
-    const response = await fetch(`/api/Plan/${selectedPlan.planID}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      throw new Error(`Failed to remove plan!`);
+    if (!planName) {
+      alert("Plan name is required!");
+      return;
     }
 
-    setPlans(plans.filter(plan => plan.planID !== selectedPlan.planID));
-    setSelectedPlan(null);
-    setRemoveMode(false);
-  } catch (error) {
-    console.error('Error removing plan:', error);
-    setError('Failed to remove plan.');
-  }
-};
+    try {
+      const response = await fetch("/api/Plan", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ planName, userID: session.user.id }), // Attach planName and userID
+      });
 
-const toggleRemoveMode = () => {
-  setRemoveMode(!removeMode);
-  setSelectedPlan(null); // Deselect any selected plan
-};
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
-if (loading) return <div className="text-center mt-4">Loading plans...</div>;
-if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
+      const data = await response.json();
+      router.push(`/plans/${data.planID}`); // Navigate to the new plan's page
+    } catch (error) {
+      console.error("Error creating plan:", error);
+      setError("Failed to create plan.");
+    }
+  };
+
+  const handleRemovePlan = async () => {
+    if (!selectedPlan) return;
+
+    try {
+      // Send the DELETE request with the planID as a query parameter
+      const response = await fetch(`/api/Plan?planID=${selectedPlan.planID}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to remove plan!`);
+      }
+
+      // If the plan was deleted successfully, update the state
+      setPlans(plans.filter(plan => plan.planID !== selectedPlan.planID));
+      setSelectedPlan(null);
+      setRemoveMode(false);
+      setShowConfirmation(false); // Close confirmation dialog after deletion
+    } catch (error) {
+      console.error('Error removing plan:', error);
+      setError('Failed to remove plan.');
+    }
+  };
+
+  const toggleRemoveMode = () => {
+    setRemoveMode(!removeMode);
+    setSelectedPlan(null); // Deselect any selected plan
+  };
+
+  const openConfirmationPopup = () => {
+    setShowConfirmation(true); // Show the confirmation popup
+  };
+
+  const closeConfirmationPopup = () => {
+    setShowConfirmation(false); // Close the confirmation popup without deleting
+  };
+
+  if (loading) return <div className="text-center mt-4">Loading plans...</div>;
+  if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
     <div className="container mx-auto p-4">
@@ -142,12 +152,13 @@ if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
           {removeMode && selectedPlan && (
             <button
-              onClick={handleRemovePlan}
+              onClick={openConfirmationPopup} // Open the confirmation popup
               className="flex-1 ml-5 bg-red-500 text-white py-2 px-4 rounded"
             >
               Remove Plan
             </button>
           )}
+
           <input
             type="text"
             placeholder="Search..."
@@ -157,44 +168,67 @@ if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
           />
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      {showConfirmation && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-xl mb-4">Are you sure you want to delete this plan?</h3>
+            <div className="flex justify-end space-x-4">
+              <button
+                onClick={handleRemovePlan}
+                className="bg-red-500 text-white py-2 px-4 rounded"
+              >
+                Yes, Delete
+              </button>
+              <button
+                onClick={closeConfirmationPopup}
+                className="bg-gray-500 text-white py-2 px-4 rounded"
+              >
+                No, Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>
-          <div className="flex flex-wrap justify-between gap-4">
-            <button
-              className="absolute left-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
-            >
-                  ←
-            </button>
-            {Array.from({ length: 8 }, (_, index) => {
-              const plan = plans[index];
-              return (
-                <div
-                  key={plan ? plan.planID : `dummy-${index}`}
-                  className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
-                  onClick={() => handlePlanClick(plan)}
-                  onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)} 
-                >
+        <div className="flex flex-wrap justify-between gap-4">
+          <button
+            className="absolute left-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
+          >
+            ←
+          </button>
+          {Array.from({ length: 8 }, (_, index) => {
+            const plan = plans[index];
+            return (
+              <div
+                key={plan ? plan.planID : `dummy-${index}`}
+                className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
+                onClick={() => handlePlanClick(plan)}
+                onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)} 
+              >
                 {plan ? (
-                    <>
-                      <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
-                      <p className="text-gray-600">{plan.planDescription}</p>
-                    </>
-                  ) : (
-                    <>
-                      <h2 className="text-xl font-semibold mt-2"></h2>
-                      <p className="text-gray-600"></p>
-                    </>
+                  <>
+                    <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
+                    <p className="text-gray-600">{plan.planDescription}</p>
+                  </>
+                ) : (
+                  <>
+                    <h2 className="text-xl font-semibold mt-2"></h2>
+                    <p className="text-gray-600"></p>
+                  </>
                 )}
               </div>
-              );
-            })}
-            <button
+            );
+          })}
+          <button
             className="absolute right-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
-            >
+          >
             →
-            </button>
-          </div>
+          </button>
+        </div>
       </div>
     </div>
   );
 }
-

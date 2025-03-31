@@ -80,7 +80,7 @@ export const addExerciseToPlan = async (
   const planExercise = em.create(PlanExercise, {
     plan,
     exercise,
-    user: plan.user!,
+    // Removed 'user' as it is not a valid property of PlanExercise
     sequenceNum: data.sequenceNum ?? 1,
     reps: data.reps ?? 10,
     sets: data.sets ?? 3,

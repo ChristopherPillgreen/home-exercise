@@ -7,10 +7,12 @@ import {
   getAllPlans,
   getExercisesForPlan,
   getPlansByUserId,
-  deletePlan
+  deletePlan, 
+  removeExerciseFromPlan
 } from './Plan.service';
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { EntityManager } from '@mikro-orm/mysql';
+import { updatePlan } from './Plan.service';
 
 // Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
@@ -65,42 +67,52 @@ export async function POST(request: NextRequest) {
 
 // PUT: Add exercise to a plan
 export async function PUT(request: NextRequest) {
-    console.log("put handler is triggered");
-    const em = (await getOrm()).em.fork()
+  console.log("PUT handler triggered");
+  const em = (await getOrm()).em.fork();
   const body = await request.json();
+  console.log("body", body);
 
-    console.log("body", body);
+  // Destructure planID and exerciseID, along with the rest of the update data.
   const { planID, exerciseID, ...data } = body;
 
-  // try {
-  //   const updatedPlanExercise = await addExerciseToPlan(em, planID, exerciseID, data);
-  //   return NextResponse.json(updatedPlanExercise, { status: 200 });
-  // } catch (error: any) {
-  //   return NextResponse.json({ error: error.message }, { status: 500 });
-  // }
-  if (!planID || !exerciseID) {
+  if (!planID) {
     return NextResponse.json(
-      { message: 'Both planID and exerciseID are required' },
+      { message: "planID is required" },
       { status: 400 }
     );
   }
 
-  try {
-    // Call the service function to add the exercise to the plan
-    const updatedPlanExercise = await addExerciseToPlan(em, Number(planID), Number(exerciseID), data);
-
-    // Respond with the updated plan
-    return NextResponse.json(updatedPlanExercise, { status: 200 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  // If exerciseID is provided, update the join table or add the exercise to the plan.
+  if (exerciseID) {
+    try {
+      const updatedPlanExercise = await addExerciseToPlan(
+        em,
+        Number(planID),
+        Number(exerciseID),
+        data
+      );
+      return NextResponse.json(updatedPlanExercise, { status: 200 });
+    } catch (error: any) {
+      console.error("Error in addExerciseToPlan:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  } else {
+    // Otherwise, update just the plan.
+    try {
+      const updatedPlan = await updatePlan(em, Number(planID), data);
+      return NextResponse.json(updatedPlan, { status: 200 });
+    } catch (error: any) {
+      console.error("Error in updatePlan:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
   }
-
-}
+} 
 
 export async function DELETE(request: NextRequest){
   try {
     const {searchParams} = new URL(request.url);
     const planIDParam = searchParams.get('planID');
+    const exerciseIDParam = searchParams.get('exerciseID');
 
     if (!planIDParam) {
       return NextResponse.json({ error: 'Plan ID is required' }, { status: 400 });
@@ -112,6 +124,15 @@ export async function DELETE(request: NextRequest){
     }
 
     const em = (await getOrm()).em.fork()
+
+    if (exerciseIDParam) {
+      const exerciseID = Number(exerciseIDParam);
+      if (isNaN(exerciseID)) {
+        return NextResponse.json({ error: 'Invalid exercise ID' }, { status: 400 });
+      }
+      await removeExerciseFromPlan(em, planID, exerciseID);
+      return NextResponse.json({ success: true }, { status: 200 });
+    }
 
     await deletePlan(em, planID);
 
