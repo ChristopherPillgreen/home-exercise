@@ -5,8 +5,9 @@ import { ReactNode } from "react"; // Import ReactNode type
 
 interface Props {
   children: ReactNode; // Define the type for children
+  session: any; // Optional session prop
 }
 
-export default function SessionProviderWrapper({ children }: Props) {
-  return <SessionProvider>{children}</SessionProvider>;
+export default function SessionProviderWrapper({ children, session }: Props) {
+  return <SessionProvider session={session}>{children}</SessionProvider>;
 }

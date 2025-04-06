@@ -1,29 +1,8 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import { Button, MegaMenu, Navbar } from "flowbite-react";
 import { signIn, signOut, useSession } from "next-auth/react"; // Import the signIn, signOut, and useSession functions from next-auth
 
 export default function Nav() {
   const { data: session } = useSession(); // Get the user's session status
-  const [isHiddenPage, setIsHiddenPage] = useState(true);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const path = window.location.pathname;
-      setIsHiddenPage(
-        path === "/" ||
-          path === "/confirm" ||
-          path === "/sign-up" ||
-          path === "/login"
-      );
-    }
-  }, []);
-
-  if (isHiddenPage) {
-    return null;
-  }
-
   const handleGoogleSignIn = () => {
     signIn("google"); // Redirects the user to Google login
   };
