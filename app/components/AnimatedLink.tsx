@@ -3,6 +3,29 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 
+// Utility function to generate lighter and darker shades of a color
+function generateGradientColors(baseColor: string): string[] {
+  const lighten = (color: string, percent: number) => {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = ((num >> 8) & 0x00ff) + amt;
+    const B = (num & 0x0000ff) + amt;
+    return `#${(
+      0x1000000 +
+      (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+      (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+      (B < 255 ? (B < 1 ? 0 : B) : 255)
+    )
+      .toString(16)
+      .slice(1)}`;
+  };
+
+  const darken = (color: string, percent: number) => lighten(color, -percent);
+
+  return [lighten(baseColor, 5), baseColor, darken(baseColor, 5)];
+}
+
 interface AnimatedLinkProps {
   href: string;
   text: string;
@@ -10,9 +33,16 @@ interface AnimatedLinkProps {
 }
 
 export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkProps) {
+  const [lightShade, baseShade, darkShade] = generateGradientColors(strokeColor);
+
   return (
     <motion.div
-      className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-md" // Smaller height and rounded corners
+      className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-md"
+      style={{
+        background: `linear-gradient(90deg, ${lightShade}, ${baseShade}, ${darkShade})`,
+        backgroundSize: "200% 200%",
+        animation: "gradientAnimation 3s ease infinite",
+      }}
       initial={{ x: "100vw", opacity: 0 }} // Slide in from the right
       animate={{ x: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 50, damping: 10 }}
@@ -20,12 +50,12 @@ export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkPr
       <Link href={href} className="relative w-full h-full">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 260 80" // Adjusted viewBox for smaller width
+          viewBox="0 0 260 80"
           className="absolute inset-0 w-full h-full"
         >
           <path
-            d="M10 10 H250 A10 10 0 0 1 260 20 V70 A10 10 0 0 1 250 80 H10 A10 10 0 0 1 0 70 V20 A10 10 0 0 1 10 10 Z" // Shorter rectangle
-            fill={strokeColor} // Fill the rectangle with the stroke color
+            d="M10 10 H250 A10 10 0 0 1 260 20 V70 A10 10 0 0 1 250 80 H10 A10 0 0 1 0 70 V20 A10 10 0 0 1 10 10 Z"
+            fill="transparent" // Keep the path transparent to show the gradient background
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white transition-opacity duration-300 hover:opacity-80">
