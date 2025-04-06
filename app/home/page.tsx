@@ -13,25 +13,25 @@ export default function Home() {
           <div className="grid grid-cols-2 gap-6">
             <Link
               href="/start"
-              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
+              className="flex py-5 px-10 bg-[#7076af] text-[#FFFFFF] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Getting Started
             </Link>
             <Link
               href="/questions"
-              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
+              className="flex py-5 px-10 bg-[#793339] text-[#FFFFFF] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Questions
             </Link>
             <Link
               href="/about"
-              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
+              className="flex py-5 px-10 bg-[#cf935c] text-[#FFFFFF] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               About Us
             </Link>
             <Link
               href="/contact"
-              className="flex py-5 px-10 bg-[#F2F2F2] text-[#7874AC] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
+              className="flex py-5 px-10 bg-[#74ac85] text-[#FFFFFF] text-2xl font-semibold rounded-lg hover:bg-[#3C3C3C] hover:text-white transition duration-300"
             >
               Contact Us
             </Link>
