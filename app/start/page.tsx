@@ -6,28 +6,26 @@ export default function GettingStarted() {
     <div className="py-12 bg-gray-100 min-h-screen">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
-          Getting Started with Your Exercise Plans
+          Getting Started with Kineticare
         </h1>
 
         <div className="space-y-8">
           <div className="step-card">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Step 1: Create an Account
+            <h2 className="text-xl font-semibold text-[#00768c]">
+              Create an Account
             </h2>
             <p className="mt-2 text-gray-600">
-              Begin by signing up for an account. This will allow you to create,
-              save, and share your exercise plans with others.
+              Click the green button to sign in using google. Kineticare uses google auth to manage accounts.
             </p>
           </div>
 
           <div className="step-card">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Step 2: Create a New Plan
+            <h2 className="text-xl font-semibold text-[#cf935c] ">
+              Go to the Planner
             </h2>
-            <p className="mt-2 text-gray-600">
-              After logging in, you can create a new exercise plan by navigating
-              to the "Planner" section. Add exercises, set repetitions, and add
-              notes.
+            <p className="mt-2 text-gray-700">
+              After logging in, you can create a new exercise plan by clicking on
+              the "Your Plans" button in the top navigation bar. This will take you to the plan creation page.
             </p>
           </div>
 
@@ -63,7 +61,7 @@ export default function GettingStarted() {
 
           <div className="text-center mt-8">
             <a
-              href="/planner"
+              href="/plans"
               className="inline-block rounded-md px-8 py-3 text-center font-medium text-white bg-[#7874AC] hover:bg-[#3C3C3C] hover:text-white"
             >
               Start Creating A Plan

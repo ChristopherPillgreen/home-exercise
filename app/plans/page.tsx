@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { motion } from "motion/react";
 
 type Plan = {
   planID: number;
@@ -12,15 +13,17 @@ type Plan = {
 };
 
 export default function PlansPage() {
+  const router = useRouter();
   const { data: session, status } = useSession();
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const [query, setQuery] = useState(""); // for search functionality
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null); // for highlighting selected plan
   const [removeMode, setRemoveMode] = useState(false); // ability to remove plan
   const [showConfirmation, setShowConfirmation] = useState(false); // control the confirmation modal
+  const [currentPage, setCurrentPage] = useState(0); // Track the current page
+  const plansPerPage = 8; // Number of plans to display per page
 
   useEffect(() => {
     if (status === "loading") return; // Wait for session to load
@@ -51,6 +54,31 @@ export default function PlansPage() {
 
     fetchPlans();
   }, [session, status]);
+
+  const handleSearch = async (searchQuery: string) => {
+    setQuery(searchQuery); // Update the query state
+
+    if (!searchQuery) {
+      // If the search query is empty, fetch all plans again
+      const response = await fetch(`/api/Plan?userID=${session?.user?.id}`);
+      const data = await response.json();
+      setPlans(data);
+      return;
+    }
+
+    try {
+      // Fetch plans matching the search query
+      const response = await fetch(`/api/Plan?userID=${session?.user?.id}&title=${searchQuery}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch plans.");
+      }
+      const data = await response.json();
+      setPlans(data); // Update the plans state with the filtered results
+    } catch (error) {
+      console.error("Error searching for plans:", error);
+      setError("Failed to search for plans.");
+    }
+  };
 
   const handlePlanClick = (plan: Plan) => {
     if (removeMode) {
@@ -133,15 +161,34 @@ export default function PlansPage() {
     setShowConfirmation(false); // Close the confirmation popup without deleting
   };
 
+  const handleNextPage = () => {
+    if ((currentPage + 1) * plansPerPage < plans.length) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   if (loading) return <div className="text-center mt-4">Loading plans...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
+
+  const displayedPlans = plans.slice(
+    currentPage * plansPerPage,
+    (currentPage + 1) * plansPerPage
+  );
 
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[#7874ac] text-3xl py-2 px-4 font-bold">
+        <button
+            className="flex-1 ml-5 mr-15 bg-[#7874ac] text-white py-2 px-4 rounded"
+        >
           Your Plans
-        </h1>
+        </button>
         <div className="flex items-center p-4 w-full max-w-md ml-auto">
           <button
             onClick={removeMode ? toggleRemoveMode : handleCreatePlan}
@@ -164,7 +211,7 @@ export default function PlansPage() {
             placeholder="Search..."
             className="ml-5 py-2 px-4 rounded border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
           />
         </div>
       </div>
@@ -193,40 +240,44 @@ export default function PlansPage() {
       )}
 
       <div>
-        <div className="flex flex-wrap justify-between gap-4">
-          <button
-            className="absolute left-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
-          >
-            ←
-          </button>
-          {Array.from({ length: 8 }, (_, index) => {
-            const plan = plans[index];
-            return (
-              <div
-                key={plan ? plan.planID : `dummy-${index}`}
-                className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
-                onClick={() => handlePlanClick(plan)}
-                onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)} 
-              >
-                {plan ? (
-                  <>
-                    <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
-                    <p className="text-gray-600">{plan.planDescription}</p>
-                  </>
-                ) : (
-                  <>
-                    <h2 className="text-xl font-semibold mt-2"></h2>
-                    <p className="text-gray-600"></p>
-                  </>
-                )}
+        <div className="relative flex flex-wrap justify-between gap-4">
+          {/* Display Plans */}
+          {displayedPlans.map((plan) => (
+            <div
+              key={plan.planID}
+              className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
+              onClick={() => handlePlanClick(plan)}
+              onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)}
+            >
+              <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
+              <p className="text-gray-600">{plan.planDescription}</p>
+            </div>
+          ))}
+
+          {/* Add Empty Placeholders */}
+          {Array.from({ length: plansPerPage - displayedPlans.length }).map((_, index) => (
+            <div
+              key={`placeholder-${index}`}
+              className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow bg-gray-100"
+            >
+              <div className="flex items-center justify-center h-full text-gray-400">
+                Empty Slot
               </div>
-            );
-          })}
-          <button
-            className="absolute right-6 top-1/2 p-3 bg-[#74ac85] text-white rounded-full"
-          >
-            →
-          </button>
+            </div>
+          ))}
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex items-center justify-center mt-4 space-x-2">
+          {[0, 1, 2].map((index) => (
+            <button
+              key={`dot-${index}`}
+              onClick={() => setCurrentPage(index)} // Navigate to the corresponding page
+              className={`w-4 h-4 rounded-full ${
+                currentPage === index ? "bg-[#00768c]" : "bg-gray-300"
+              }`}
+            />
+          ))}
         </div>
       </div>
     </div>

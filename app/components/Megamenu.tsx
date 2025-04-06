@@ -20,11 +20,6 @@ export default function Nav() {
     tap: { scale: 0.95 },
   };
 
-  const linkVariants = {
-    hover: { color: "#3C3C3C", transition: { duration: 0.2 } },
-    tap: { scale: 0.95 },
-  };
-
   return (
     <MegaMenu>
       <motion.div
@@ -36,7 +31,7 @@ export default function Nav() {
         <Navbar.Brand href="/home">
           <motion.img
             alt="Logo"
-            src="logo.svg"
+            src="/logo.svg"
             className="h-4 w-auto md:h-6"
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
@@ -50,10 +45,10 @@ export default function Nav() {
             whileTap="tap"
           >
             <Button
-                href="./plans"
+                href="/plans"
                 style={{ backgroundColor: "#b9633a" }}
               >
-                Plan Creator
+                Your Plans
             </Button>
           </motion.div>
           <motion.div
@@ -63,7 +58,7 @@ export default function Nav() {
                 whileTap="tap"
           >
             <Button
-                href="./about"
+                href="/about"
                 style={{ backgroundColor: "#008d6c" }}
               >
                 About Us
