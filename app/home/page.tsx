@@ -73,7 +73,6 @@ export default function Home() {
             src="/webstock.png" // Replace with the actual path to the Kineticare logo
             className="w-auto transform scale-50 mt-[21rem]" // Adjust size as needed
             onContextMenu={(e) => e.preventDefault()} // Disable right-click
-            whileHover={{ scale: 0.51}}
           />
 
           {/* Overlapping Image */}

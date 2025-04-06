@@ -35,6 +35,11 @@ interface AnimatedLinkProps {
 export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkProps) {
   const [lightShade, baseShade, darkShade] = generateGradientColors(strokeColor);
 
+  const buttonVariants = {
+    hover: { scale: 1.1, transition: { duration: 0.2 } },
+    tap: { scale: 0.95 },
+  };
+
   return (
     <motion.div
       className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-md"
@@ -45,6 +50,9 @@ export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkPr
       }}
       initial={{ x: "100vw", opacity: 0 }} // Slide in from the right
       animate={{ x: 0, opacity: 1 }}
+      whileHover="hover" // Apply hover state
+      whileTap="tap"
+      variants={buttonVariants}
       transition={{ type: "spring", stiffness: 50, damping: 10 }}
     >
       <Link href={href} className="relative w-full h-full">

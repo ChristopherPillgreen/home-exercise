@@ -43,6 +43,32 @@ export default function Nav() {
           />
         </Navbar.Brand>
         <div className="order-2 hidden items-center md:flex">
+        <motion.div
+            className="mr-[1rem]"
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+          >
+            <Button
+                href="./plans"
+                style={{ backgroundColor: "#b9633a" }}
+              >
+                Plan Creator
+            </Button>
+          </motion.div>
+          <motion.div
+                className="mr-[1rem]"
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+          >
+            <Button
+                href="./about"
+                style={{ backgroundColor: "#008d6c" }}
+              >
+                About Us
+            </Button>
+          </motion.div>
           {session ? (
             <motion.div
               variants={buttonVariants}
@@ -71,22 +97,6 @@ export default function Nav() {
             </motion.div>
           )}
         </div>
-        <Navbar.Collapse>
-          <motion.div
-            variants={linkVariants}
-            whileHover="hover"
-            whileTap="tap"
-          >
-            <Navbar.Link href="/plans">Plans</Navbar.Link>
-          </motion.div>
-          <motion.div
-            variants={linkVariants}
-            whileHover="hover"
-            whileTap="tap"
-          >
-            <Navbar.Link href="/about">About</Navbar.Link>
-          </motion.div>
-        </Navbar.Collapse>
       </motion.div>
     </MegaMenu>
   );
