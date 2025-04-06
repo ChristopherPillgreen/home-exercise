@@ -15,31 +15,17 @@ export default function Open() {
                           <div className="absolute transform sm:left-1/2 sm:top-0 sm:translate-x-8 lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-8">
                               <div className="flex items-center space-x-6 lg:space-x-8">
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg sm:opacity-0 lg:opacity-100">
-                                          <img src="exercises_home/exercise_1.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_2.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#008d6c]"/>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#b9633a]"/>
                                   </div>
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_3.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_4.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_5.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#793339]"/>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#7076af]"/>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#74ac85]"/>
                                   </div>
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_6.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg">
-                                          <img src="exercises_home/exercise_7.jpg" alt="" className="h-full w-full object-cover object-center"/>
-                                      </div>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#00768c]"/>
+                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#cf935c]"/>
                                   </div>
                               </div>
                           </div>
