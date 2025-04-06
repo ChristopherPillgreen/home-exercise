@@ -1,9 +1,8 @@
-'use client'; // Add this line to mark the component as a client component
+'use client';
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { motion } from "motion/react";
 
 type Plan = {
   planID: number;
@@ -18,15 +17,14 @@ export default function PlansPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState(""); // for search functionality
-  const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null); // for highlighting selected plan
-  const [removeMode, setRemoveMode] = useState(false); // ability to remove plan
-  const [showConfirmation, setShowConfirmation] = useState(false); // control the confirmation modal
-  const [currentPage, setCurrentPage] = useState(0); // Track the current page
-  const plansPerPage = 8; // Number of plans to display per page
+  const [query, setQuery] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedPlanID, setSelectedPlanID] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(0);
+  const plansPerPage = 8;
 
   useEffect(() => {
-    if (status === "loading") return; // Wait for session to load
+    if (status === "loading") return;
     if (!session?.user) {
       setError("You must be logged in to view plans.");
       setLoading(false);
@@ -35,15 +33,10 @@ export default function PlansPage() {
 
     const fetchPlans = async () => {
       try {
-        // Construct the API URL with the correct userID from session
         const response = await fetch(`/api/Plan?userID=${session.user.id}`);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        setPlans(data); // Set the fetched plans
+        setPlans(data);
       } catch (err) {
         console.error("Error fetching plans:", err);
         setError("Failed to fetch plans.");
@@ -56,10 +49,8 @@ export default function PlansPage() {
   }, [session, status]);
 
   const handleSearch = async (searchQuery: string) => {
-    setQuery(searchQuery); // Update the query state
-
+    setQuery(searchQuery);
     if (!searchQuery) {
-      // If the search query is empty, fetch all plans again
       const response = await fetch(`/api/Plan?userID=${session?.user?.id}`);
       const data = await response.json();
       setPlans(data);
@@ -67,26 +58,13 @@ export default function PlansPage() {
     }
 
     try {
-      // Fetch plans matching the search query
       const response = await fetch(`/api/Plan?userID=${session?.user?.id}&title=${searchQuery}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch plans.");
-      }
+      if (!response.ok) throw new Error("Failed to fetch plans.");
       const data = await response.json();
-      setPlans(data); // Update the plans state with the filtered results
+      setPlans(data);
     } catch (error) {
       console.error("Error searching for plans:", error);
       setError("Failed to search for plans.");
-    }
-  };
-
-  const handlePlanClick = (plan: Plan) => {
-    if (removeMode) {
-      setRemoveMode(false);
-      setSelectedPlan(plan);
-    } else {
-      setRemoveMode(true);
-      setSelectedPlan(plan);
     }
   };
 
@@ -97,7 +75,6 @@ export default function PlansPage() {
     }
 
     const planName = prompt("Enter a name for your new plan:");
-
     if (!planName) {
       alert("Plan name is required!");
       return;
@@ -106,60 +83,55 @@ export default function PlansPage() {
     try {
       const response = await fetch("/api/Plan", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ planName, userID: session.user.id }), // Attach planName and userID
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ planName, userID: session.user.id }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
-      router.push(`/plans/${data.planID}`); // Navigate to the new plan's page
+      router.push(`/plans/${data.planID}`);
     } catch (error) {
       console.error("Error creating plan:", error);
       setError("Failed to create plan.");
     }
   };
 
-  const handleRemovePlan = async () => {
-    if (!selectedPlan) return;
-
-    try {
-      // Send the DELETE request with the planID as a query parameter
-      const response = await fetch(`/api/Plan?planID=${selectedPlan.planID}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to remove plan!`);
-      }
-
-      // If the plan was deleted successfully, update the state
-      setPlans(plans.filter(plan => plan.planID !== selectedPlan.planID));
-      setSelectedPlan(null);
-      setRemoveMode(false);
-      setShowConfirmation(false); // Close confirmation dialog after deletion
-    } catch (error) {
-      console.error('Error removing plan:', error);
-      setError('Failed to remove plan.');
-    }
-  };
-
-  const toggleRemoveMode = () => {
-    setRemoveMode(!removeMode);
-    setSelectedPlan(null); // Deselect any selected plan
-  };
-
-  const openConfirmationPopup = () => {
-    setShowConfirmation(true); // Show the confirmation popup
+  const openConfirmationPopup = (planID: number) => {
+    setSelectedPlanID(planID);
+    setShowConfirmation(true);
   };
 
   const closeConfirmationPopup = () => {
-    setShowConfirmation(false); // Close the confirmation popup without deleting
+    setSelectedPlanID(null);
+    setShowConfirmation(false);
   };
+
+  const handleRemovePlan = async () => {
+    if (!selectedPlanID) return;
+
+    try {
+      const response = await fetch(`/api/Plan?planID=${selectedPlanID}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error("Failed to remove plan!");
+      setPlans(plans.filter(plan => plan.planID !== selectedPlanID));
+      setSelectedPlanID(null);
+      setShowConfirmation(false);
+    } catch (error) {
+      console.error("Error removing plan:", error);
+      setError("Failed to remove plan.");
+    }
+  };
+
+  const filteredPlans = plans.filter(plan =>
+    plan.planName.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const displayedPlans = filteredPlans.slice(
+    currentPage * plansPerPage,
+    (currentPage + 1) * plansPerPage
+  );
 
   const handleNextPage = () => {
     if ((currentPage + 1) * plansPerPage < plans.length) {
@@ -176,36 +148,19 @@ export default function PlansPage() {
   if (loading) return <div className="text-center mt-4">Loading plans...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
-  const displayedPlans = plans.slice(
-    currentPage * plansPerPage,
-    (currentPage + 1) * plansPerPage
-  );
-
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
-        <button
-            className="flex-1 ml-5 mr-15 bg-[#7874ac] text-white py-2 px-4 rounded"
-        >
+        <button className="flex-1 ml-5 mr-15 bg-[#7874ac] text-white py-2 px-4 rounded">
           Your Plans
         </button>
         <div className="flex items-center p-4 w-full max-w-md ml-auto">
           <button
-            onClick={removeMode ? toggleRemoveMode : handleCreatePlan}
+            onClick={handleCreatePlan}
             className="flex-1 ml-5 bg-[#74ac85] text-white py-2 px-4 rounded"
           >
-            {removeMode ? 'Cancel Remove' : 'Create a New Plan'}
+            Create a New Plan
           </button>
-
-          {removeMode && selectedPlan && (
-            <button
-              onClick={openConfirmationPopup} // Open the confirmation popup
-              className="flex-1 ml-5 bg-red-500 text-white py-2 px-4 rounded"
-            >
-              Remove Plan
-            </button>
-          )}
-
           <input
             type="text"
             placeholder="Search..."
@@ -239,46 +194,55 @@ export default function PlansPage() {
         </div>
       )}
 
-      <div>
-        <div className="relative flex flex-wrap justify-between gap-4">
-          {/* Display Plans */}
-          {displayedPlans.map((plan) => (
-            <div
-              key={plan.planID}
-              className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow cursor-pointer hover:bg-[#b8d1c0] transition"
-              onClick={() => handlePlanClick(plan)}
-              onDoubleClick={() => plan && router.push(`/plans/${plan.planID}`)}
-            >
-              <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
-              <p className="text-gray-600">{plan.planDescription}</p>
-            </div>
-          ))}
+      <div className="relative flex flex-wrap justify-between gap-4">
+        {displayedPlans.map((plan) => (
+          <div
+            key={plan.planID}
+            className="relative flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow hover:bg-[#b8d1c0] transition cursor-pointer"
+            onClick={() => router.push(`/plans/${plan.planID}`)}
+          >
+            <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
+            <p className="text-gray-600">{plan.planDescription}</p>
+            
+            {/* Delete button inside the card */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();  // Prevent triggering the card click
+              openConfirmationPopup(plan.planID);
+            }}
+            className="absolute top-2 right-2 text-white px-2 py-1 text-sm rounded hover:bg-gray-500 hover:text-white transition duration-200"
 
-          {/* Add Empty Placeholders */}
-          {Array.from({ length: plansPerPage - displayedPlans.length }).map((_, index) => (
-            <div
-              key={`placeholder-${index}`}
-              className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow bg-gray-100"
-            >
-              <div className="flex items-center justify-center h-full text-gray-400">
-                Empty Slot
-              </div>
-            </div>
-          ))}
-        </div>
+          >
+            🗑️
+          </button>
 
-        {/* Pagination Dots */}
-        <div className="flex items-center justify-center mt-4 space-x-2">
-          {[0, 1, 2].map((index) => (
-            <button
-              key={`dot-${index}`}
-              onClick={() => setCurrentPage(index)} // Navigate to the corresponding page
-              className={`w-4 h-4 rounded-full ${
-                currentPage === index ? "bg-[#00768c]" : "bg-gray-300"
-              }`}
-            />
-          ))}
-        </div>
+          </div>
+        ))}
+
+        {/* Placeholder cards to fill layout */}
+        {Array.from({ length: plansPerPage - displayedPlans.length }).map((_, i) => (
+          <div
+            key={`placeholder-${i}`}
+            className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow bg-gray-100"
+          >
+            <div className="flex items-center justify-center h-full text-gray-400">
+              Empty Slot
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination Dots */}
+      <div className="flex items-center justify-center mt-4 space-x-2">
+        {[...Array(Math.ceil(filteredPlans.length / plansPerPage))].map((_, index) => (
+          <button
+            key={`dot-${index}`}
+            onClick={() => setCurrentPage(index)}
+            className={`w-4 h-4 rounded-full ${
+              currentPage === index ? "bg-[#00768c]" : "bg-gray-300"
+            }`}
+          />
+        ))}
       </div>
     </div>
   );
