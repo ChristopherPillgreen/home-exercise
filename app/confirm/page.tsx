@@ -4,7 +4,7 @@ export default function Confirm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-200">
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg max-w-2xl mx-auto my-10">
-        <img src="logo.png" alt="Logo" className="h-16 w-auto mx-auto mb-6" />
+        <img src="logo.svg" alt="Logo" className="h-16 w-auto mx-auto mb-6" />
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
           <span className="pl-4">Kineticare</span> offers a comprehensive tool
           for a wide range of rehabilitation professionals—including physical

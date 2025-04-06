@@ -36,8 +36,8 @@ export default function Nav() {
         <Navbar.Brand href="/home">
           <motion.img
             alt="Logo"
-            src="logo.png"
-            className="h-16 w-auto"
+            src="logo.svg"
+            className="h-4 w-auto md:h-6"
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
           />

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion } from "motion/react";
 
 interface AnimatedLinkProps {
   href: string;
@@ -10,37 +10,28 @@ interface AnimatedLinkProps {
 }
 
 export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkProps) {
-  const svgVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { duration: 1.5 } },
-  };
-
-  const pathVariants = {
-    hidden: { pathLength: 0 },
-    visible: { pathLength: 1, transition: { duration: 2, ease: "easeInOut" } },
-  };
-
   return (
-    <Link href={href} className="relative w-80 h-28"> {/* Increased height */}
-      <motion.svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 320 120" // Adjusted viewBox to provide more space
-        className="absolute inset-0 w-full h-full"
-        variants={svgVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        <motion.path
-          d="M20 20 H300 A20 20 0 0 1 320 40 V100 A20 20 0 0 1 300 120 H20 A20 20 0 0 1 0 100 V40 A20 20 0 0 1 20 20 Z" // Adjusted path for larger rounded rectangle
-          fill={strokeColor} // Fill the rectangle with the stroke color
-          stroke={strokeColor} // Border color
-          strokeWidth="4"
-          variants={pathVariants}
-        />
-      </motion.svg>
-      <div className="absolute inset-0 flex items-center justify-center text-2xl font-semibold text-white transition duration-300 hover:opacity-80">
-        {text}
-      </div>
-    </Link>
+    <motion.div
+      className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-md" // Smaller height and rounded corners
+      initial={{ x: "100vw", opacity: 0 }} // Slide in from the right
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ type: "spring", stiffness: 50, damping: 10 }}
+    >
+      <Link href={href} className="relative w-full h-full">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 260 80" // Adjusted viewBox for smaller width
+          className="absolute inset-0 w-full h-full"
+        >
+          <path
+            d="M10 10 H250 A10 10 0 0 1 260 20 V70 A10 10 0 0 1 250 80 H10 A10 10 0 0 1 0 70 V20 A10 10 0 0 1 10 10 Z" // Shorter rectangle
+            fill={strokeColor} // Fill the rectangle with the stroke color
+          />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white transition-opacity duration-300 hover:opacity-80">
+          {text}
+        </div>
+      </Link>
+    </motion.div>
   );
 }

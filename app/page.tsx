@@ -6,7 +6,7 @@ export default function Open() {
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
           <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
               <div className="sm:max-w-lg">
-                  <img alt="" src="logo.png" className="h-20 w-auto" />
+                  <img alt="" src="logo.svg" className="h-20 w-auto" />
                   <p className="mt-4 text-xl text-gray-500">Create and send exercise routines with ease</p>
               </div>
               <div>
