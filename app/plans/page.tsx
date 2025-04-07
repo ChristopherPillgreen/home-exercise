@@ -151,9 +151,9 @@ export default function PlansPage() {
   return (
     <div className="container mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
-        <button className="flex-1 ml-5 mr-15 bg-[#7874ac] text-white py-2 px-4 rounded">
+        <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
           Your Plans
-        </button>
+        </h1>
         <div className="flex items-center p-4 w-full max-w-md ml-auto">
           <button
             onClick={handleCreatePlan}
@@ -198,24 +198,30 @@ export default function PlansPage() {
         {displayedPlans.map((plan) => (
           <div
             key={plan.planID}
-            className="relative flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow hover:bg-[#b8d1c0] transition cursor-pointer"
+            className="relative flex-1 min-w-[20%] max-w-[30%] h-[20vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
             onClick={() => router.push(`/plans/${plan.planID}`)}
           >
-            <h2 className="text-xl font-semibold mt-2">{plan.planName}</h2>
-            <p className="text-gray-600">{plan.planDescription}</p>
-            
+            {/* Top half with white background */}
+            <div className="bg-white p-2 rounded-t-xl h-[30%] flex items-center">
+              <h2 className="text-xl font-semibold">{plan.planName.length > 26 ? `${plan.planName.slice(0, 24)}...` : plan.planName}
+              </h2>
+            </div>
+
+            {/* Bottom half with description */}
+            <div className="bg-gray-100 p-2 rounded-b-xl h-[70%] flex items-center">
+              <p className="text-gray-600">{plan.planDescription}</p>
+            </div>
+
             {/* Delete button inside the card */}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();  // Prevent triggering the card click
-              openConfirmationPopup(plan.planID);
-            }}
-            className="absolute top-2 right-2 text-white px-2 py-1 text-sm rounded hover:bg-gray-500 hover:text-white transition duration-200"
-
-          >
-            🗑️
-          </button>
-
+            <button
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering the card click
+                openConfirmationPopup(plan.planID);
+              }}
+              className="absolute top-2 right-2 font-extrabold text-black px-2 py-1 text-sm rounded hover:bg-gray-500 hover:text-white transition duration-200"
+            >
+              X
+            </button>
           </div>
         ))}
 
@@ -223,11 +229,8 @@ export default function PlansPage() {
         {Array.from({ length: plansPerPage - displayedPlans.length }).map((_, i) => (
           <div
             key={`placeholder-${i}`}
-            className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border p-4 rounded-xl shadow bg-gray-100"
+            className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border rounded-xl shadow bg-gray-100"
           >
-            <div className="flex items-center justify-center h-full text-gray-400">
-              Empty Slot
-            </div>
           </div>
         ))}
       </div>
@@ -239,7 +242,7 @@ export default function PlansPage() {
             key={`dot-${index}`}
             onClick={() => setCurrentPage(index)}
             className={`w-4 h-4 rounded-full ${
-              currentPage === index ? "bg-[#00768c]" : "bg-gray-300"
+              currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
             }`}
           />
         ))}
