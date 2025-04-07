@@ -249,18 +249,30 @@ export default function EditPlanPage() {
         )}
       </div>
 
-      {showQRCode && (
-        <div className="mt-4">
-          <QRCode value={`https://yourdomain.com/plans/${planID}`} />
-        </div>
-      )}
+  {showQRCode && (
+  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+      <button
+        onClick={() => setShowQRCode(false)}
+        className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
+      >
+        &times;
+      </button>
+      <h2 className="text-lg font-semibold mb-4 text-center">{planExercises[0]?.plan.planName}</h2>
+      <div className="flex justify-center">
+        <QRCode value={JSON.stringify(planExercises)} />
+      </div>
+    </div>
+  </div>
+)}
+
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
         {planExercises.length === 0 ? (
           <p>No exercises added yet.</p>
         ) : (
           planExercises.map((exercise) => (
-            <div key={exercise.id} className="border p-4 rounded shadow relative">
+            <div key={exercise.id} className="border p-4 rounded shadow relative bg-white">
               <h2 className="text-xl font-semibold mt-2">
                 {exercise.exercise.exerciseName}
               </h2>
