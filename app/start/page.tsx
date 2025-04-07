@@ -12,7 +12,7 @@ export default function GettingStarted() {
         <div className="space-y-8">
           <div className="step-card">
             <h2 className="text-xl font-semibold text-[#00768c]">
-              Create an Account
+              Create an account
             </h2>
             <p className="mt-2 text-gray-600">
               Click the green button to sign in using google. Kineticare uses google auth to manage accounts.
@@ -21,7 +21,7 @@ export default function GettingStarted() {
 
           <div className="step-card">
             <h2 className="text-xl font-semibold text-[#cf935c] ">
-              Go to the Planner
+              Go to the planner
             </h2>
             <p className="mt-2 text-gray-700">
               After logging in, you can create a new exercise plan by clicking on
@@ -30,8 +30,8 @@ export default function GettingStarted() {
           </div>
 
           <div className="step-card">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Step 3: Customize Your Plan
+            <h2 className="text-xl font-semibold text-[#793339]">
+              Customize your plan
             </h2>
             <p className="mt-2 text-gray-600">
               Customize your plan by naming it, adjusting the details, and
@@ -40,22 +40,13 @@ export default function GettingStarted() {
           </div>
 
           <div className="step-card">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Step 4: Save Your Plan
+            <h2 className="text-xl font-semibold text-[#b9633a]">
+              Save and share!
             </h2>
             <p className="mt-2 text-gray-600">
-              Once you're happy with your plan, save it. You can also export it
-              as a PDF file for sharing or printing.
-            </p>
-          </div>
-
-          <div className="step-card">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Step 5: Share With QR Code
-            </h2>
-            <p className="mt-2 text-gray-600">
-              Share your plans with friends or clients via our mobile app by
-              scanning the QR code generated after you finish your plan.
+              Once you're satified with your plan, save it. You can export your plan to pdf, or generate
+              a shareable QR code that allows patients to access the plan on their devices using 
+              the Kineticare mobile app!
             </p>
           </div>
 

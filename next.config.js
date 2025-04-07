@@ -12,7 +12,7 @@ const nextConfig = {
   webpack: (config, { dev, isServer }) => {
     // Provide fallbacks for both server and client builds
     
-    config.optimization.minimize = true;
+    config.optimization.minimize = false;
     
     
     

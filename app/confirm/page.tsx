@@ -1,4 +1,5 @@
 "use client";
+import { motion } from "motion/react";
 
 export default function Confirm() {
   return (
@@ -14,7 +15,7 @@ export default function Confirm() {
           the unique needs of their patients.
         </p>
         <p className="text-lg font-bold text-gray-600 dark:text-gray-400 mb-6">
-          <span className="pl-4">Please</span> note that users should seek
+          Please note that users should seek
           professional advice before attempting any exercises or programs found
           on the site.
         </p>
