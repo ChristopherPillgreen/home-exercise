@@ -198,7 +198,7 @@ export default function PlansPage() {
         {displayedPlans.map((plan) => (
           <div
             key={plan.planID}
-            className="relative flex-1 min-w-[20%] max-w-[30%] h-[20vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
+            className="relative flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
             onClick={() => router.push(`/plans/${plan.planID}`)}
           >
             {/* Top half with white background */}
@@ -229,7 +229,7 @@ export default function PlansPage() {
         {Array.from({ length: plansPerPage - displayedPlans.length }).map((_, i) => (
           <div
             key={`placeholder-${i}`}
-            className="flex-1 min-w-[20%] max-w-[30%] h-[20vh] border rounded-xl shadow bg-gray-100"
+            className="flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
           >
           </div>
         ))}
