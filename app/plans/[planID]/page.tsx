@@ -3,6 +3,20 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 
+// type Exercise = {
+//   id: number;
+//   sequenceNum: number;
+//   reps: number;
+//   sets: number;
+//   duration: number;
+//   time: string;
+//   description: string;
+//   exerciseID: number;
+//   exerciseName: string;
+//   exerciseDescription: string;
+//   exerciseImage: string;
+// };
+
 interface PlanExercise {
   exercise: {
     exerciseID: number;
