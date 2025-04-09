@@ -1,11 +1,18 @@
 "use client";
-import { motion } from "motion/react";
+
+import { CldImage } from "next-cloudinary";
 
 export default function Confirm() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-200">
-      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg max-w-2xl mx-auto my-10">
-        <img src="logo.svg" alt="Logo" className="h-16 w-auto mx-auto mb-6" />
+      <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg max-w-2xl mx-auto my-10 flex flex-col items-center">
+        <CldImage
+          src="logo_stsvdy"
+          width="256" // Adjust width as needed
+          height="128" // Adjust height as needed
+          alt="Logo"
+          className="w-auto h-auto mb-6"
+        />
         <p className="text-lg text-gray-600 dark:text-gray-400 mb-6">
           <span className="pl-4">Kineticare</span> offers a comprehensive tool
           for a wide range of rehabilitation professionals—including physical

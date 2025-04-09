@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import jsPDF from "jspdf";
 import QRCode from "react-qr-code";
+import { CldImage } from "next-cloudinary";
 
 interface PlanExercise {
   exercise: {
@@ -34,6 +35,7 @@ export default function EditPlanPage() {
   const [saving, setSaving] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
 
@@ -114,12 +116,13 @@ export default function EditPlanPage() {
       });
 
       if (!response.ok) throw new Error("Failed to save plan");
-      alert("Plan saved successfully!");
+      setNotification("Plan saved successfully!");
     } catch (err: any) {
       console.error("Error saving plan:", err);
-      alert("Failed to save plan.");
+      setNotification("Failed to save plan.");
     } finally {
       setSaving(false);
+      setTimeout(() => setNotification(null), 3000); // Clear notification after 3 seconds
     }
   };
 
@@ -132,56 +135,72 @@ export default function EditPlanPage() {
   };
 
   const generatePDF = () => {
-    const doc = new jsPDF();
+  const doc = new jsPDF();
+  const pageWidth = doc.internal.pageSize.getWidth();
 
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
-    doc.text("Home Exercise Plan", 105, 20, { align: "center" });
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(18);
+  doc.text(`${planExercises[0]?.plan.planName}`, pageWidth / 2, 20, { align: "center" });
 
-    doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(12);
+
+  let yOffset = 30;
+
+  planExercises.forEach((exercise, index) => {
+    // Reserve vertical space for image height if needed
+    const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
+    const imageHeight = 50;
+    const textBlockHeight = 80; // estimated
+
+    // Reset page if needed before starting exercise
+    if (yOffset + textBlockHeight > 270) {
+      doc.addPage();
+      yOffset = 20;
+    }
+
+    doc.setFontSize(14);
+    doc.text(`Exercise ${index + 1}: ${exercise.exercise.exerciseName}`, 14, yOffset);
+    yOffset += 8;
+
     doc.setFontSize(12);
+    doc.text(`Sequence Number: ${exercise.sequenceNum}`, 14, yOffset);
+    yOffset += 6;
 
-    let yOffset = 30;
+    doc.text(`Reps: ${exercise.reps}`, 14, yOffset);
+    yOffset += 6;
 
-    planExercises.forEach((exercise, index) => {
-      doc.setFontSize(14);
-      doc.text(`Exercise ${index + 1}: ${exercise.exercise.exerciseName}`, 14, yOffset);
-      yOffset += 8;
+    doc.text(`Sets: ${exercise.sets}`, 14, yOffset);
+    yOffset += 6;
 
-      doc.setFontSize(12);
-      doc.text(`Sequence Number: ${exercise.sequenceNum}`, 14, yOffset);
-      yOffset += 6;
+    doc.text(`Duration: ${exercise.duration} minutes`, 14, yOffset);
+    yOffset += 6;
 
-      doc.text(`Reps: ${exercise.reps}`, 14, yOffset);
-      yOffset += 6;
+    doc.text(`Time: ${exercise.time}`, 14, yOffset);
+    yOffset += 6;
 
-      doc.text(`Sets: ${exercise.sets}`, 14, yOffset);
-      yOffset += 6;
+    doc.text("Description:", 14, yOffset);
+    yOffset += 6;
 
-      doc.text(`Duration: ${exercise.duration} minutes`, 14, yOffset);
-      yOffset += 6;
+    const desc = exercise.exercise.exerciseDescription;
+    const descriptionLines = doc.splitTextToSize(desc, 100); // narrower width for left side
+    doc.text(descriptionLines, 14, yOffset);
+    const descHeight = descriptionLines.length * 6;
+    
+    // Draw image on the right side
+    const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
+    doc.addImage(cloudinaryImageUrl, "JPEG", imageX, yOffset - 50, 50, 50);
 
-      doc.text(`Time: ${exercise.time}`, 14, yOffset);
-      yOffset += 6;
+    yOffset += Math.max(descHeight, imageHeight) + 12;
 
-      doc.text("Description:", 14, yOffset);
-      yOffset += 6;
+    if (yOffset > 260) {
+      doc.addPage();
+      yOffset = 20;
+    }
+  });
 
-      const desc = exercise.exercise.exerciseDescription;
-      const descriptionLines = doc.splitTextToSize(desc, 180);
-      doc.text(descriptionLines, 14, yOffset);
-      yOffset += descriptionLines.length * 6 + 6;
-
-      yOffset += 12;
-
-      if (yOffset > 260) {
-        doc.addPage();
-        yOffset = 20;
-      }
-    });
-
-    doc.save("plan-exercises.pdf");
-  };
+  doc.save(`${planExercises[0]?.plan.planName}.pdf`);
+};
 
   if (loading) return <div className="text-center mt-4">Loading exercises...</div>;
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
@@ -260,12 +279,32 @@ export default function EditPlanPage() {
       </button>
       <h2 className="text-lg font-semibold mb-4 text-center">{planExercises[0]?.plan.planName}</h2>
       <div className="flex justify-center">
-        <QRCode value={JSON.stringify(planExercises)} />
+        <QRCode
+          value={JSON.stringify({
+            planName: planExercises[0]?.plan.planName || "Unnamed Plan",
+            exercises: planExercises.map((exercise) => ({
+              exerciseImage: exercise.exercise.image,
+              exerciseID: exercise.exercise.exerciseID,
+              exerciseName: exercise.exercise.exerciseName,
+              sequenceNum: exercise.sequenceNum,
+              reps: exercise.reps,
+              sets: exercise.sets,
+              duration: exercise.duration,
+              time: exercise.time,
+              description: exercise.description,
+            })),
+          })}
+        />
       </div>
     </div>
   </div>
 )}
 
+        {notification && (
+          <div className="bg-green-500 text-white p-2 rounded mt-4">
+            {notification}
+          </div>
+        )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
         {planExercises.length === 0 ? (
@@ -276,11 +315,13 @@ export default function EditPlanPage() {
               <h2 className="text-xl font-semibold mt-2">
                 {exercise.exercise.exerciseName}
               </h2>
-              <img
+              <CldImage
                 src={exercise.exercise.image}
+                width="300"
+                height="200"
                 alt={exercise.exercise.exerciseName}
                 className="w-full h-48 object-cover mt-2 rounded"
-              />
+                />
               <div className="mt-2 text-sm text-gray-700">
                 <div>
                   <strong>Sequence:</strong>

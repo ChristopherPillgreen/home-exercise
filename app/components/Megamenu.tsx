@@ -3,7 +3,7 @@
 import { Button, MegaMenu, Navbar } from "flowbite-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { motion } from "motion/react";
-
+import { CldImage } from "next-cloudinary";
 export default function Nav() {
   const { data: session } = useSession();
 
@@ -29,13 +29,20 @@ export default function Nav() {
         transition={{ duration: 0.5 }}
       >
         <Navbar.Brand href="/home">
-          <motion.img
-            alt="Logo"
-            src="/logo.svg"
+          <motion.div           
             className="h-4 w-auto md:h-6"
+
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
-          />
+          >
+            <CldImage
+              width="240"
+              height="30"
+              src="logo_stsvdy"
+              sizes="100vw"
+              alt="Description of my image"
+            />
+          </motion.div>
         </Navbar.Brand>
         <div className="order-2 hidden items-center md:flex">
         <motion.div
@@ -58,10 +65,10 @@ export default function Nav() {
                 whileTap="tap"
           >
             <Button
-                href="/about"
+                href="/exercises"
                 style={{ backgroundColor: "#008d6c" }}
               >
-                About Us
+                View Exercises
             </Button>
           </motion.div>
           {session ? (

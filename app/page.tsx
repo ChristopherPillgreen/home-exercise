@@ -1,12 +1,20 @@
 "use client";
 
+import { CldImage } from 'next-cloudinary';
+
 export default function Open() {
   return (
     <div className="relative flex h-screen overflow-hidden bg-white">
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
           <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
               <div className="sm:max-w-lg">
-                  <img alt="" src="logo.svg" className="h-20 w-auto" />
+                    <CldImage
+                        width="960"
+                        height="600"
+                        src="logo_stsvdy"
+                        sizes="100vw"
+                        alt="logo"
+                    />
                   <p className="mt-4 text-xl text-gray-500">Create and send exercise routines with ease</p>
               </div>
               <div>

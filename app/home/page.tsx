@@ -1,6 +1,7 @@
 "use client";
 
 import AnimatedLink from "../components/AnimatedLink";
+import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
 
 export default function Home() {
@@ -38,50 +39,44 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-start pt-[5vw] items-center min-h-screen bg-gray-100">
+    <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100">
       <motion.div
-        className="flex w-full justify-between items-start pl-[15vw] pr-[15vw]" // Align links and logo horizontally
+        className="flex flex-col md:flex-row w-full max-w-5xl justify-between items-center px-4 md:px-8" // Responsive layout
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         {/* Left Column: Animated Links */}
-        <div className="flex flex-col gap-6">
-          <motion.div className="w-80 h-24" variants={linkVariants}>
+        <div className="flex flex-col gap-6 mb-8 md:mb-0"> {/* Add margin for smaller screens */}
+          <motion.div className="w-64 md:w-80 h-20 md:h-24" variants={linkVariants}>
             <AnimatedLink href="/start" text="Getting Started" strokeColor="#7076af" />
           </motion.div>
-          <motion.div className="w-80 h-24" variants={linkVariants}>
+          <motion.div className="w-64 md:w-80 h-20 md:h-24" variants={linkVariants}>
             <AnimatedLink href="/questions" text="Questions" strokeColor="#793339" />
           </motion.div>
-          <motion.div className="w-80 h-24" variants={linkVariants}>
+          <motion.div className="w-64 md:w-80 h-20 md:h-24" variants={linkVariants}>
             <AnimatedLink href="/about" text="About Us" strokeColor="#cf935c" />
           </motion.div>
-          <motion.div className="w-80 h-24" variants={linkVariants}>
+          <motion.div className="w-64 md:w-80 h-20 md:h-24" variants={linkVariants}>
             <AnimatedLink href="/contact" text="Contact Us" strokeColor="#74ac85" />
           </motion.div>
         </div>
 
         {/* Right Column: Logo */}
         <motion.div
-          className="relative flex items-center justify-center h-24 w-full" // Make the container relative for positioning
+          className="relative flex items-center justify-center h-auto w-auto" // Center the logo
           variants={rightColumnVariants}
           initial="hidden"
           animate="visible"
         >
           {/* Main Image */}
-          <motion.img
-            src="/webstock.png" // Replace with the actual path to the Kineticare logo
-            className="w-auto transform scale-50 mt-[21rem]" // Adjust size as needed
-            onContextMenu={(e) => e.preventDefault()} // Disable right-click
-          />
-
-          {/* Overlapping Image */}
-          <motion.img
-            src="/appstore.svg" // Replace with the actual path to the App Store logo
-            className="absolute w-auto transform h-[3rem] mt-[38rem] mr-[10rem]" // Adjust size as needed
-            whileHover={{ scale: 1.1 }} // Add hover animation
-            transition={{ duration: 0.2 }}
-            onContextMenu={(e) => e.preventDefault()} // Disable right-click
+          <CldImage
+            src="webstock_fzsz6p"
+            width="384"
+            height="340"
+            sizes="(max-width: 768px) 60vw, 40vw" // Responsive sizes
+            alt="Image of site running on computer"
+            className="w-auto h-auto transform scale-90 md:scale-75" // Adjust scaling for smaller screens
           />
         </motion.div>
       </motion.div>

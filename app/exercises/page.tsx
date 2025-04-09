@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import PlusIcon from "../components/PlusIcon";
-import { HiClipboard, HiHeart, HiViewBoards } from "react-icons/hi";
 import { useRouter } from "next/navigation";
+import { CldImage } from "next-cloudinary";
+
 
 type Exercise = {
   exerciseID: number;
@@ -44,11 +44,12 @@ export default function Planner() {
     fetchExercises();
   }, []);
 
+  // Handles search functionality
   const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
 
     if (!searchQuery) {
-      // Fetch all exercises if the search query is empty
+      // If search query is empty, fetch all exercises again
       try {
         const response = await fetch("/api/exercise");
         if (!response.ok) throw new Error("Failed to fetch exercises.");
@@ -104,7 +105,12 @@ export default function Planner() {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  const displayedExercises = exercises.slice(
+  // Filter exercises based on query
+  const filteredExercises = exercises.filter((exercise) =>
+    exercise.exerciseName.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const displayedExercises = filteredExercises.slice(
     currentPage * exercisesPerPage,
     (currentPage + 1) * exercisesPerPage
   );
@@ -141,68 +147,66 @@ export default function Planner() {
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
           />
-
         </div>
       </div>
 
+      <div className="flex">
       {/* Left Menu (1/5th of the screen) */}
-      <div className="w-1/6 absolute justify-between gap-4 mr-auto">
-        <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl box-border shadow">
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Cervical</li>
-          <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Oral Motor</li>
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Shoulder</li>
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Elbow & Hand</li>
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Thoracic Lumbar</li>
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Ankle & Foot</li>
-          <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Education</li>
-          <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Special</li>
-        </ul>
-      </div>
+      <div className="w-1/5 h-auto pr-4">
+      <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Cervical</li>
+            <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Oral Motor</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Shoulder</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Elbow & Hand</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Thoracic Lumbar</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Ankle & Foot</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Education</li>
+            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Special</li>
+          </ul>
+        </div>
 
-      <div className="w-4/5 grid grid-cols-3 relative justify-between gap-4 ml-auto">
+        <div className="w-4/5 grid grid-cols-3 gap-4">
         {displayedExercises.map((exercise) => (
-          <div
-            key={exercise.exerciseID}
-            className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
-          >
-            {/* Top half with white background */}
-            <div className="bg-white p-2 rounded-t-xl h-[15%] flex items-center justify-between">
-              <h2 className="text-xl font-semibold">
-                {exercise.exerciseName.length > 26
-                  ? `${exercise.exerciseName.slice(0, 24)}...`
-                  : exercise.exerciseName}
-              </h2>
-              <button
-                className="w-fit focus:outline-none active:bg-transparent"
-                onClick={() => handleAddExercise(exercise.exerciseID)} // Pass exerciseID to onAdd
-              >
-                <PlusIcon />
-              </button>
-            </div>
-            {/* Middle half with image */}
-            <div className="h-[50%] flex items-center">
-              <img
-                src={exercise.image}
-                alt={exercise.exerciseName}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
+            <div
+              key={exercise.exerciseID}
+              className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
+            >
+              {/* Top half with white background */}
+              <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
+                <h2 className="text-xl font-semibold">
+                  {exercise.exerciseName.length > 26
+                    ? `${exercise.exerciseName.slice(0, 24)}...`
+                    : exercise.exerciseName}
+                </h2>
+              </div>
+              {/* Middle half with image */}
+              <div className="h-[50%] flex justify-center items-center bg-gray-200">
+                <CldImage
+                  width="250"
+                  height="250"
+                  src={exercise.image}
+                  sizes="50vw"
+                  alt={exercise.exerciseName}
+                  className="items-center w-auto h-full max-w-full max-h-full object-contain rounded-lg"
+                />
+              </div>
 
-            {/* Bottom half with description */}
-            <div className="bg-gray-100 p-2 rounded-b-xl h-[35%] flex">
-              <p className="text-gray-600">{exercise.exerciseDescription}</p>
+              {/* Bottom half with description */}
+              <div className="bg-gray-100 p-2 rounded-b-xl h-[30%] flex">
+                <p className="text-gray-600">{exercise.exerciseDescription}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
 
-        {/* Placeholder cards to fill layout */}
-        {Array.from({ length: exercisesPerPage - displayedExercises.length }).map((_, i) => (
-          <div
-            key={`placeholder-${i}`}
-            className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
-          >
-          </div>
-        ))}
+          {/* Placeholder cards to fill layout */}
+          {Array.from({ length: exercisesPerPage - displayedExercises.length }).map((_, i) => (
+            <div
+              key={`placeholder-${i}`}
+              className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
+            >
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Pagination Controls */}
