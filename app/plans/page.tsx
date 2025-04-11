@@ -20,6 +20,8 @@ export default function PlansPage() {
   const [query, setQuery] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [selectedPlanID, setSelectedPlanID] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newPlanName, setNewPlanName] = useState("");
   const [currentPage, setCurrentPage] = useState(0);
   const plansPerPage = 8;
 
@@ -69,26 +71,19 @@ export default function PlansPage() {
   };
 
   const handleCreatePlan = async () => {
-    if (!session?.user) {
-      alert("You must be logged in to create a plan.");
-      return;
-    }
-
-    const planName = prompt("Enter a name for your new plan:");
-    if (!planName) {
-      alert("Plan name is required!");
-      return;
-    }
+    if (!session?.user || !newPlanName.trim()) return;
 
     try {
       const response = await fetch("/api/Plan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ planName, userID: session.user.id }),
+        body: JSON.stringify({ planName: newPlanName, userID: session.user.id }),
       });
 
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
+      setShowCreateModal(false);
+      setNewPlanName("");
       router.push(`/plans/${data.planID}`);
     } catch (error) {
       console.error("Error creating plan:", error);
@@ -155,8 +150,8 @@ export default function PlansPage() {
           Your Plans
         </h1>
         <div className="flex items-center p-4 w-full max-w-md ml-auto">
-          <button
-            onClick={handleCreatePlan}
+           <button
+            onClick={() => setShowCreateModal(true)}
             className="flex-1 ml-5 bg-[#74ac85] text-white py-2 px-4 rounded"
           >
             Create a New Plan
@@ -171,6 +166,48 @@ export default function PlansPage() {
         </div>
       </div>
 
+      {/* Create Plan Modal  */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h3 className="text-xl font-bold mb-4">Create a New Plan</h3>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleCreatePlan();
+              }}
+            >
+              <input
+                type="text"
+                className="w-full border border-gray-300 p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-[#7874AC]"
+                placeholder="Enter plan name..."
+                value={newPlanName}
+                onChange={(e) => setNewPlanName(e.target.value)}
+              />
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="submit"
+                  className="bg-[#74ac85] text-white px-4 py-2 rounded"
+                >
+                  Create
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setNewPlanName("");
+                  }}
+                  className="bg-gray-400 text-white px-4 py-2 rounded"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+    
       {/* Confirmation Modal */}
       {showConfirmation && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">

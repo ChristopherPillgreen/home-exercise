@@ -24,8 +24,15 @@ export default async function RootLayout({
     <html lang="en">
       <body className="flex flex-col min-h-screen">
         <SessionProviderWrapper session={session}>
-          <NavWrapper/>
-          <div className="bg-slate-200 w-full flex-grow">{children}</div>
+          {/* Top Navigation */}
+          <NavWrapper />
+
+          {/* Main Content */}
+          <div className="flex-grow bg-slate-200 flex items-center justify-center">
+            {children}
+          </div>
+
+          {/* Footer */}
           <PageFooter />
         </SessionProviderWrapper>
       </body>

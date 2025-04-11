@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 export default function NavWrapper() {
   const pathname = usePathname();
   const hiddenNavRoutes = ["/", "/confirm", "/sign-up", "/login"];
-  const shouldHideNav = hiddenNavRoutes.includes(pathname);
+
+  const shouldHideNav =
+    hiddenNavRoutes.includes(pathname) || pathname.match(/^\/plans\/[^/]+\/qr$/);
 
   return !shouldHideNav ? (
     <nav className="w-full p-1">

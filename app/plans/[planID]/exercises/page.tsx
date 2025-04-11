@@ -25,6 +25,7 @@ export default function Planner() {
   const exercisesPerPage = 6; // Number of exercises per page
   const { planID } = useParams(); // Get plan ID from URL
   const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
+  const [notification, setNotification] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -95,6 +96,8 @@ export default function Planner() {
         throw new Error("Failed to add exercise to plan.");
       }
 
+      setNotification("Exercise added successfully!");
+      setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
       // alert("Exercise added successfully!");
     } catch (err) {
       console.error("Error adding exercise:", err);
@@ -128,6 +131,12 @@ export default function Planner() {
   if (error) return <div>{error}</div>;
 
   return (
+    <>
+      {notification && (
+        <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+          {notification}
+        </div>
+      )}
     <div className="container mx-auto p-4">
       <div className="flex items-center justify-between mb-4">
         <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
@@ -159,10 +168,10 @@ export default function Planner() {
             <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Oral Motor</li>
             <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Shoulder</li>
             <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Elbow & Hand</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Thoracic Lumbar</li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Back</li>
+            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Hip & Knee</li>
             <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Ankle & Foot</li>
             <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Education</li>
-            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Special</li>
           </ul>
         </div>
 
@@ -246,5 +255,6 @@ export default function Planner() {
         })}
       </div>
     </div>
+    </>
   );
 }

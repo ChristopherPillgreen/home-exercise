@@ -20,10 +20,11 @@ export default function Nav() {
               <Sidebar.Item>Oral Motor</Sidebar.Item>
               <Sidebar.Item>Shoulder</Sidebar.Item>
               <Sidebar.Item>Elbow & Hand</Sidebar.Item>
-              <Sidebar.Item>Thoracic Lumbar</Sidebar.Item>
+              <Sidebar.Item>Back</Sidebar.Item>
               <Sidebar.Item>Ankle & Foot</Sidebar.Item>
               <Sidebar.Item>Education</Sidebar.Item>
               <Sidebar.Item>Special</Sidebar.Item>
+              <Sidebar.Item>Hip & Knee</Sidebar.Item>
               <Sidebar.Item></Sidebar.Item>
             </Sidebar.Collapse>
             <Sidebar.Item href="plans/" icon={HiClipboard}>

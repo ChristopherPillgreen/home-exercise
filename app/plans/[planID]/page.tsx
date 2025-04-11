@@ -134,6 +134,45 @@ export default function EditPlanPage() {
     }
   };
 
+  const compactData = {
+    p: planExercises[0]?.plan.planName || "",
+    e: planExercises.map((ex: PlanExercise) => ({
+      n: ex.exercise.exerciseName,
+      sn: ex.sequenceNum,
+      r: ex.reps,
+      s: ex.sets,
+      d: ex.duration,
+      t: ex.time,
+      de: ex.description,
+      i: ex.exercise.image,
+    })),
+  };
+
+  const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
+    setPlanExercises((prev) => {
+      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
+      if (index === -1) return prev;
+  
+      const newExercises = [...prev];
+  
+      // Swap the current exercise with the one above or below
+      if (direction === "up" && index > 0) {
+        [newExercises[index - 1], newExercises[index]] = [newExercises[index], newExercises[index - 1]];
+      } else if (direction === "down" && index < newExercises.length - 1) {
+        [newExercises[index], newExercises[index + 1]] = [newExercises[index + 1], newExercises[index]];
+      }
+  
+      // Update sequence numbers
+      return newExercises.map((exercise, idx) => ({
+        ...exercise,
+        sequenceNum: idx + 1,
+      }));
+    });
+  };
+  
+  const jsonData = JSON.stringify(compactData);
+  const base64Data = encodeURIComponent(btoa(jsonData));
+
   const generatePDF = () => {
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
@@ -279,22 +318,12 @@ export default function EditPlanPage() {
       </button>
       <h2 className="text-lg font-semibold mb-4 text-center">{planExercises[0]?.plan.planName}</h2>
       <div className="flex justify-center">
-        <QRCode
-          value={JSON.stringify({
-            planName: planExercises[0]?.plan.planName || "Unnamed Plan",
-            exercises: planExercises.map((exercise) => ({
-              exerciseImage: exercise.exercise.image,
-              exerciseID: exercise.exercise.exerciseID,
-              exerciseName: exercise.exercise.exerciseName,
-              sequenceNum: exercise.sequenceNum,
-              reps: exercise.reps,
-              sets: exercise.sets,
-              duration: exercise.duration,
-              time: exercise.time,
-              description: exercise.description,
-            })),
-          })}
-        />
+          <QRCode 
+            value={base64Data}
+            size={150}
+            bgColor="#ffffff"
+            fgColor="#7874AC"
+          />
       </div>
     </div>
   </div>
@@ -325,49 +354,62 @@ export default function EditPlanPage() {
               <div className="mt-2 text-sm text-gray-700">
                 <div>
                   <strong>Sequence:</strong>
-                  <input
-                    type="number"
-                    value={exercise.sequenceNum}
-                    onChange={(e) => handleInputChange(e, exercise.id, "sequenceNum")}
-                    className="border rounded p-2 w-full"
-                  />
+                  <div className="flex items-center gap-2 mt-2">
+                    <button
+                      onClick={() => handleMoveExercise(exercise.id, "up")}
+                      disabled={exercise.sequenceNum === 1} // Disable if it's the first exercise
+                      className={`px-2 py-1 rounded bg-[#74ac85] w-full text-white ${
+                        exercise.sequenceNum === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#74ac85]"
+                      }`}
+                    >
+                      Move Up
+                    </button>
+                    <button
+                      onClick={() => handleMoveExercise(exercise.id, "down")}
+                      disabled={exercise.sequenceNum === planExercises.length} // Disable if it's the last exercise
+                      className={`px-2 py-1 rounded bg-[#74ac85] w-full text-white ${
+                        exercise.sequenceNum === planExercises.length
+                          ? "opacity-50 cursor-not-allowed"
+                          : "hover:bg-[#74ac85]"
+                      }`}
+                    >
+                      Move Down
+                    </button>
+                  </div>
                 </div>
 
-                <div>
+                <div className="flex flex-row gap-4 mt-2">
                   <strong>Reps:</strong>
                   <input
                     type="number"
-                    value={exercise.reps}
+                    value={exercise.duration ?? 0}
                     onChange={(e) => handleInputChange(e, exercise.id, "reps")}
                     className="border rounded p-2 w-full"
+                    min="0"
                   />
-                </div>
-
-                <div>
                   <strong>Sets:</strong>
                   <input
                     type="number"
-                    value={exercise.sets}
+                    value={exercise.duration ?? 0}
                     onChange={(e) => handleInputChange(e, exercise.id, "sets")}
                     className="border rounded p-2 w-full"
+                    min="0"
+                    max="20"
                   />
                 </div>
 
-                <div>
-                  <strong>Duration:</strong>
-                  <input
-                    type="number"
-                    value={exercise.duration}
-                    onChange={(e) => handleInputChange(e, exercise.id, "duration")}
-                    className="border rounded p-2 w-full"
-                  />
-                </div>
-
-                <div>
+                <div className="flex flex-row gap-4 mt-2">
+                  <strong>Hold</strong>
+                    <input
+                      type="number"
+                      value={exercise.duration ?? 0}
+                      onChange={(e) => handleInputChange(e, exercise.id, "duration")}
+                      className="border rounded p-2 w-full"
+                    />
                   <strong>Time:</strong>
                   <input
                     type="text"
-                    value={exercise.time}
+                    value={exercise.time ?? ""}
                     onChange={(e) => handleInputChange(e, exercise.id, "time")}
                     className="border rounded p-2 w-full"
                   />
