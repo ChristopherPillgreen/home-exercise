@@ -39,7 +39,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen w-full bg-gray-100">
+    <div className="flex flex-col justify-center items-center h-fit w-full">
       <motion.div
         className="flex flex-col md:flex-row w-full max-w-5xl justify-between items-center px-4 md:px-8" // Responsive layout
         variants={containerVariants}

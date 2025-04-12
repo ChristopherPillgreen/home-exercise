@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import { motion } from "motion/react";
+
 
 type Plan = {
   planID: number;
@@ -144,39 +146,49 @@ export default function PlansPage() {
   if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
+    <div className="container h-fit overflow-hidden">
+      <div className="flex items-center justify-between">
+        <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl">
           Your Plans
         </h1>
         <div className="flex items-center p-4 w-full max-w-md ml-auto">
-           <button
+          <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+          >
+          <button
             onClick={() => setShowCreateModal(true)}
-            className="flex-1 ml-5 bg-[#74ac85] text-white py-2 px-4 rounded"
+            className="flex-1 ml-5 bg-[#74ac85] text-white py-2 px-4 rounded-xl"
           >
             Create a New Plan
           </button>
+          </motion.div>
+          <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+          >
           <input
             type="text"
             placeholder="Search..."
-            className="ml-5 py-2 px-4 rounded border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
+            className="ml-5 px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
             value={query}
             onChange={(e) => handleSearch(e.target.value)}
           />
+          </motion.div>
         </div>
       </div>
 
       {/* Create Plan Modal  */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h3 className="text-xl font-bold mb-4">Create a New Plan</h3>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleCreatePlan();
-              }}
-            >
+              <h3 className="text-xl text-[#7874ac] font-semibold mb-4">Create a New Plan</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreatePlan();
+                }}
+              >
               <input
                 type="text"
                 className="w-full border border-gray-300 p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-[#7874AC]"
@@ -197,7 +209,7 @@ export default function PlansPage() {
                     setShowCreateModal(false);
                     setNewPlanName("");
                   }}
-                  className="bg-gray-400 text-white px-4 py-2 rounded"
+                  className="bg-[#793339] text-white px-4 py-2 rounded"
                 >
                   Cancel
                 </button>
@@ -210,19 +222,19 @@ export default function PlansPage() {
     
       {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-xl mb-4">Are you sure you want to delete this plan?</h3>
-            <div className="flex justify-end space-x-4">
+            <h3 className="text-xl text-[#7874ac] font-semibold mb-4">Are you sure you want to delete this plan?</h3>
+            <div className="flex justify-center space-x-4">
               <button
                 onClick={handleRemovePlan}
-                className="bg-red-500 text-white py-2 px-4 rounded"
+                className="bg-[#793339] text-white py-2 px-4 rounded"
               >
                 Yes, Delete
               </button>
               <button
                 onClick={closeConfirmationPopup}
-                className="bg-gray-500 text-white py-2 px-4 rounded"
+                className="bg-[#74ac85] text-white py-2 px-4 rounded"
               >
                 No, Cancel
               </button>
@@ -255,7 +267,7 @@ export default function PlansPage() {
                 e.stopPropagation(); // Prevent triggering the card click
                 openConfirmationPopup(plan.planID);
               }}
-              className="absolute top-2 right-2 font-extrabold text-black px-2 py-1 text-sm rounded hover:bg-gray-500 hover:text-white transition duration-200"
+              className="absolute top-2 right-2 bg-[#793339] text-white font-bold px-4 py-2 rounded-3xl"
             >
               X
             </button>
@@ -273,12 +285,12 @@ export default function PlansPage() {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex items-center justify-center mt-4 space-x-2">
+      <div className="flex items-center justify-center mt-1 space-x-2">
         {[...Array(Math.ceil(filteredPlans.length / plansPerPage))].map((_, index) => (
           <button
             key={`dot-${index}`}
             onClick={() => setCurrentPage(index)}
-            className={`w-4 h-4 rounded-full ${
+            className={`w-3 h-3 rounded-full ${
               currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
             }`}
           />

@@ -1,6 +1,6 @@
 export default function FavoritePlans() {
   return (
-    <div className="flex justify-center p-6">
+    <div className="relative flex justify-center h-fit w-full">
       <div className="max-w-4xl">
         <h1 className="text-2xl font-bold text-black text-center mb-4">Privacy Policy</h1>
         <p className="text-sm text-gray-600 text-center mb-6">Last updated April 09, 2025</p>

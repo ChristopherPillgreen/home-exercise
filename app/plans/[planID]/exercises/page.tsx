@@ -26,6 +26,7 @@ export default function Planner() {
   const { planID } = useParams(); // Get plan ID from URL
   const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
   const [notification, setNotification] = useState("");
+  const [cantCreate, setCreation] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -95,7 +96,7 @@ export default function Planner() {
       if (!response.ok) {
         throw new Error("Failed to add exercise to plan.");
       }
-
+ 
       setNotification("Exercise added successfully!");
       setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
       // alert("Exercise added successfully!");
@@ -135,6 +136,11 @@ export default function Planner() {
       {notification && (
         <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
           {notification}
+        </div>
+      )}
+      {cantCreate && (
+        <div className="fixed top-5 right-5 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+          {cantCreate}
         </div>
       )}
     <div className="container mx-auto p-4">

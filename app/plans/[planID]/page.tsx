@@ -56,7 +56,6 @@ export default function EditPlanPage() {
             sequenceNum: index + 1,
           })
         );
-
         setPlanExercises(exercisesWithSequence);
         console.log("Fetched exercises:", data);
       } catch (err: any) {

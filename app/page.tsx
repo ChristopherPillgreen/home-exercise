@@ -4,7 +4,7 @@ import { CldImage } from 'next-cloudinary';
 
 export default function Open() {
   return (
-    <div className="relative flex h-screen w-full overflow-hidden bg-white">
+    <div className="relative flex h-fit w-full overflow-hidden">
       <div className="pb-80 pt-16 sm:pb-40 sm:pt-24 lg:pb-48 lg:pt-40">
           <div className="relative mx-auto max-w-7xl px-4 sm:static sm:px-6 lg:px-8">
               <div className="sm:max-w-lg">
@@ -23,17 +23,17 @@ export default function Open() {
                           <div className="absolute transform sm:left-1/2 sm:top-0 sm:translate-x-8 lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-8">
                               <div className="flex items-center space-x-6 lg:space-x-8">
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#008d6c]"/>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#b9633a]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#008d6c]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#b9633a]"/>
                                   </div>
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#793339]"/>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#7076af]"/>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#74ac85]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#793339]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#7076af]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#74ac85]"/>
                                   </div>
                                   <div className="grid flex-shrink-0 grid-cols-1 gap-y-6 lg:gap-y-8">
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#00768c]"/>
-                                      <div className="h-64 w-44 overflow-hidden rounded-lg bg-[#cf935c]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#00768c]"/>
+                                      <div className="h-32 w-44 overflow-hidden rounded-xl bg-[#cf935c]"/>
                                   </div>
                               </div>
                           </div>

@@ -28,7 +28,7 @@ export default async function RootLayout({
           <NavWrapper />
 
           {/* Main Content */}
-          <div className="flex-grow bg-slate-200 flex items-center justify-center">
+          <div className="flex-grow bg-gray-100 flex items-center justify-center">
             {children}
           </div>
 
