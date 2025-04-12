@@ -189,20 +189,34 @@ export default function PlansPage() {
                   handleCreatePlan();
                 }}
               >
+              <motion.div
+                whileHover={{ scale: 1.08 }}
+                transition={{ duration: 0.2 }}
+              >
               <input
                 type="text"
-                className="w-full border border-gray-300 p-2 rounded mb-4 focus:outline-none focus:ring-2 focus:ring-[#7874AC]"
+                className="w-full border border-[#74ac85] p-2 rounded-xl mb-4 focus:outline-none focus:ring focus:ring-[#7874AC]"
                 placeholder="Enter plan name..."
                 value={newPlanName}
                 onChange={(e) => setNewPlanName(e.target.value)}
               />
+              </motion.div>
               <div className="flex justify-end space-x-4">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                >
                 <button
                   type="submit"
                   className="bg-[#74ac85] text-white px-4 py-2 rounded"
                 >
                   Create
                 </button>
+                </motion.div>
+                <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
+                >
                 <button
                   type="button"
                   onClick={() => {
@@ -213,6 +227,7 @@ export default function PlansPage() {
                 >
                   Cancel
                 </button>
+                </motion.div>
               </div>
             </form>
           </div>
@@ -226,18 +241,28 @@ export default function PlansPage() {
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-xl text-[#7874ac] font-semibold mb-4">Are you sure you want to delete this plan?</h3>
             <div className="flex justify-center space-x-4">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
+              >
               <button
                 onClick={handleRemovePlan}
                 className="bg-[#793339] text-white py-2 px-4 rounded"
               >
                 Yes, Delete
               </button>
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
+              >
               <button
                 onClick={closeConfirmationPopup}
                 className="bg-[#74ac85] text-white py-2 px-4 rounded"
               >
                 No, Cancel
               </button>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -262,15 +287,21 @@ export default function PlansPage() {
             </div>
 
             {/* Delete button inside the card */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+              className="absolute top-2 right-2"
+            >
             <button
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering the card click
                 openConfirmationPopup(plan.planID);
               }}
-              className="absolute top-2 right-2 bg-[#793339] text-white font-bold px-4 py-2 rounded-3xl"
+              className="bg-[#793339] text-white font-bold px-4 py-2 rounded-3xl"
             >
               X
             </button>
+            </motion.div>
           </div>
         ))}
 
@@ -287,6 +318,10 @@ export default function PlansPage() {
       {/* Pagination Dots */}
       <div className="flex items-center justify-center mt-1 space-x-2">
         {[...Array(Math.ceil(filteredPlans.length / plansPerPage))].map((_, index) => (
+          <motion.div
+            whileHover={{ scale: 1.2 }}
+            transition={{ duration: 0.2 }}
+           >
           <button
             key={`dot-${index}`}
             onClick={() => setCurrentPage(index)}
@@ -294,6 +329,7 @@ export default function PlansPage() {
               currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
             }`}
           />
+          </motion.div>
         ))}
       </div>
     </div>

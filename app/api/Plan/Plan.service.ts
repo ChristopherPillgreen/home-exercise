@@ -60,8 +60,8 @@ export const addExerciseToPlan = async (
     sequenceNum?: number;
     reps?: number;
     sets?: number;
-    duration?: number;
-    time?: number;
+    duration?: string;
+    time?: string;
   }
 ) => {
   // Fetch the plan
@@ -84,8 +84,8 @@ export const addExerciseToPlan = async (
     sequenceNum: data.sequenceNum ?? 1,
     reps: data.reps ?? 10,
     sets: data.sets ?? 3,
-    duration: data.duration ?? 0,
-    time: data.time ?? 0,
+    duration: data.duration?.toString() ?? "0", 
+    time: data.time?.toString() ?? "0",
     
   });
 
