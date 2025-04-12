@@ -21,11 +21,11 @@ export class PlanExercise {
   @Property({type: "int", nullable: true})
   sets?: number;
 
-  @Property({type: "int", nullable: true})
-  duration?: number;
+  @Property({type: "string", nullable: true})
+  duration?: string;
 
-  @Property({type: "int", nullable: true})
-  time?: number;
+  @Property({type: "string", nullable: true})
+  time?: string;
 
   @Property({type: "string", nullable: true})
   description?: string;

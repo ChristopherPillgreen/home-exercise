@@ -39,13 +39,25 @@ export default function EditPlanPage() {
   const router = useRouter();
   const { planID } = useParams();
 
+  const maxExercises = 8;
+  const [currentPage, setCurrentPage] = useState(0);
+  const exercisesPerPage = 3;
+
   useEffect(() => {
     const fetchExercises = async () => {
       try {
         const response = await fetch(`/api/planexercise?planID=${planID}`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-        setPlanExercises(data);
+        const exercisesWithSequence = data.map(
+          (exercise: PlanExercise, index: number) => ({
+            ...exercise,
+            sequenceNum: index + 1,
+          })
+        );
+
+        setPlanExercises(exercisesWithSequence);
         console.log("Fetched exercises:", data);
       } catch (err: any) {
         console.error("Error fetching exercises:", err);
@@ -63,30 +75,56 @@ export default function EditPlanPage() {
     }
   }, [planID]);
 
+  const displayedExercises = planExercises.slice(
+    currentPage * exercisesPerPage,
+    (currentPage + 1) * exercisesPerPage
+  );
+
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
     exerciseId: number,
     field: string
   ) => {
     setPlanExercises((prev) =>
       prev.map((exercise) =>
-        exercise.id === exerciseId ? { ...exercise, [field]: e.target.value } : exercise
+        exercise.id === exerciseId
+          ? { ...exercise, [field]: e.target.value }
+          : exercise
       )
     );
   };
 
   const handleDeleteExercise = async (exerciseID: number, id: number) => {
     try {
-      const response = await fetch(`/api/planexercise?planID=${planID}&exerciseID=${exerciseID}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `/api/planexercise?planID=${planID}&exerciseID=${exerciseID}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (response.ok) {
         console.log("Exercise deleted successfully");
-        setPlanExercises((prev) => prev.filter((exercise) => exercise.id !== id));
+
+        setPlanExercises((prev) => {
+          const updatedExercises = prev
+            .filter((exercise) => exercise.id !== id)
+            .map((exercise, index) => ({
+              ...exercise,
+              sequenceNum: index + 1, // Recalculate sequenceNum
+            }));
+
+          // Adjust the current page if the current page is no longer valid
+          const totalPages = Math.ceil(updatedExercises.length / exercisesPerPage);
+          if (currentPage >= totalPages && currentPage > 0) {
+            setCurrentPage(currentPage - 1);
+          }
+
+          return updatedExercises;
+        });
       } else {
         console.error("Failed to delete exercise");
       }
@@ -152,16 +190,22 @@ export default function EditPlanPage() {
     setPlanExercises((prev) => {
       const index = prev.findIndex((exercise) => exercise.id === exerciseId);
       if (index === -1) return prev;
-  
+
       const newExercises = [...prev];
-  
+
       // Swap the current exercise with the one above or below
       if (direction === "up" && index > 0) {
-        [newExercises[index - 1], newExercises[index]] = [newExercises[index], newExercises[index - 1]];
+        [newExercises[index - 1], newExercises[index]] = [
+          newExercises[index],
+          newExercises[index - 1],
+        ];
       } else if (direction === "down" && index < newExercises.length - 1) {
-        [newExercises[index], newExercises[index + 1]] = [newExercises[index + 1], newExercises[index]];
+        [newExercises[index], newExercises[index + 1]] = [
+          newExercises[index + 1],
+          newExercises[index],
+        ];
       }
-  
+
       // Update sequence numbers
       return newExercises.map((exercise, idx) => ({
         ...exercise,
@@ -169,88 +213,105 @@ export default function EditPlanPage() {
       }));
     });
   };
-  
+
   const jsonData = JSON.stringify(compactData);
   const base64Data = encodeURIComponent(btoa(jsonData));
 
   const generatePDF = () => {
-  const doc = new jsPDF();
-  const pageWidth = doc.internal.pageSize.getWidth();
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
 
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(18);
-  doc.text(`${planExercises[0]?.plan.planName}`, pageWidth / 2, 20, { align: "center" });
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    doc.text(`${planExercises[0]?.plan.planName}`, pageWidth / 2, 20, {
+      align: "center",
+    });
 
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(12);
-
-  let yOffset = 30;
-
-  planExercises.forEach((exercise, index) => {
-    // Reserve vertical space for image height if needed
-    const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
-    const imageHeight = 50;
-    const textBlockHeight = 80; // estimated
-
-    // Reset page if needed before starting exercise
-    if (yOffset + textBlockHeight > 270) {
-      doc.addPage();
-      yOffset = 20;
-    }
-
-    doc.setFontSize(14);
-    doc.text(`Exercise ${index + 1}: ${exercise.exercise.exerciseName}`, 14, yOffset);
-    yOffset += 8;
-
+    doc.setFont("helvetica", "normal");
     doc.setFontSize(12);
-    doc.text(`Sequence Number: ${exercise.sequenceNum}`, 14, yOffset);
-    yOffset += 6;
 
-    doc.text(`Reps: ${exercise.reps}`, 14, yOffset);
-    yOffset += 6;
+    let yOffset = 30;
 
-    doc.text(`Sets: ${exercise.sets}`, 14, yOffset);
-    yOffset += 6;
+    planExercises.forEach((exercise, index) => {
+      // Reserve vertical space for image height if needed
+      const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
+      const imageHeight = 50;
+      const textBlockHeight = 80; // estimated
 
-    doc.text(`Duration: ${exercise.duration} minutes`, 14, yOffset);
-    yOffset += 6;
+      // Reset page if needed before starting exercise
+      if (yOffset + textBlockHeight > 270) {
+        doc.addPage();
+        yOffset = 20;
+      }
 
-    doc.text(`Time: ${exercise.time}`, 14, yOffset);
-    yOffset += 6;
+      doc.setFontSize(14);
+      doc.text(
+        `Exercise ${index + 1}: ${exercise.exercise.exerciseName}`,
+        14,
+        yOffset
+      );
+      yOffset += 8;
 
-    doc.text("Description:", 14, yOffset);
-    yOffset += 6;
+      doc.setFontSize(12);
+      doc.text(`Sequence Number: ${exercise.sequenceNum}`, 14, yOffset);
+      yOffset += 6;
 
-    const desc = exercise.exercise.exerciseDescription;
-    const descriptionLines = doc.splitTextToSize(desc, 100); // narrower width for left side
-    doc.text(descriptionLines, 14, yOffset);
-    const descHeight = descriptionLines.length * 6;
-    
-    // Draw image on the right side
-    const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
-    doc.addImage(cloudinaryImageUrl, "JPEG", imageX, yOffset - 50, 50, 50);
+      doc.text(`Reps: ${exercise.reps}`, 14, yOffset);
+      yOffset += 6;
 
-    yOffset += Math.max(descHeight, imageHeight) + 12;
+      doc.text(`Sets: ${exercise.sets}`, 14, yOffset);
+      yOffset += 6;
 
-    if (yOffset > 260) {
-      doc.addPage();
-      yOffset = 20;
-    }
-  });
+      doc.text(`Duration: ${exercise.duration} minutes`, 14, yOffset);
+      yOffset += 6;
 
-  doc.save(`${planExercises[0]?.plan.planName}.pdf`);
-};
+      doc.text(`Time: ${exercise.time}`, 14, yOffset);
+      yOffset += 6;
 
-  if (loading) return <div className="text-center mt-4">Loading exercises...</div>;
-  if (error) return <div className="text-red-500 text-center mt-4">{error}</div>;
+      doc.text("Description:", 14, yOffset);
+      yOffset += 6;
+
+      const desc = exercise.exercise.exerciseDescription;
+      const descriptionLines = doc.splitTextToSize(desc, 100); // narrower width for left side
+      doc.text(descriptionLines, 14, yOffset);
+      const descHeight = descriptionLines.length * 6;
+
+      // Draw image on the right side
+      const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
+      doc.addImage(cloudinaryImageUrl, "JPEG", imageX, yOffset - 50, 50, 50);
+
+      yOffset += Math.max(descHeight, imageHeight) + 12;
+
+      if (yOffset > 260) {
+        doc.addPage();
+        yOffset = 20;
+      }
+    });
+
+    doc.save(`${planExercises[0]?.plan.planName}.pdf`);
+  };
+
+  if (loading)
+    return <div className="text-center mt-4">Loading exercises...</div>;
+  if (error)
+    return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">{planExercises[0]?.plan.planName}</h1>
-
+      <div className="flex items-center justify-between mb-4">
+      <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
+          {planExercises[0]?.plan.planName}
+        </h1>
+      <div className="relative">
+      <button
+            onClick={() => router.push(`/plans`)}
+            className="py-2 px-4 bg-[#793339] text-white rounded-md focus:outline-none"
+        >
+            Back to Plan
+      </button>
       <button
         onClick={() => router.push(`/plans/${planID}/exercises`)}
-        className="bg-green-500 text-white py-2 px-4 rounded mb-4"
+        className="ml-4 bg-[#74ac85] text-white py-2 px-4 rounded mb-4"
       >
         Add Exercises
       </button>
@@ -258,7 +319,7 @@ export default function EditPlanPage() {
       <button
         onClick={savePlan}
         disabled={saving}
-        className={`ml-4 bg-blue-500 text-white py-2 px-4 rounded mb-4 ${
+        className={`ml-4 bg-[#7874AC] text-white py-2 px-4 rounded mb-4 ${
           saving ? "opacity-50 cursor-not-allowed" : ""
         }`}
       >
@@ -306,135 +367,234 @@ export default function EditPlanPage() {
           </div>
         )}
       </div>
-
-  {showQRCode && (
-  <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-      <button
-        onClick={() => setShowQRCode(false)}
-        className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
-      >
-        &times;
-      </button>
-      <h2 className="text-lg font-semibold mb-4 text-center">{planExercises[0]?.plan.planName}</h2>
-      <div className="flex justify-center">
-          <QRCode 
-            value={base64Data}
-            size={150}
-            bgColor="#ffffff"
-            fgColor="#7874AC"
-          />
       </div>
-    </div>
-  </div>
-)}
+      </div>
 
-        {notification && (
-          <div className="bg-green-500 text-white p-2 rounded mt-4">
-            {notification}
+      {showQRCode && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
+            <button
+              onClick={() => setShowQRCode(false)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
+            >
+              &times;
+            </button>
+            <h2 className="text-lg font-semibold mb-4 text-center">
+              {planExercises[0]?.plan.planName}
+            </h2>
+            <div className="flex justify-center">
+              <QRCode
+                value={base64Data}
+                size={150}
+                bgColor="#ffffff"
+                fgColor="#7874AC"
+              />
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-        {planExercises.length === 0 ? (
-          <p>No exercises added yet.</p>
-        ) : (
-          planExercises.map((exercise) => (
-            <div key={exercise.id} className="border p-4 rounded shadow relative bg-white">
-              <h2 className="text-xl font-semibold mt-2">
+      {notification && (
+        <div className="bg-green-500 text-white p-2 rounded mt-4">
+          {notification}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 hover:box-border hover:outline-[#7874AC] transition cursor-pointer">
+        {displayedExercises.map((exercise) => (
+          <div
+            key={exercise.id}
+            className="border p-4 rounded-xl shadow bg-white "
+          >
+            <div className="flex items-center justify-between">
+              <h1
+                className="flex-1 font-semibold text-[#7874AC] text-2xl py-2 px-4 rounded"
+              >
                 {exercise.exercise.exerciseName}
-              </h2>
+              </h1>
+              <button
+                onClick={() =>
+                  handleDeleteExercise(
+                    exercise.exercise.exerciseID,
+                    exercise.id
+                  )
+                }
+                className="bg-[#793339] text-white font-bold px-4 py-2 rounded-s-3xl rounded-e-3xl"
+              >
+                X
+              </button>
+            </div>
+
+            {exercise.exercise.image ? (
               <CldImage
                 src={exercise.exercise.image}
                 width="300"
                 height="200"
                 alt={exercise.exercise.exerciseName}
                 className="w-full h-48 object-cover mt-2 rounded"
-                />
-              <div className="mt-2 text-sm text-gray-700">
-                <div>
-                  <strong>Sequence:</strong>
-                  <div className="flex items-center gap-2 mt-2">
-                    <button
-                      onClick={() => handleMoveExercise(exercise.id, "up")}
-                      disabled={exercise.sequenceNum === 1} // Disable if it's the first exercise
-                      className={`px-2 py-1 rounded bg-[#74ac85] w-full text-white ${
-                        exercise.sequenceNum === 1 ? "opacity-50 cursor-not-allowed" : "hover:bg-[#74ac85]"
-                      }`}
-                    >
-                      Move Up
-                    </button>
-                    <button
-                      onClick={() => handleMoveExercise(exercise.id, "down")}
-                      disabled={exercise.sequenceNum === planExercises.length} // Disable if it's the last exercise
-                      className={`px-2 py-1 rounded bg-[#74ac85] w-full text-white ${
-                        exercise.sequenceNum === planExercises.length
-                          ? "opacity-50 cursor-not-allowed"
-                          : "hover:bg-[#74ac85]"
-                      }`}
-                    >
-                      Move Down
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-row gap-4 mt-2">
-                  <strong>Reps:</strong>
+              />
+            ) : (
+              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
+                <span className="text-gray-500">No Image</span>
+              </div>
+            )}
+            <div className="flex items-center gap-2 mt-2">
+              <button
+                disabled
+                className="px-2 py-2 rounded-xl bg-[#74ac85] text-white text-bold w-1/5"
+              >
+                {exercise.sequenceNum}
+              </button>
+              <button
+                onClick={() => handleMoveExercise(exercise.id, "up")}
+                disabled={exercise.sequenceNum === 1} // Disable if it's the first exercise
+                className={`px-2 py-2 rounded-xl bg-[#74ac85] w-2/5 text-white ${
+                  exercise.sequenceNum === 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-[#74ac85]"
+                }`}
+              >
+                Move Up
+              </button>
+              <button
+                onClick={() => handleMoveExercise(exercise.id, "down")}
+                disabled={exercise.sequenceNum === planExercises.length} // Disable if it's the last exercise
+                className={`px-2 py-2 rounded-xl bg-[#74ac85] w-2/5 text-white ${
+                  exercise.sequenceNum === planExercises.length
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-[#74ac85]"
+                }`}
+              >
+                Move Down
+              </button>
+            </div>
+            <div className="mt-2 text-sm text-gray-700">
+              <div className="flex flex-row justify-start gap-1 mt-2">
+                <div className="flex flex-row gap-0 mt-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                    disabled
+                  >
+                    Repititions
+                  </button>
                   <input
+                    id={`reps-input-${exercise.id}`} // Unique ID for the input box
                     type="number"
-                    value={exercise.duration ?? 0}
+                    value={exercise.reps ?? 0}
                     onChange={(e) => handleInputChange(e, exercise.id, "reps")}
-                    className="border rounded p-2 w-full"
+                    className="w-2/3 border rounded-xl rounded-l-none p-2"
                     min="0"
-                  />
-                  <strong>Sets:</strong>
-                  <input
-                    type="number"
-                    value={exercise.duration ?? 0}
-                    onChange={(e) => handleInputChange(e, exercise.id, "sets")}
-                    className="border rounded p-2 w-full"
-                    min="0"
-                    max="20"
                   />
                 </div>
-
-                <div className="flex flex-row gap-4 mt-2">
-                  <strong>Hold</strong>
-                    <input
-                      type="number"
-                      value={exercise.duration ?? 0}
-                      onChange={(e) => handleInputChange(e, exercise.id, "duration")}
-                      className="border rounded p-2 w-full"
-                    />
-                  <strong>Time:</strong>
+                <div className="flex flex-row gap-0 mt-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                    disabled
+                  >
+                    Duration
+                  </button>
                   <input
+                    id={`duration-input-${exercise.id}`}
                     type="text"
-                    value={exercise.time ?? ""}
+                    value={exercise.duration ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(e, exercise.id, "duration")
+                    }
+                    className="w-2/3 border rounded-xl rounded-l-none p-2"
+                    placeholder="0 sec"
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-row justify-start gap-1 mt-2">
+                <div className="flex flex-row gap-0 mt-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                    disabled
+                  >
+                    Sets
+                  </button>
+                  <input
+                    id={`sets-input-${exercise.id}`}
+                    type="number"
+                    value={exercise.sets ?? 0}
+                    onChange={(e) => handleInputChange(e, exercise.id, "sets")}
+                    className="w-2/3 border rounded-xl rounded-l-none p-2"
+                    min="0"
+                  />
+                </div>
+                <div className="flex flex-row gap-0 mt-2">
+                  <button
+                    type="button"
+                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                    disabled
+                  >
+                    Time
+                  </button>
+                  <select
+                    id={`time-select-${exercise.id}`}
+                    value={exercise.time ?? "1 time / day"} // Default value
                     onChange={(e) => handleInputChange(e, exercise.id, "time")}
-                    className="border rounded p-2 w-full"
-                  />
+                    className=" border rounded-xl rounded-l-none p-2"
+                  >
+                    <option value="1 time / day">1 time / day</option>
+                    <option value="2 times / day">2 times / day</option>
+                    <option value="3 times / day">3 times / day</option>
+                    <option value="4 times / day">4 times / day</option>
+                    <option value="5 times / day">5 times / day</option>
+                  </select>
                 </div>
+              </div>
 
-                <div>
-                  <strong>Description:</strong>
-                  <textarea
-                    value={exercise.description}
-                    onChange={(e) => handleInputChange(e, exercise.id, "description")}
-                    className="border rounded p-2 w-full"
-                  />
-                </div>
-
+              <div className="flex flex-row justify-start gap-0 mt-4">
                 <button
-                  onClick={() =>
-                    handleDeleteExercise(exercise.exercise.exerciseID, exercise.id)
-                  }
-                  className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+                    type="button"
+                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                    disabled
                 >
-                  Delete
+                  Description:
                 </button>
+                <textarea
+                  value={exercise.description}
+                  onChange={(e) =>
+                    handleInputChange(e, exercise.id, "description")
+                  }
+                  className="border rounded-xl rounded-l-none p-2 w-full resize-none"
+                  maxLength={500}
+                />
               </div>
             </div>
-          ))
+          </div>
+        ))}
+
+        {/* Placeholder cards for empty slots */}
+        {Array.from({
+          length: exercisesPerPage - displayedExercises.length,
+        }).map((_, i) => (
+          <div
+            key={`placeholder-${i}`}
+            className="border p-4 rounded-xl shadow bg-gray-100 flex items-center justify-center"
+          >
+            <span className="text-gray-500">Empty Slot</span>
+          </div>
+        ))}
+      </div>
+
+      {/* Pagination Dots */}
+      <div className="flex items-center justify-center mt-4 space-x-2">
+        {[...Array(Math.ceil(planExercises.length / exercisesPerPage))].map(
+          (_, index) => (
+            <button
+              key={`dot-${index}`}
+              onClick={() => setCurrentPage(index)}
+              className={`w-4 h-4 rounded-full ${
+                currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+              }`}
+            />
+          )
         )}
       </div>
     </div>

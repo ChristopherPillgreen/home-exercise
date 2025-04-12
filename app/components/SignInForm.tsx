@@ -29,8 +29,7 @@ export function SignInForm() {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirect to the home page after successful login
-        router.push("/home"); // Use router.push to navigate to /home
+        router.push("/plans");
       } else {
         setError(data.error || "Login failed");
       }
