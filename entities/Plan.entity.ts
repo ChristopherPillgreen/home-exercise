@@ -39,6 +39,9 @@ export class Plan {
   @Property({ type: 'string', nullable: true })
   planName?: string;
 
+  @Property({ type: 'string', nullable: true })
+  planDescription?: string;
+
   @ManyToOne(() => User, { nullable: false })
   user?: Rel<User>;
 

@@ -5,7 +5,11 @@ import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
-import { IoAddCircle, IoInformationCircle } from "react-icons/io5";
+import {
+  IoAddCircle,
+  IoCloseCircle,
+  IoInformationCircle,
+} from "react-icons/io5";
 
 type Exercise = {
   exerciseID: number;
@@ -26,8 +30,22 @@ export default function Planner() {
   const { planID } = useParams(); // Get plan ID from URL
   const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
   const [notification, setNotification] = useState("");
-  const [cantCreate, setCreation] = useState("");
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+    null
+  );
   const router = useRouter();
+
+  const handleOpenInfoModal = (exercise: Exercise) => {
+    setSelectedExercise(exercise);
+    setShowInfoModal(true);
+  };
+
+  // Function to close the modal
+  const handleCloseInfoModal = () => {
+    setSelectedExercise(null);
+    setShowInfoModal(false);
+  };
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -138,31 +156,37 @@ export default function Planner() {
           {notification}
         </div>
       )}
-      {cantCreate && (
-        <div className="fixed top-5 right-5 z-50 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
-          {cantCreate}
-        </div>
-      )}
-      <div className="container mx-auto p-4">
-        <div className="flex items-center justify-between mb-4">
-          <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
+      <div className="container h-fit overflow-hidden">
+        <div className="ml-4 flex items-center justify-between w-screen">
+          <h1 className="flex font-bold text-[#7874AC] text-3xl">
             Exercises
           </h1>
-          <div className="relative">
-            {/* Back Button */}
-            <button
-              onClick={handleBackNavigation}
-              className="py-2 px-4 bg-[#793339] text-white rounded-md focus:outline-none"
+          <div className="flex flex-row mr-12 p-4 w-full max-w-lg space-x-4">
+          {/* Back Button */}
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
             >
-              Back to Plan
-            </button>
-            <input
-              type="text"
-              placeholder="Search..."
-              className="ml-5 py-2 px-4 rounded border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
-              value={query}
-              onChange={(e) => handleSearch(e.target.value)}
-            />
+              <button
+                onClick={handleBackNavigation}
+                className="h-full px-4 bg-[#793339] text-white rounded-xl flex items-center justify-center overflow-hidden"
+
+              >
+                Back to Plan
+              </button>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <input
+                type="text"
+                placeholder="Search..."
+                className="h-full w-full px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
+                value={query}
+                onChange={(e) => handleSearch(e.target.value)}
+              />
+            </motion.div>
           </div>
         </div>
 
@@ -201,8 +225,8 @@ export default function Planner() {
             {displayedExercises.map((exercise) => (
               <div
                 key={exercise.exerciseID}
-                className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
-              >
+                className="relative w-full border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer"
+                >
                 {/* Top half with white background */}
                 <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
                   <h2 className="text-xl font-semibold">
@@ -215,21 +239,57 @@ export default function Planner() {
                     transition={{ duration: 0.2 }}
                     className="absolute top-2 right-10"
                   >
-                      <IoInformationCircle
-                        color="#b9633a"
-                        size={30}
-                      />
+                    <IoInformationCircle
+                      onClick={() => handleOpenInfoModal(exercise)}
+                      color="#b9633a"
+                      size={30}
+                    />
                   </motion.div>
+                  {showInfoModal && selectedExercise && (
+                    <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
+                      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                        <div className="flex flex-row justify-between">
+                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                            {selectedExercise.exerciseName}
+                          </h3>
+                          <motion.div
+                            whileHover={{ scale: 1.1 }}
+                            transition={{ duration: 0.2 }}
+                            className="top-2 right-2"
+                          >
+                            <IoCloseCircle
+                              onClick={() => handleCloseInfoModal()}
+                              color="#793339"
+                              size={30}
+                            />
+                          </motion.div>
+                        </div>
+                        <div className="flex justify-center mb-4">
+                          <CldImage
+                            width="250"
+                            height="250"
+                            src={selectedExercise.image}
+                            sizes="50vw"
+                            alt={selectedExercise.exerciseName}
+                            className="w-full h-auto object-contain mb-4 p-3"
+                          />
+                        </div>
+                        <p className="text-gray-600 mb-4">
+                          {selectedExercise.exerciseDescription}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                   <motion.div
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.2 }}
                     className="absolute top-2 right-2"
                   >
-                      <IoAddCircle
-                        onClick={() => handleAddExercise(exercise.exerciseID)}
-                        color="#74ac85"
-                        size={30}
-                      />
+                    <IoAddCircle
+                      onClick={() => handleAddExercise(exercise.exerciseID)}
+                      color="#74ac85"
+                      size={30}
+                    />
                   </motion.div>
                 </div>
                 {/* Middle half with image */}
@@ -252,39 +312,30 @@ export default function Planner() {
             }).map((_, i) => (
               <div
                 key={`placeholder-${i}`}
-                className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
-              ></div>
+                className="relative w-full h-[30vh] border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer flex flex-col"
+                ></div>
             ))}
           </div>
         </div>
 
-        {/* Pagination Controls */}
-        <div className="w-4/5 relative flex items-center justify-center mt-4 space-x-2 ml-auto">
-          {[...Array(5)].map((_, index) => {
-            const pageIndex = currentInterval * 4 + index; // Calculate the page index for each dot
-            const isSelected = currentPage === pageIndex;
-
-            return (
+        {/* Pagination Dots for Exercises */}
+        <div className="flex items-center justify-center mt-1 space-x-2">
+          {[
+            ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
+          ].map((_, index) => (
+            <motion.div
+              key={`dot-${index}`}
+              whileHover={{ scale: 1.2 }}
+              transition={{ duration: 0.2 }}
+            >
               <button
-                key={`dot-${index}`}
-                onClick={() => {
-                  if (index === 0 && currentInterval > 0) {
-                    // Shift interval backward when clicking the 1st dot
-                    setCurrentInterval((prev) => prev - 1);
-                  } else if (index === 4 && pageIndex < totalPages - 1) {
-                    // Shift interval forward when clicking the 5th dot
-                    setCurrentInterval((prev) => prev + 1);
-                  } else {
-                    // Set the current page for other dots
-                    setCurrentPage(pageIndex);
-                  }
-                }}
-                className={`w-4 h-4 rounded-full ${
-                  isSelected ? "bg-[#7874AC]" : "bg-gray-300"
-                } hover:bg-[#7874AC]`}
-              ></button>
-            );
-          })}
+                onClick={() => setCurrentPage(index)}
+                className={`w-3 h-3 rounded-full ${
+                  currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+                }`}
+              />
+            </motion.div>
+          ))}
         </div>
       </div>
     </>

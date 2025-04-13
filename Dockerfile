@@ -10,6 +10,8 @@ RUN apk add curl
 COPY package.json package-lock.json ./
 RUN npm install
 
+ENV NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=kineticare
+
 # Now copy the rest of the app and build it
 COPY . .
 RUN npm run build

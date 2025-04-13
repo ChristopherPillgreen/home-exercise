@@ -5,6 +5,12 @@ import { useRouter, useParams } from "next/navigation";
 import jsPDF from "jspdf";
 import QRCode from "react-qr-code";
 import { CldImage } from "next-cloudinary";
+import { motion } from "motion/react";
+import {
+  IoArrowDownCircle,
+  IoArrowUpCircle,
+  IoCloseCircle,
+} from "react-icons/io5";
 
 interface PlanExercise {
   exercise: {
@@ -23,7 +29,7 @@ interface PlanExercise {
   sequenceNum: number;
   reps: number;
   sets: number;
-  duration: number;
+  duration: string;
   time: string;
   description: string;
 }
@@ -80,10 +86,16 @@ export default function EditPlanPage() {
   );
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
     exerciseId: number,
     field: string
   ) => {
+    console.log(
+      `Changed ${field} for exercise ${exerciseId}: ${e.target.value}`
+    ); // 👈 Add this line
+
     setPlanExercises((prev) =>
       prev.map((exercise) =>
         exercise.id === exerciseId
@@ -117,7 +129,9 @@ export default function EditPlanPage() {
             }));
 
           // Adjust the current page if the current page is no longer valid
-          const totalPages = Math.ceil(updatedExercises.length / exercisesPerPage);
+          const totalPages = Math.ceil(
+            updatedExercises.length / exercisesPerPage
+          );
           if (currentPage >= totalPages && currentPage > 0) {
             setCurrentPage(currentPage - 1);
           }
@@ -135,21 +149,29 @@ export default function EditPlanPage() {
   const savePlan = async () => {
     setSaving(true);
     try {
+      const payload = {
+        planID,
+        exercises: planExercises.map((ex) => ({
+          exerciseID: ex.exercise.exerciseID,
+          sequenceNum: Number(ex.sequenceNum),
+          reps: Number(ex.reps),
+          sets: Number(ex.sets),
+          duration: String(ex.duration),
+          time: ex.time ? String(ex.time) : null,
+          description: String(ex.description),
+        })),
+      };
+
+      // 🔍 Log the full payload being sent
+      console.log(
+        "Saving exercises payload:",
+        JSON.stringify(payload, null, 2)
+      );
+      console.log("Current planExercises before sending:", planExercises);
       const response = await fetch("/api/planexercise", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          planID,
-          exercises: planExercises.map((ex) => ({
-            exerciseID: ex.exercise.exerciseID,
-            sequenceNum: ex.sequenceNum,
-            reps: ex.reps,
-            sets: ex.sets,
-            duration: ex.duration,
-            time: ex.time,
-            description: ex.description,
-          })),
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) throw new Error("Failed to save plan");
@@ -189,23 +211,15 @@ export default function EditPlanPage() {
     setPlanExercises((prev) => {
       const index = prev.findIndex((exercise) => exercise.id === exerciseId);
       if (index === -1) return prev;
-
       const newExercises = [...prev];
-
-      // Swap the current exercise with the one above or below
-      if (direction === "up" && index > 0) {
-        [newExercises[index - 1], newExercises[index]] = [
-          newExercises[index],
-          newExercises[index - 1],
-        ];
-      } else if (direction === "down" && index < newExercises.length - 1) {
-        [newExercises[index], newExercises[index + 1]] = [
-          newExercises[index + 1],
-          newExercises[index],
-        ];
-      }
-
-      // Update sequence numbers
+      if (direction === "up" && index === 0) return prev;
+      if (direction === "down" && index === newExercises.length - 1)
+        return prev;
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      [newExercises[index], newExercises[swapIndex]] = [
+        newExercises[swapIndex],
+        newExercises[index],
+      ];
       return newExercises.map((exercise, idx) => ({
         ...exercise,
         sequenceNum: idx + 1,
@@ -296,306 +310,336 @@ export default function EditPlanPage() {
     return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-4">
-      <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
-          {planExercises[0]?.plan.planName}
-        </h1>
-      <div className="relative">
-      <button
-            onClick={() => router.push(`/plans`)}
-            className="py-2 px-4 bg-[#793339] text-white rounded-md focus:outline-none"
-        >
-            Back to Plan
-      </button>
-      <button
-        onClick={() => router.push(`/plans/${planID}/exercises`)}
-        className="ml-4 bg-[#74ac85] text-white py-2 px-4 rounded mb-4"
-      >
-        Add Exercises
-      </button>
-
-      <button
-        onClick={savePlan}
-        disabled={saving}
-        className={`ml-4 bg-[#7874AC] text-white py-2 px-4 rounded mb-4 ${
-          saving ? "opacity-50 cursor-not-allowed" : ""
-        }`}
-      >
-        {saving ? "Saving..." : "Save Plan"}
-      </button>
-
-      <div className="relative inline-block text-left ml-4">
-        <button
-          type="button"
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="bg-gray-500 text-white py-2 px-4 rounded flex items-center"
-        >
-          Export as
-          <svg
-            className="ml-2 w-5 h-5"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              fillRule="evenodd"
-              d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </button>
-
-        {dropdownOpen && (
-          <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-            <div className="py-1">
-              <button
-                onClick={() => handleExportOption("PDF")}
-                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-              >
-                PDF
-              </button>
-              <button
-                onClick={() => handleExportOption("QR Code")}
-                className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-              >
-                QR Code
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-      </div>
-      </div>
-
-      {showQRCode && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md relative">
-            <button
-              onClick={() => setShowQRCode(false)}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
-            >
-              &times;
-            </button>
-            <h2 className="text-lg font-semibold mb-4 text-center">
-              {planExercises[0]?.plan.planName}
-            </h2>
-            <div className="flex justify-center">
-              <QRCode
-                value={base64Data}
-                size={150}
-                bgColor="#ffffff"
-                fgColor="#7874AC"
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
+    <>
       {notification && (
-        <div className="bg-green-500 text-white p-2 rounded mt-4">
+        <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
           {notification}
         </div>
       )}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 hover:box-border hover:outline-[#7874AC] transition cursor-pointer">
-        {displayedExercises.map((exercise) => (
-          <div
-            key={exercise.id}
-            className="border p-4 rounded-xl shadow bg-white "
-          >
-            <div className="flex items-center justify-between">
-              <h1
-                className="flex-1 font-semibold text-[#7874AC] text-2xl py-2 px-4 rounded"
-              >
-                {exercise.exercise.exerciseName}
-              </h1>
+      <div className="container h-fit overflow-hidden">
+        <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
+          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap">
+            {planExercises[0]?.plan.planName}
+          </h1>
+          <div className="flex flex-wrap gap-4">
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
               <button
-                onClick={() =>
-                  handleDeleteExercise(
-                    exercise.exercise.exerciseID,
-                    exercise.id
-                  )
-                }
-                className="bg-[#793339] text-white font-bold px-4 py-2 rounded-s-3xl rounded-e-3xl"
+                onClick={() => router.push(`/plans`)}
+                className="px-4 py-2 bg-[#793339] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
               >
-                X
+                Back to Plan
               </button>
-            </div>
-
-            {exercise.exercise.image ? (
-              <CldImage
-                src={exercise.exercise.image}
-                width="300"
-                height="200"
-                alt={exercise.exercise.exerciseName}
-                className="w-full h-48 object-cover mt-2 rounded"
-              />
-            ) : (
-              <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
-                <span className="text-gray-500">No Image</span>
-              </div>
-            )}
-            <div className="flex items-center gap-2 mt-2">
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
               <button
-                disabled
-                className="px-2 py-2 rounded-xl bg-[#74ac85] text-white text-bold w-1/5"
+                onClick={() => router.push(`/plans/${planID}/exercises`)}
+                className="px-4 py-2 bg-[#74ac85] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
               >
-                {exercise.sequenceNum}
+                Add Exercises
               </button>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
               <button
-                onClick={() => handleMoveExercise(exercise.id, "up")}
-                disabled={exercise.sequenceNum === 1} // Disable if it's the first exercise
-                className={`px-2 py-2 rounded-xl bg-[#74ac85] w-2/5 text-white ${
-                  exercise.sequenceNum === 1
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-[#74ac85]"
+                onClick={savePlan}
+                disabled={saving}
+                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap ${
+                  saving ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                Move Up
+                {saving ? "Saving..." : "Save Plan"}
               </button>
-              <button
-                onClick={() => handleMoveExercise(exercise.id, "down")}
-                disabled={exercise.sequenceNum === planExercises.length} // Disable if it's the last exercise
-                className={`px-2 py-2 rounded-xl bg-[#74ac85] w-2/5 text-white ${
-                  exercise.sequenceNum === planExercises.length
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-[#74ac85]"
-                }`}
-              >
-                Move Down
-              </button>
-            </div>
-            <div className="mt-2 text-sm text-gray-700">
-              <div className="flex flex-row justify-start gap-1 mt-2">
-                <div className="flex flex-row gap-0 mt-2">
-                  <button
-                    type="button"
-                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                    disabled
-                  >
-                    Repititions
-                  </button>
-                  <input
-                    id={`reps-input-${exercise.id}`} // Unique ID for the input box
-                    type="number"
-                    value={exercise.reps ?? 0}
-                    onChange={(e) => handleInputChange(e, exercise.id, "reps")}
-                    className="w-2/3 border rounded-xl rounded-l-none p-2"
-                    min="0"
-                  />
-                </div>
-                <div className="flex flex-row gap-0 mt-2">
-                  <button
-                    type="button"
-                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                    disabled
-                  >
-                    Duration
-                  </button>
-                  <input
-                    id={`duration-input-${exercise.id}`}
-                    type="text"
-                    value={exercise.duration ?? ""}
-                    onChange={(e) =>
-                      handleInputChange(e, exercise.id, "duration")
-                    }
-                    className="w-2/3 border rounded-xl rounded-l-none p-2"
-                    placeholder="0 sec"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-row justify-start gap-1 mt-2">
-                <div className="flex flex-row gap-0 mt-2">
-                  <button
-                    type="button"
-                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                    disabled
-                  >
-                    Sets
-                  </button>
-                  <input
-                    id={`sets-input-${exercise.id}`}
-                    type="number"
-                    value={exercise.sets ?? 0}
-                    onChange={(e) => handleInputChange(e, exercise.id, "sets")}
-                    className="w-2/3 border rounded-xl rounded-l-none p-2"
-                    min="0"
-                  />
-                </div>
-                <div className="flex flex-row gap-0 mt-2">
-                  <button
-                    type="button"
-                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                    disabled
-                  >
-                    Time
-                  </button>
-                  <select
-                    id={`time-select-${exercise.id}`}
-                    value={exercise.time ?? "1 time / day"} // Default value
-                    onChange={(e) => handleInputChange(e, exercise.id, "time")}
-                    className=" border rounded-xl rounded-l-none p-2"
-                  >
-                    <option value="1 time / day">1 time / day</option>
-                    <option value="2 times / day">2 times / day</option>
-                    <option value="3 times / day">3 times / day</option>
-                    <option value="4 times / day">4 times / day</option>
-                    <option value="5 times / day">5 times / day</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex flex-row justify-start gap-0 mt-4">
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+            >
+              <div className="relative">
                 <button
-                    type="button"
-                    className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                    disabled
+                  type="button"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="px-4 py-2 bg-[#cf935c] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
                 >
-                  Description:
+                  Export as
+                  <svg
+                    className="ml-2 w-5 h-5"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
                 </button>
-                <textarea
-                  value={exercise.description}
-                  onChange={(e) =>
-                    handleInputChange(e, exercise.id, "description")
-                  }
-                  className="border rounded-xl rounded-l-none p-2 w-full resize-none"
-                  maxLength={500}
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+                    <div className="py-1">
+                      <button
+                        onClick={() => handleExportOption("PDF")}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                      >
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => handleExportOption("QR Code")}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                      >
+                        QR Code
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        </div>
+
+        {showQRCode && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-[40vh] max-w-md relative">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
+              >
+                <IoCloseCircle
+                  onClick={() => setShowQRCode(false)}
+                  color="#793339"
+                  size={30}
+                />
+              </motion.div>
+              <h2 className="text-lg font-semibold text-[#7874AC] mb-4 text-center">
+                {planExercises[0]?.plan.planName}
+              </h2>
+              <div className="flex justify-center">
+                <QRCode
+                  value={base64Data}
+                  size={150}
+                  bgColor="#ffffff"
+                  fgColor="#7874AC"
                 />
               </div>
             </div>
           </div>
-        ))}
-
-        {/* Placeholder cards for empty slots */}
-        {Array.from({
-          length: exercisesPerPage - displayedExercises.length,
-        }).map((_, i) => (
-          <div
-            key={`placeholder-${i}`}
-            className="border p-4 rounded-xl shadow bg-gray-100 flex items-center justify-center"
-          >
-            <span className="text-gray-500">Empty Slot</span>
-          </div>
-        ))}
-      </div>
-
-      {/* Pagination Dots */}
-      <div className="flex items-center justify-center mt-4 space-x-2">
-        {[...Array(Math.ceil(planExercises.length / exercisesPerPage))].map(
-          (_, index) => (
-            <button
-              key={`dot-${index}`}
-              onClick={() => setCurrentPage(index)}
-              className={`w-4 h-4 rounded-full ${
-                currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
-              }`}
-            />
-          )
         )}
+
+        <div className="w-full px-4 py-6 flex justify-center">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {/* Your actual exercise cards */}
+            {displayedExercises.map((exercise) => (
+              <div
+                key={exercise.id}
+                className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
+              >
+                <div className="flex items-center justify-between">
+                  <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
+                    {exercise.exercise.exerciseName}
+                  </h1>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IoArrowUpCircle
+                      color="#74ac85"
+                      size={30}
+                      onClick={() => handleMoveExercise(exercise.id, "up")}
+                    />
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IoArrowDownCircle
+                      color="#74ac85"
+                      size={30}
+                      onClick={() => handleMoveExercise(exercise.id, "down")}
+                    />
+                  </motion.div>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <IoCloseCircle
+                      onClick={() =>
+                        handleDeleteExercise(
+                          exercise.exercise.exerciseID,
+                          exercise.id
+                        )
+                      }
+                      color="#793339"
+                      size={30}
+                    />
+                  </motion.div>
+                </div>
+
+                {exercise.exercise.image ? (
+                  <CldImage
+                    src={exercise.exercise.image}
+                    width="300"
+                    height="200"
+                    alt={exercise.exercise.exerciseName}
+                    className="w-full h-36 object-contain mt-2 rounded"
+                  />
+                ) : (
+                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
+                    <span className="text-gray-500">No Image</span>
+                  </div>
+                )}
+                <div className="mt-2 text-sm text-gray-700 overflow-y-auto">
+                  <div className="flex flex-row justify-start gap-1 mt-2">
+                    <div className="flex flex-row gap-0 mt-2">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        disabled
+                      >
+                        Repititions
+                      </button>
+                      <input
+                        id={`reps-input-${exercise.id}`} // Unique ID for the input box
+                        type="number"
+                        value={exercise.reps ?? 0}
+                        onChange={(e) =>
+                          handleInputChange(e, exercise.id, "reps")
+                        }
+                        className="w-2/3 border rounded-xl rounded-l-none p-2"
+                        min="0"
+                      />
+                    </div>
+                    <div className="flex flex-row gap-0 mt-2">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        disabled
+                      >
+                        Duration
+                      </button>
+                      <input
+                        id={`duration-input-${exercise.id}`}
+                        type="text"
+                        value={exercise.duration ?? ""}
+                        onChange={(e) =>
+                          handleInputChange(e, exercise.id, "duration")
+                        }
+                        className="w-2/3 border rounded-xl rounded-l-none p-2"
+                        placeholder="0 sec"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row justify-start gap-1 mt-2">
+                    <div className="flex flex-row gap-0 mt-2">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        disabled
+                      >
+                        Sets
+                      </button>
+                      <input
+                        id={`sets-input-${exercise.id}`}
+                        type="number"
+                        value={exercise.sets ?? 0}
+                        onChange={(e) =>
+                          handleInputChange(e, exercise.id, "sets")
+                        }
+                        className="w-2/3 border rounded-xl rounded-l-none p-2"
+                        min="0"
+                      />
+                    </div>
+                    <div className="flex flex-row gap-0 mt-2">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        disabled
+                      >
+                        Time
+                      </button>
+                      <select
+                        id={`time-select-${exercise.id}`}
+                        value={exercise.time ?? "1 time / day"} // Default value
+                        onChange={(e) =>
+                          handleInputChange(e, exercise.id, "time")
+                        }
+                        className=" border rounded-xl rounded-l-none p-2"
+                      >
+                        <option value="1 time / day">1 time / day</option>
+                        <option value="2 times / day">2 times / day</option>
+                        <option value="3 times / day">3 times / day</option>
+                        <option value="4 times / day">4 times / day</option>
+                        <option value="5 times / day">5 times / day</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-row justify-start gap-0 mt-4">
+                    <button
+                      type="button"
+                      className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                      disabled
+                    >
+                      Description:
+                    </button>
+                    <textarea
+                      value={exercise.description}
+                      onChange={(e) =>
+                        handleInputChange(e, exercise.id, "description")
+                      }
+                      className="border rounded-xl rounded-l-none p-2 w-full resize-none"
+                      maxLength={500}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))
+            }
+
+            {/* Placeholder cards */}
+            {Array.from({
+              length: exercisesPerPage - displayedExercises.length,
+            }).map((_, i) => (
+              <div
+  key={`placeholder-${i}`}
+  className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400"
+>
+  Empty Slot
+</div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pagination Dots */}
+        <div className="flex items-center justify-center space-x-2">
+          {[...Array(Math.ceil(planExercises.length / exercisesPerPage))].map(
+            (_, index) => (
+              <motion.div
+                key={`dot-${index}`}
+                whileHover={{ scale: 1.2 }}
+                transition={{ duration: 0.2 }}
+              >
+                <button
+                  onClick={() => setCurrentPage(index)}
+                  className={`w-3 h-3 rounded-full ${
+                    currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+                  }`}
+                />
+              </motion.div>
+            )
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
