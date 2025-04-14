@@ -169,7 +169,7 @@ const fetchPlan = async () => {
   setSaving(true);
   try {
     const payload = {
-      planID,
+      planID: Number(planID),
       exercises: planExercises.map((ex) => ({
         exerciseID: ex.exercise.exerciseID,
         sequenceNum: Number(ex.sequenceNum),
@@ -181,7 +181,6 @@ const fetchPlan = async () => {
       })),
     };
 
-    // 🔍 Log the full payload being sent
     console.log(
       "Saving exercises payload:",
       JSON.stringify(payload, null, 2)
