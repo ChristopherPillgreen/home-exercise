@@ -14,8 +14,9 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="flex justify-center p-6">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
+    <div className="h-fit w-full">
+      <div className="flex justify-center">
+      <div className="bg-white p-4 rounded-lg shadow-lg w-fit max-w-2xl">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Contact Us
         </h1>
@@ -78,14 +79,8 @@ export default function ContactPage() {
             </button>
           </form>
         </div>
-
-        <div className="text-center">
-          <p className="text-gray-600 text-sm">
-            Thank you for reaching out to Kineticare. We look forward to
-            assisting you!
-          </p>
-        </div>
       </div>
+    </div>
     </div>
   );
 }

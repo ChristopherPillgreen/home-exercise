@@ -197,14 +197,14 @@ export default function PlansPage() {
         <h1 className="flex font-bold text-[#7874AC] text-3xl">
           Your Plans
         </h1>
-        <div className="flex flex-row mr-4 p-4 w-full max-w-lg space-x-4">
+        <div className="flex flex-row mr-10 p-4 w-full max-w-lg space-x-4 overflow-visible">
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
           >
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
+              className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center"
               >
               Create Plan
             </button>
@@ -216,7 +216,7 @@ export default function PlansPage() {
             <input
               type="text"
               placeholder="Search..."
-              className="h-full w-full px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
+              className="h-full w-full px-3 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
             />

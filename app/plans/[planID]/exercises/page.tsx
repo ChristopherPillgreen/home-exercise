@@ -36,6 +36,8 @@ export default function Planner() {
   );
   const router = useRouter();
 
+  const [selectedCategoryID, setSelectedCategoryID] = useState<number | null>(null); // State to store selected category ID
+
   const handleOpenInfoModal = (exercise: Exercise) => {
     setSelectedExercise(exercise);
     setShowInfoModal(true);
@@ -62,8 +64,11 @@ export default function Planner() {
       }
     };
 
-    fetchExercises();
-  }, []);
+    // Only fetch all exercises if no category/tag is selected
+    if (selectedCategoryID === null) {
+      fetchExercises();
+    }
+  }, [selectedCategoryID]); // Add selectedCategoryID to dependency array
 
   // Handles search functionality
   const handleSearch = async (searchQuery: string) => {
@@ -130,7 +135,7 @@ export default function Planner() {
 
   // Filter exercises based on query
   const filteredExercises = exercises.filter((exercise) =>
-    exercise.exerciseName.toLowerCase().includes(query.toLowerCase())
+    exercise.exerciseName && exercise.exerciseName.toLowerCase().includes(query.toLowerCase())
   );
 
   const displayedExercises = filteredExercises.slice(
@@ -149,195 +154,223 @@ export default function Planner() {
   if (loading) return <div>Loading exercises...</div>;
   if (error) return <div>{error}</div>;
 
+  const handleClick = async (tagID: number) => {
+    console.log("Clicked category with tagID:", tagID);
+    setSelectedCategoryID(tagID);
+
+    try {
+      const response = await fetch(`/api/TagExercises?tagID=${tagID}`);
+      if (!response.ok) throw new Error("Failed to fetch exercises for tag.");
+      const data = await response.json();
+
+      // If data is like [{ exercise: {...} }], extract the inner exercise
+      const extractedExercises = data.map((item: any) => item.exercise); 
+      console.log("Extracted exercises:", extractedExercises);
+
+      setExercises(extractedExercises); // Set state with clean exercise objects
+      setCurrentPage(0);
+    } catch (error) {
+      console.error("Error fetching exercises by tag:", error);
+      setError("Failed to fetch exercises by tag.");
+    }
+  };
+
   return (
-    <>
-      {notification && (
-        <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
-          {notification}
-        </div>
-      )}
-      <div className="container h-fit overflow-hidden">
-        <div className="ml-4 flex items-center justify-between w-screen">
-          <h1 className="flex font-bold text-[#7874AC] text-3xl">
-            Exercises
-          </h1>
-          <div className="flex flex-row mr-12 p-4 w-full max-w-lg space-x-4">
+  <>
+    {notification && (
+      <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+        {notification}
+      </div>
+    )}
+    <div className="container h-fit overflow-hidden">
+      <div className="ml-4 flex items-center justify-between w-screen">
+        <h1 className="flex font-bold text-[#7874AC] text-3xl">
+          Exercises
+        </h1>
+        <div className="flex flex-row mr-14 p-4 w-full max-w-lg space-x-4">
           {/* Back Button */}
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
+              onClick={handleBackNavigation}
+              className="h-full px-4 bg-[#793339] text-white rounded-xl flex items-center justify-center overflow-hidden"
             >
-              <button
-                onClick={handleBackNavigation}
-                className="h-full px-4 bg-[#793339] text-white rounded-xl flex items-center justify-center overflow-hidden"
+              Back to Plan
+            </button>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <input
+              type="text"
+              placeholder="Search..."
+              className="h-full w-full px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
+              value={query}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </motion.div>
+        </div>
+      </div>
 
-              >
-                Back to Plan
-              </button>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <input
-                type="text"
-                placeholder="Search..."
-                className="h-full w-full px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
-                value={query}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </motion.div>
-          </div>
+      <div className="flex">
+        {/* Left Menu (1/5th of the screen) */}
+        <div className="w-1/5 h-auto pr-4">
+          <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(1)}>
+              Cervical
+            </li>
+            <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(2)}>
+              Oral Motor
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(3)}>
+              Shoulder
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(4)}>
+              Elbow & Hand
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(5)}>
+              Back
+            </li>
+            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(6)}>
+              Hip & Knee
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(7)}>
+              Lower Body Strength
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(8)}>
+              Upper Body Strength
+            </li>
+          </ul>
         </div>
 
-        <div className="flex">
-          {/* Left Menu (1/5th of the screen) */}
-          <div className="w-1/5 h-auto pr-4">
-            <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Cervical
-              </li>
-              <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Oral Motor
-              </li>
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Shoulder
-              </li>
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Elbow & Hand
-              </li>
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Back
-              </li>
-              <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Hip & Knee
-              </li>
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Ankle & Foot
-              </li>
-              <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">
-                Education
-              </li>
-            </ul>
-          </div>
-
-          <div className="w-4/5 grid grid-cols-3 gap-4">
-            {displayedExercises.map((exercise) => (
-              <div
-                key={exercise.exerciseID}
-                className="relative w-full border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer"
+        {/* Right Section (Exercise Cards) */}
+        <div className="w-4/5 grid grid-cols-3 gap-4">
+          {displayedExercises.map((exercise) => (
+            <div
+              key={exercise.exerciseID}
+              className="relative w-full border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer"
+            >
+              {/* Top half with white background */}
+              <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
+                <h2 className="text-xl font-semibold">
+                  {exercise.exerciseName.length > 26
+                    ? `${exercise.exerciseName.slice(0, 24)}...`
+                    : exercise.exerciseName}
+                </h2>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-2 right-10"
                 >
-                {/* Top half with white background */}
-                <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
-                    {exercise.exerciseName.length > 26
-                      ? `${exercise.exerciseName.slice(0, 24)}...`
-                      : exercise.exerciseName}
-                  </h2>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-2 right-10"
-                  >
-                    <IoInformationCircle
-                      onClick={() => handleOpenInfoModal(exercise)}
-                      color="#b9633a"
-                      size={30}
-                    />
-                  </motion.div>
-                  {showInfoModal && selectedExercise && (
-                    <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
-                      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <div className="flex flex-row justify-between">
-                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
-                            {selectedExercise.exerciseName}
-                          </h3>
-                          <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.2 }}
-                            className="top-2 right-2"
-                          >
-                            <IoCloseCircle
-                              onClick={() => handleCloseInfoModal()}
-                              color="#793339"
-                              size={30}
-                            />
-                          </motion.div>
-                        </div>
-                        <div className="flex justify-center mb-4">
-                          <CldImage
-                            width="250"
-                            height="250"
-                            src={selectedExercise.image}
-                            sizes="50vw"
-                            alt={selectedExercise.exerciseName}
-                            className="w-full h-auto object-contain mb-4 p-3"
-                          />
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                          {selectedExercise.exerciseDescription}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-2 right-2"
-                  >
-                    <IoAddCircle
-                      onClick={() => handleAddExercise(exercise.exerciseID)}
-                      color="#74ac85"
-                      size={30}
-                    />
-                  </motion.div>
-                </div>
-                {/* Middle half with image */}
-                <div className="h-[80%] flex justify-center items-center rounded-b-xl bg-gray-200">
-                  <CldImage
-                    width="250"
-                    height="250"
-                    src={exercise.image}
-                    sizes="50vw"
-                    alt={exercise.exerciseName}
-                    className="items-center w-auto h-full max-w-full max-h-full object-contain p-5"
+                  <IoInformationCircle
+                    onClick={() => handleOpenInfoModal(exercise)}
+                    color="#b9633a"
+                    size={30}
                   />
-                </div>
+                </motion.div>
+                {showInfoModal && selectedExercise && (
+                  <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                      <div className="flex flex-row justify-between">
+                        <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                          {selectedExercise.exerciseName}
+                        </h3>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                          className="top-2 right-2"
+                        >
+                          <IoCloseCircle
+                            onClick={() => handleCloseInfoModal()}
+                            color="#793339"
+                            size={30}
+                          />
+                        </motion.div>
+                      </div>
+                      <div className="flex justify-center mb-4">
+                        <CldImage
+                          width="250"
+                          height="250"
+                          src={selectedExercise.image}
+                          sizes="50vw"
+                          alt={selectedExercise.exerciseName}
+                          className="w-full h-auto object-contain mb-4 p-3"
+                        />
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        {selectedExercise.exerciseDescription}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-2 right-2"
+                >
+                  <IoAddCircle
+                    onClick={() => handleAddExercise(exercise.exerciseID)}
+                    color="#74ac85"
+                    size={30}
+                  />
+                </motion.div>
               </div>
-            ))}
+              {/* Middle half with image */}
+              <div className="h-[80%] flex justify-center items-center rounded-b-xl bg-gray-200">
+                <CldImage
+                  width="250"
+                  height="250"
+                  src={exercise.image}
+                  sizes="50vw"
+                  alt={exercise.exerciseName}
+                  className="items-center w-auto h-full max-w-full max-h-full object-contain p-5"
+                />
+              </div>
+            </div>
+          ))}
 
-            {/* Placeholder cards to fill layout */}
-            {Array.from({
-              length: exercisesPerPage - displayedExercises.length,
-            }).map((_, i) => (
-              <div
-                key={`placeholder-${i}`}
-                className="relative w-full h-[30vh] border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer flex flex-col"
-                ></div>
-            ))}
-          </div>
-        </div>
-
-        {/* Pagination Dots for Exercises */}
-        <div className="flex items-center justify-center mt-1 space-x-2">
-          {[
-            ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
-          ].map((_, index) => (
-            <motion.div
-              key={`dot-${index}`}
-              whileHover={{ scale: 1.2 }}
-              transition={{ duration: 0.2 }}
-            >
-              <button
-                onClick={() => setCurrentPage(index)}
-                className={`w-3 h-3 rounded-full ${
-                  currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
-                }`}
-              />
-            </motion.div>
+          {/* Placeholder cards to fill layout */}
+          {Array.from({
+            length: exercisesPerPage - displayedExercises.length,
+          }).map((_, i) => (
+            <div
+              key={`placeholder-${i}`}
+              className="relative w-full h-[30vh] border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer flex flex-col"
+            ></div>
           ))}
         </div>
       </div>
-    </>
-  );
+      {/* Pagination Dots for Exercises (alternative pagination) */}
+      <div className="flex items-center justify-center mt-1 space-x-2">
+        {[
+          ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
+        ].map((_, index) => (
+          <motion.div
+            key={`dot-${index}`}
+            whileHover={{ scale: 1.2 }}
+            transition={{ duration: 0.2 }}
+          >
+            <button
+              onClick={() => setCurrentPage(index)}
+              className={`w-3 h-3 rounded-full ${
+                currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+              }`}
+            />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </>
+);
 }

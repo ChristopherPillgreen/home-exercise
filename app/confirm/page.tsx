@@ -4,7 +4,7 @@ import { CldImage } from "next-cloudinary";
 
 export default function Confirm() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-200">
+    <div className="h-screen flex w-full items-center justify-center bg-slate-200">
       <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg max-w-2xl mx-auto my-10 flex flex-col items-center">
         <CldImage
           src="logo_stsvdy"

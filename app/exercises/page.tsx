@@ -4,7 +4,12 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
-
+import { motion } from "motion/react";
+import {
+  IoAddCircle,
+  IoCloseCircle,
+  IoInformationCircle,
+} from "react-icons/io5";
 
 type Exercise = {
   exerciseID: number;
@@ -24,7 +29,25 @@ export default function Planner() {
   const exercisesPerPage = 6; // Number of exercises per page
   const { planID } = useParams(); // Get plan ID from URL
   const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
+  const [notification, setNotification] = useState("");
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
+    null
+  );
   const router = useRouter();
+
+  const [selectedCategoryID, setSelectedCategoryID] = useState<number | null>(null); // State to store selected category ID
+
+  const handleOpenInfoModal = (exercise: Exercise) => {
+    setSelectedExercise(exercise);
+    setShowInfoModal(true);
+  };
+
+  // Function to close the modal
+  const handleCloseInfoModal = () => {
+    setSelectedExercise(null);
+    setShowInfoModal(false);
+  };
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -41,15 +64,15 @@ export default function Planner() {
       }
     };
 
-    fetchExercises();
-  }, []);
+    if (selectedCategoryID === null) {
+      fetchExercises();
+    }
+  }, [selectedCategoryID]);
 
-  // Handles search functionality
   const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
 
     if (!searchQuery) {
-      // If search query is empty, fetch all exercises again
       try {
         const response = await fetch("/api/exercise");
         if (!response.ok) throw new Error("Failed to fetch exercises.");
@@ -63,7 +86,6 @@ export default function Planner() {
     }
 
     try {
-      // Fetch exercises matching the search query
       const response = await fetch(`/api/exercise?title=${searchQuery}`);
       if (!response.ok) throw new Error("Failed to fetch exercises.");
       const data = await response.json();
@@ -74,40 +96,12 @@ export default function Planner() {
     }
   };
 
-  const handleAddExercise = async (exerciseID: number) => {
-    try {
-      const planIDNumber = Number(planID);
-      if (isNaN(planIDNumber)) {
-        alert("Invalid Plan ID.");
-        return;
-      }
-
-      const response = await fetch(`/api/planexercise`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ planID: planIDNumber, exerciseID }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to add exercise to plan.");
-      }
-
-      // alert("Exercise added successfully!");
-    } catch (err) {
-      console.error("Error adding exercise:", err);
-      alert("Failed to add exercise.");
-    }
-  };
-
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
   };
 
-  // Filter exercises based on query
   const filteredExercises = exercises.filter((exercise) =>
-    exercise.exerciseName.toLowerCase().includes(query.toLowerCase())
+    exercise.exerciseName && exercise.exerciseName.toLowerCase().includes(query.toLowerCase())
   );
 
   const displayedExercises = filteredExercises.slice(
@@ -115,129 +109,202 @@ export default function Planner() {
     (currentPage + 1) * exercisesPerPage
   );
 
-  const handleBackNavigation = () => {
-    if (window.history.length > 1) {
-      router.back();
-    } else {
-      router.push("/plans");
-    }
-  };
 
   if (loading) return <div>Loading exercises...</div>;
   if (error) return <div>{error}</div>;
 
+  const handleClick = async (tagID: number) => {
+    console.log("Clicked category with tagID:", tagID);
+    setSelectedCategoryID(tagID);
+
+    try {
+      const response = await fetch(`/api/TagExercises?tagID=${tagID}`);
+      if (!response.ok) throw new Error("Failed to fetch exercises for tag.");
+      const data = await response.json();
+
+      const extractedExercises = data.map((item: any) => item.exercise); 
+      console.log("Extracted exercises:", extractedExercises);
+
+      setExercises(extractedExercises);
+      setCurrentPage(0);
+    } catch (error) {
+      console.error("Error fetching exercises by tag:", error);
+      setError("Failed to fetch exercises by tag.");
+    }
+  };
+
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="flex-1 ml-5 mr-15 font-bold text-[#7874AC] text-3xl py-2 px-4 rounded">
+  <>
+    {notification && (
+      <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+        {notification}
+      </div>
+    )}
+    <div className="container h-fit overflow-hidden">
+      <div className="ml-4 flex items-center justify-between w-screen">
+        <h1 className="flex font-bold text-[#7874AC] text-3xl">
           Exercises
         </h1>
-        <div className="relative">
-          {/* Back Button */}
-          <button
-            onClick={handleBackNavigation}
-            className="py-2 px-4 bg-[#793339] text-white rounded-md focus:outline-none"
+        <div className="flex flex-row mr-14 p-4 w-full max-w-lg space-x-4">
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.2 }}
           >
-            Back to Plan
-          </button>
-          <input
-            type="text"
-            placeholder="Search..."
-            className="ml-5 py-2 px-4 rounded border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac]"
-            value={query}
-            onChange={(e) => handleSearch(e.target.value)}
-          />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.2 }}
+          >
+            <input
+              type="text"
+              placeholder="Search..."
+              className="h-full w-full ml-14 px-4 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
+              value={query}
+              onChange={(e) => handleSearch(e.target.value)}
+            />
+          </motion.div>
         </div>
       </div>
 
       <div className="flex">
-      {/* Left Menu (1/5th of the screen) */}
-      <div className="w-1/5 h-auto pr-4">
-      <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Cervical</li>
-            <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Oral Motor</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Shoulder</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Elbow & Hand</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Thoracic Lumbar</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Ankle & Foot</li>
-            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Education</li>
-            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer">Special</li>
+        <div className="w-1/5 h-auto pr-4">
+          <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(1)}>
+              Cervical
+            </li>
+            <li className="px-4 py-3 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(2)}>
+              Oral Motor
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(3)}>
+              Shoulder
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(4)}>
+              Elbow & Hand
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(5)}>
+              Back
+            </li>
+            <li className="px-4 py-5 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(6)}>
+              Hip & Knee
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(7)}>
+              Lower Body Strength
+            </li>
+            <li className="px-4 py-4 hover:bg-[#74ac85] hover:rounded-xl hover:text-white cursor-pointer"
+              onClick={() => handleClick(8)}>
+              Upper Body Strength
+            </li>
           </ul>
         </div>
 
         <div className="w-4/5 grid grid-cols-3 gap-4">
-        {displayedExercises.map((exercise) => (
+          {displayedExercises.map((exercise) => (
             <div
               key={exercise.exerciseID}
-              className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
+              className="relative w-full border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer"
             >
-              {/* Top half with white background */}
               <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
                 <h2 className="text-xl font-semibold">
                   {exercise.exerciseName.length > 26
                     ? `${exercise.exerciseName.slice(0, 24)}...`
                     : exercise.exerciseName}
                 </h2>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-2 right-2"
+                >
+                  <IoInformationCircle
+                    onClick={() => handleOpenInfoModal(exercise)}
+                    color="#b9633a"
+                    size={30}
+                  />
+                </motion.div>
+                {showInfoModal && selectedExercise && (
+                  <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                      <div className="flex flex-row justify-between">
+                        <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                          {selectedExercise.exerciseName}
+                        </h3>
+                        <motion.div
+                          whileHover={{ scale: 1.1 }}
+                          transition={{ duration: 0.2 }}
+                          className="top-2 right-2"
+                        >
+                          <IoCloseCircle
+                            onClick={() => handleCloseInfoModal()}
+                            color="#793339"
+                            size={30}
+                          />
+                        </motion.div>
+                      </div>
+                      <div className="flex justify-center mb-4">
+                        <CldImage
+                          width="250"
+                          height="250"
+                          src={selectedExercise.image}
+                          sizes="50vw"
+                          alt={selectedExercise.exerciseName}
+                          className="w-full h-auto object-contain mb-4 p-3"
+                        />
+                      </div>
+                      <p className="text-gray-600 mb-4">
+                        {selectedExercise.exerciseDescription}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
-              {/* Middle half with image */}
-              <div className="h-[50%] flex justify-center items-center bg-gray-200">
+              <div className="h-[80%] flex justify-center items-center rounded-b-xl bg-gray-200">
                 <CldImage
                   width="250"
                   height="250"
                   src={exercise.image}
                   sizes="50vw"
                   alt={exercise.exerciseName}
-                  className="items-center w-auto h-full max-w-full max-h-full object-contain rounded-lg"
+                  className="items-center w-auto h-full max-w-full max-h-full object-contain p-5"
                 />
-              </div>
-
-              {/* Bottom half with description */}
-              <div className="bg-gray-100 p-2 rounded-b-xl h-[30%] flex">
-                <p className="text-gray-600">{exercise.exerciseDescription}</p>
               </div>
             </div>
           ))}
 
-          {/* Placeholder cards to fill layout */}
-          {Array.from({ length: exercisesPerPage - displayedExercises.length }).map((_, i) => (
+          {Array.from({
+            length: exercisesPerPage - displayedExercises.length,
+          }).map((_, i) => (
             <div
               key={`placeholder-${i}`}
-              className="relative flex-1 min-w-[100%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
-            >
-            </div>
+              className="relative w-full h-[30vh] border rounded-xl shadow hover:border-[#7874AC] transition cursor-pointer flex flex-col"
+            ></div>
           ))}
         </div>
       </div>
-
-      {/* Pagination Controls */}
-      <div className="w-4/5 relative flex items-center justify-center mt-4 space-x-2 ml-auto">
-        {[...Array(5)].map((_, index) => {
-          const pageIndex = currentInterval * 4 + index; // Calculate the page index for each dot
-          const isSelected = currentPage === pageIndex;
-
-          return (
+      <div className="flex items-center justify-center mt-1 space-x-2">
+        {[
+          ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
+        ].map((_, index) => (
+          <motion.div
+            key={`dot-${index}`}
+            whileHover={{ scale: 1.2 }}
+            transition={{ duration: 0.2 }}
+          >
             <button
-              key={`dot-${index}`}
-              onClick={() => {
-                if (index === 0 && currentInterval > 0) {
-                  // Shift interval backward when clicking the 1st dot
-                  setCurrentInterval((prev) => prev - 1);
-                } else if (index === 4 && pageIndex < totalPages - 1) {
-                  // Shift interval forward when clicking the 5th dot
-                  setCurrentInterval((prev) => prev + 1);
-                } else {
-                  // Set the current page for other dots
-                  setCurrentPage(pageIndex);
-                }
-              }}
-              className={`w-4 h-4 rounded-full ${
-                isSelected ? "bg-[#7874AC]" : "bg-gray-300"
-              } hover:bg-[#7874AC]`}
-            >
-            </button>
-          );
-        })}
+              onClick={() => setCurrentPage(index)}
+              className={`w-3 h-3 rounded-full ${
+                currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+              }`}
+            />
+          </motion.div>
+        ))}
       </div>
     </div>
-  );
+  </>
+);
 }

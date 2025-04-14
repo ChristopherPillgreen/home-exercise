@@ -3,7 +3,7 @@
 
 export default function Questions() {
   return (
-    <div className="py-12 bg-gray-100 min-h-screen w-full">
+    <div className="py-12 bg-gray-100 h-fit w-full">
       <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Frequently Asked Questions
@@ -61,7 +61,7 @@ export default function Questions() {
               </summary>
               <div className="mt-2 text-gray-600">
                 <p>
-                  As of right now, all of the exercises are managed by our team. You can react out to us
+                  As of right now, all of the exercises are managed by our team. You can reach out to us
                   via the contact form on our website to request an exercise to be added.
                 </p>
               </div>

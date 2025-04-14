@@ -196,6 +196,7 @@ export default function EditPlanPage() {
   const compactData = {
     p: planExercises[0]?.plan.planName || "",
     e: planExercises.map((ex: PlanExercise) => ({
+      eid: ex.exercise.exerciseID,
       n: ex.exercise.exerciseName,
       sn: ex.sequenceNum,
       r: ex.reps,
@@ -339,7 +340,7 @@ export default function EditPlanPage() {
             >
               <button
                 onClick={() => router.push(`/plans/${planID}/exercises`)}
-                className="px-4 py-2 bg-[#74ac85] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
+              className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
               >
                 Add Exercises
               </button>
