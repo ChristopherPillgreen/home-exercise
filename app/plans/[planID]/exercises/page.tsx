@@ -170,7 +170,8 @@ export default function Planner() {
       setTimeout(() => setNotification(""), 3000); 
     } catch (err) {
       console.error("Error adding exercise:", err);
-      alert("Failed to add exercise.");
+      setNotification("Cannot add duplicate exercises.");
+      setTimeout(() => setNotification(""), 3000);
     }
   };
 

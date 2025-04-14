@@ -32,18 +32,27 @@ export const addExerciseToPlan = async (
   userID: string,
   data: Omit<PlanExercise, "plan" | "exercise">
 ): Promise<PlanExercise> => {
-  const plan = await em.findOne(Plan, { planID, user: {userID} });
+  const plan = await em.findOne(Plan, { planID, user: { userID } });
   const exercise = await em.findOne(Exercise, { exerciseID });
 
   if (!plan) throw new Error("Plan not found");
   if (!exercise) throw new Error("Exercise not found");
 
-  // Automatically set the description field from exerciseDescription if it's not provided
+  // 🔒 Check for existing PlanExercise to prevent duplicates
+  const existing = await em.findOne(PlanExercise, {
+    plan,
+    exercise,
+  });
+
+  if (existing) {
+    throw new Error("Exercise already exists in this plan");
+  }
+
   const planExerciseData = {
     ...data,
     plan,
     exercise,
-    description: data.description || exercise.exerciseDescription, // Set default to exerciseDescription
+    description: data.description || exercise.exerciseDescription,
   };
 
   const planExercise = em.create(PlanExercise, planExerciseData);
@@ -69,40 +78,6 @@ export const updatePlanExercise = async (
   await em.persistAndFlush(planExercise);
   return planExercise;
 };
-// export const updatePlanExercise = async (
-//   em: EntityManager,
-//   id: number,  // The primary key (ID) of the PlanExercise entry
-//   userID: string,
-//   planID: number,
-//   exerciseID: number,
-//   data: Partial<Omit<PlanExercise, "plan" | "exercise">>
-// ): Promise<PlanExercise | null> => {
-//   console.log("Received PlanExercise id:", id);  // Log the incoming PlanExercise ID
-
-//   // Fetch the PlanExercise entry using its primary key (id)
-//   const planExercise = await em.findOne(PlanExercise, { id }, { populate: ["plan", "exercise"] });
-
-//   console.log("PlanExercise found:", planExercise);
-
-//   // If PlanExercise is not found or doesn't have the associated plan or user
-//   if (!planExercise || !planExercise.plan || !planExercise.plan.user) {
-//     throw new Error("PlanExercise not found or unauthorized access");
-//   }
-
-//   // Ensure the userID in the plan matches the given userID
-//   if (planExercise.plan.user.userID !== userID) {
-//     throw new Error("Unauthorized access");
-//   }
-
-//   // Update the PlanExercise with the provided data
-//   em.assign(planExercise, data);
-
-//   // Persist and flush the changes
-//   await em.persistAndFlush(planExercise);
-
-//   return planExercise;
-// };
-  
 
 
 export const removeExerciseFromPlan = async (

@@ -44,7 +44,9 @@ export default function EditPlanPage() {
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
-  const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
+  const [notificationfalse, setNotificationFalse] = useState<string | null>(
+    null
+  );
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
 
@@ -59,7 +61,7 @@ export default function EditPlanPage() {
           (exercise: PlanExercise, index: number) => ({
             ...exercise,
             sequenceNum: index + 1,
-          }) 
+          })
         );
         setPlanExercises(exercisesWithSequence);
         console.log("Fetched exercises:", data);
@@ -93,7 +95,7 @@ export default function EditPlanPage() {
   ) => {
     console.log(
       `Changed ${field} for exercise ${exerciseId}: ${e.target.value}`
-    ); // 👈 Add this line
+    );
 
     setPlanExercises((prev) =>
       prev.map((exercise) =>
@@ -148,11 +150,13 @@ export default function EditPlanPage() {
   const savePlan = async () => {
     setSaving(true);
     try {
+      console.log("Current planExercises before sending:", planExercises);
+
       const payload = {
         planID,
-        exercises: planExercises.map((ex) => ({
+        exercises: planExercises.map((ex, idx) => ({
           exerciseID: ex.exercise.exerciseID,
-          sequenceNum: Number(ex.sequenceNum),
+          sequenceNum: ex.sequenceNum, // This is the updated sequence number
           reps: Number(ex.reps),
           sets: Number(ex.sets),
           duration: String(ex.duration),
@@ -161,12 +165,11 @@ export default function EditPlanPage() {
         })),
       };
 
-      // 🔍 Log the full payload being sent
       console.log(
         "Saving exercises payload:",
         JSON.stringify(payload, null, 2)
       );
-      console.log("Current planExercises before sending:", planExercises);
+
       const response = await fetch("/api/planexercise", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -180,7 +183,7 @@ export default function EditPlanPage() {
       setNotificationFalse("Failed to save plan.");
     } finally {
       setSaving(false);
-      setTimeout(() => setNotification(null), 3000); 
+      setTimeout(() => setNotification(null), 3000);
     }
   };
 
@@ -188,14 +191,14 @@ export default function EditPlanPage() {
     if (option === "PDF") {
       if (planExercises.length === 0) {
         setNotificationFalse("No exercises to export.");
-        setTimeout(() => setNotification(null), 3000); 
+        setTimeout(() => setNotification(null), 3000);
         return;
       }
-    generatePDF();
-    } else if (option === "QR Code") { 
+      generatePDF();
+    } else if (option === "QR Code") {
       if (planExercises.length === 0) {
         setNotificationFalse("No exercises to export.");
-        setTimeout(() => setNotification(null), 3000); 
+        setTimeout(() => setNotification(null), 3000);
         return;
       }
       setShowQRCode(true);
@@ -219,21 +222,29 @@ export default function EditPlanPage() {
 
   const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
     setPlanExercises((prev) => {
-      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
-      if (index === -1) return prev;
-      const newExercises = [...prev];
-      if (direction === "up" && index === 0) return prev;
-      if (direction === "down" && index === newExercises.length - 1)
-        return prev;
-      const swapIndex = direction === "up" ? index - 1 : index + 1;
-      [newExercises[index], newExercises[swapIndex]] = [
-        newExercises[swapIndex],
-        newExercises[index],
-      ];
-      return newExercises.map((exercise, idx) => ({
-        ...exercise,
-        sequenceNum: idx + 1,
-      }));
+      const current = prev.find((ex) => ex.id === exerciseId);
+      if (!current) return prev;
+
+      const targetSequence =
+        direction === "up" ? current.sequenceNum - 1 : current.sequenceNum + 1;
+
+      if (targetSequence < 1 || targetSequence > prev.length) return prev;
+
+      const other = prev.find((ex) => ex.sequenceNum === targetSequence);
+      if (!other) return prev;
+
+      const updatedExercises = prev.map((ex) => {
+        if (ex.id === current.id) {
+          return { ...ex, sequenceNum: targetSequence };
+        } else if (ex.id === other.id) {
+          return { ...ex, sequenceNum: current.sequenceNum };
+        }
+        return ex;
+      });
+
+      console.log("Updated exercises after move:", updatedExercises); // Log the updated exercises
+
+      return updatedExercises;
     });
   };
 
@@ -245,7 +256,8 @@ export default function EditPlanPage() {
     const pageWidth = doc.internal.pageSize.getWidth();
 
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(18);
+    doc.setTextColor("#7874AC");
+    doc.setFontSize(30);
     doc.text(`${planExercises[0]?.plan.planName}`, pageWidth / 2, 20, {
       align: "center",
     });
@@ -255,26 +267,28 @@ export default function EditPlanPage() {
 
     let yOffset = 30;
 
-    planExercises.forEach((exercise, index) => {
+    // Sort planExercises by sequenceNum before the loop
+    planExercises.sort((a, b) => a.sequenceNum - b.sequenceNum);
+
+    planExercises.forEach((exercise) => {
       // Reserve vertical space for image height if needed
       const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
-      const imageHeight = 50;
+      const imageHeight = 80;
       const textBlockHeight = 80; // estimated
-
       // Reset page if needed before starting exercise
       if (yOffset + textBlockHeight > 270) {
         doc.addPage();
         yOffset = 20;
       }
 
+      doc.setFont("helvetica", "bold");
+      doc.setTextColor("#7874AC");
       doc.setFontSize(14);
-      doc.text(
-        `Exercise ${index + 1}: ${exercise.exercise.exerciseName}`,
-        14,
-        yOffset
-      );
+      doc.text(`${exercise.exercise.exerciseName}`, 14, yOffset);
       yOffset += 8;
 
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor("#000000");
       doc.setFontSize(12);
       doc.text(`Sequence Number: ${exercise.sequenceNum}`, 14, yOffset);
       yOffset += 6;
@@ -301,16 +315,15 @@ export default function EditPlanPage() {
 
       // Draw image on the right side
       const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
-      doc.addImage(cloudinaryImageUrl, "JPEG", imageX, yOffset - 50, 50, 50);
+      doc.addImage(cloudinaryImageUrl, "JPEG", imageX-50, yOffset-50, 100, 50);
 
-      yOffset += Math.max(descHeight, imageHeight) + 12;
+      yOffset += Math.max(descHeight, imageHeight) - 50;
 
       if (yOffset > 260) {
         doc.addPage();
-        yOffset = 20;
+        yOffset = 5;
       }
     });
-
     doc.save(`${planExercises[0]?.plan.planName}.pdf`);
   };
 
@@ -329,7 +342,7 @@ export default function EditPlanPage() {
       {notificationfalse && (
         <div
           className="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
-          style={{ backgroundColor: '#793339' }}
+          style={{ backgroundColor: "#793339" }}
         >
           {notificationfalse}
         </div>
@@ -358,7 +371,7 @@ export default function EditPlanPage() {
             >
               <button
                 onClick={() => router.push(`/plans/${planID}/exercises`)}
-              className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
+                className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
               >
                 Add Exercises
               </button>
@@ -457,176 +470,180 @@ export default function EditPlanPage() {
         <div className="w-full px-4 py-6 flex justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {/* Your actual exercise cards */}
-            {displayedExercises.map((exercise) => (
-              <div
-                key={exercise.id}
-                className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
-              >
-                <div className="flex items-center justify-between">
-                  <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
-                    {exercise.exercise.exerciseName}
-                  </h1>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <IoArrowUpCircle
-                      color="#74ac85"
-                      size={30}
-                      onClick={() => handleMoveExercise(exercise.id, "up")}
-                    />
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <IoArrowDownCircle
-                      color="#74ac85"
-                      size={30}
-                      onClick={() => handleMoveExercise(exercise.id, "down")}
-                    />
-                  </motion.div>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <IoCloseCircle
-                      onClick={() =>
-                        handleDeleteExercise(
-                          exercise.exercise.exerciseID,
-                          exercise.id
-                        )
-                      }
-                      color="#793339"
-                      size={30}
-                    />
-                  </motion.div>
-                </div>
-
-                {exercise.exercise.image ? (
-                  <CldImage
-                    src={exercise.exercise.image}
-                    width="300"
-                    height="200"
-                    alt={exercise.exercise.exerciseName}
-                    className="w-full h-36 object-contain mt-2 rounded"
-                  />
-                ) : (
-                  <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
-                    <span className="text-gray-500">No Image</span>
-                  </div>
-                )}
-                <div className="mt-2 text-sm text-gray-700 overflow-y-auto">
-                  <div className="flex flex-row justify-start gap-1 mt-2">
-                    <div className="flex flex-row gap-0 mt-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                        disabled
-                      >
-                        Repititions
-                      </button>
-                      <input
-                        id={`reps-input-${exercise.id}`} // Unique ID for the input box
-                        type="number"
-                        value={exercise.reps ?? 0}
-                        onChange={(e) =>
-                          handleInputChange(e, exercise.id, "reps")
-                        }
-                        className="w-2/3 border rounded-xl rounded-l-none p-2"
-                        min="0"
-                      />
-                    </div>
-                    <div className="flex flex-row gap-0 mt-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                        disabled
-                      >
-                        Duration
-                      </button>
-                      <input
-                        id={`duration-input-${exercise.id}`}
-                        type="text"
-                        value={exercise.duration ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(e, exercise.id, "duration")
-                        }
-                        className="w-2/3 border rounded-xl rounded-l-none p-2"
-                        placeholder="0 sec"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row justify-start gap-1 mt-2">
-                    <div className="flex flex-row gap-0 mt-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                        disabled
-                      >
-                        Sets
-                      </button>
-                      <input
-                        id={`sets-input-${exercise.id}`}
-                        type="number"
-                        value={exercise.sets ?? 0}
-                        onChange={(e) =>
-                          handleInputChange(e, exercise.id, "sets")
-                        }
-                        className="w-2/3 border rounded-xl rounded-l-none p-2"
-                        min="0"
-                      />
-                    </div>
-                    <div className="flex flex-row gap-0 mt-2">
-                      <button
-                        type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                        disabled
-                      >
-                        Time
-                      </button>
-                      <select
-                        id={`time-select-${exercise.id}`}
-                        value={exercise.time ?? "1 time / day"} // Default value
-                        onChange={(e) =>
-                          handleInputChange(e, exercise.id, "time")
-                        }
-                        className=" border rounded-xl rounded-l-none p-2"
-                      >
-                        <option value="1 time / day">1 time / day</option>
-                        <option value="2 times / day">2 times / day</option>
-                        <option value="3 times / day">3 times / day</option>
-                        <option value="4 times / day">4 times / day</option>
-                        <option value="5 times / day">5 times / day</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="flex flex-row justify-start gap-0 mt-4">
-                    <button
-                      type="button"
-                      className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
-                      disabled
+            {displayedExercises
+              .slice()
+              .sort((a, b) => a.sequenceNum - b.sequenceNum)
+              .map((exercise) => (
+                <div
+                  key={exercise.id}
+                  className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between">
+                    <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
+                      {exercise.exercise.exerciseName}
+                    </h1>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
                     >
-                      Description:
-                    </button>
-                    <textarea
-                      value={exercise.description}
-                      onChange={(e) =>
-                        handleInputChange(e, exercise.id, "description")
-                      }
-                      className="border rounded-xl rounded-l-none p-2 w-full resize-none"
-                      maxLength={500}
+                      <IoArrowUpCircle
+                        color="#74ac85"
+                        size={30}
+                        onClick={() => handleMoveExercise(exercise.id, "up")}
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <IoArrowDownCircle
+                        color="#74ac85"
+                        size={30}
+                        onClick={() => handleMoveExercise(exercise.id, "down")}
+                      />
+                    </motion.div>
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <IoCloseCircle
+                        onClick={() =>
+                          handleDeleteExercise(
+                            exercise.exercise.exerciseID,
+                            exercise.id
+                          )
+                        }
+                        color="#793339"
+                        size={30}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {exercise.exercise.image ? (
+                    <CldImage
+                      src={exercise.exercise.image}
+                      width="300"
+                      height="200"
+                      alt={exercise.exercise.exerciseName}
+                      className="w-full h-36 object-contain mt-2 rounded"
                     />
+                  ) : (
+                    <div className="w-full h-48 bg-gray-200 flex items-center justify-center rounded">
+                      <span className="text-gray-500">No Image</span>
+                    </div>
+                  )}
+                  <div className="mt-2 text-sm text-gray-700 overflow-y-auto">
+                    <div className="flex flex-row justify-start gap-1 mt-2">
+                      <div className="flex flex-row gap-0 mt-2">
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          disabled
+                        >
+                          Repititions
+                        </button>
+                        <input
+                          id={`reps-input-${exercise.id}`} // Unique ID for the input box
+                          type="number"
+                          value={exercise.reps ?? 0}
+                          onChange={(e) =>
+                            handleInputChange(e, exercise.id, "reps")
+                          }
+                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          min="0"
+                        />
+                      </div>
+                      <div className="flex flex-row gap-0 mt-2">
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          disabled
+                        >
+                          Duration
+                        </button>
+                        <input
+                          id={`duration-input-${exercise.id}`}
+                          type="text"
+                          value={exercise.duration ?? ""}
+                          onChange={(e) =>
+                            handleInputChange(e, exercise.id, "duration")
+                          }
+                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          placeholder="0 sec"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row justify-start gap-1 mt-2">
+                      <div className="flex flex-row gap-0 mt-2">
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          disabled
+                        >
+                          Sets
+                        </button>
+                        <input
+                          id={`sets-input-${exercise.id}`}
+                          type="number"
+                          value={exercise.sets ?? 0}
+                          onChange={(e) =>
+                            handleInputChange(e, exercise.id, "sets")
+                          }
+                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          min="0"
+                        />
+                      </div>
+                      <div className="flex flex-row gap-0 mt-2">
+                        <button
+                          type="button"
+                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          disabled
+                        >
+                          Time
+                        </button>
+                        <select
+                          id={`time-select-${exercise.id}`}
+                          value={exercise.time ?? "1 time / day"} // Default value
+                          onChange={(e) =>
+                            handleInputChange(e, exercise.id, "time")
+                          }
+                          className=" border rounded-xl rounded-l-none p-2"
+                        >
+                          <option value="1 time / day">1 time / day</option>
+                          <option value="2 times / day">2 times / day</option>
+                          <option value="3 times / day">3 times / day</option>
+                          <option value="4 times / day">4 times / day</option>
+                          <option value="5 times / day">5 times / day</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-row justify-start gap-0 mt-4">
+                      <button
+                        type="button"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        disabled
+                      >
+                        Description:
+                      </button>
+                      <textarea
+                        value={exercise.description}
+                        onChange={(e) =>
+                          handleInputChange(e, exercise.id, "description")
+                        }
+                        className="border rounded-xl rounded-l-none p-2 w-full resize-none"
+                        maxLength={500}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
-            }
+              ))}
 
             {/* Placeholder cards */}
-              {Array.from({ length: exercisesPerPage - displayedExercises.length }).map((_, i) => (
+            {Array.from({
+              length: exercisesPerPage - displayedExercises.length,
+            }).map((_, i) => (
               <div
                 key={`placeholder-${i}`}
                 className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400"
