@@ -44,7 +44,8 @@ export default function EditPlanPage() {
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
-
+  const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
+  const [planName, setPlanName] = useState<string | null>(null);
   const maxExercises = 8;
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
@@ -60,7 +61,7 @@ export default function EditPlanPage() {
           (exercise: PlanExercise, index: number) => ({
             ...exercise,
             sequenceNum: index + 1,
-          })
+          }) 
         );
         setPlanExercises(exercisesWithSequence);
         console.log("Fetched exercises:", data);
@@ -178,17 +179,27 @@ export default function EditPlanPage() {
       setNotification("Plan saved successfully!");
     } catch (err: any) {
       console.error("Error saving plan:", err);
-      setNotification("Failed to save plan.");
+      setNotificationFalse("Failed to save plan.");
     } finally {
       setSaving(false);
-      setTimeout(() => setNotification(null), 3000); // Clear notification after 3 seconds
+      setTimeout(() => setNotification(null), 3000); 
     }
   };
 
   const handleExportOption = (option: string) => {
     if (option === "PDF") {
-      generatePDF();
-    } else if (option === "QR Code") {
+      if (planExercises.length === 0) {
+        setNotificationFalse("No exercises to export.");
+        setTimeout(() => setNotification(null), 3000); 
+        return;
+      }
+    generatePDF();
+    } else if (option === "QR Code") { 
+      if (planExercises.length === 0) {
+        setNotificationFalse("No exercises to export.");
+        setTimeout(() => setNotification(null), 3000); 
+        return;
+      }
       setShowQRCode(true);
     }
   };
@@ -317,6 +328,15 @@ export default function EditPlanPage() {
           {notification}
         </div>
       )}
+      {notificationfalse && (
+        <div
+          className="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
+          style={{ backgroundColor: '#793339' }}
+        >
+          {notificationfalse}
+        </div>
+      )}
+
       <div className="container h-fit overflow-hidden">
         <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
           <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap">
@@ -608,15 +628,15 @@ export default function EditPlanPage() {
             }
 
             {/* Placeholder cards */}
-            {Array.from({
-              length: exercisesPerPage - displayedExercises.length,
-            }).map((_, i) => (
+              {Array.from({ length: exercisesPerPage - displayedExercises.length }).map((_, i) => (
               <div
-  key={`placeholder-${i}`}
-  className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400"
->
-  Empty Slot
-</div>
+                key={`placeholder-${i}`}
+                className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400"
+              >
+                <div className="flex flex-1 justify-center items-center w-full min-h-[200px] min-w-[450px]">
+                  <span className="text-center">Empty Slot</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>
