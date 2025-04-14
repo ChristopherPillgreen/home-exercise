@@ -9,20 +9,26 @@ export const getPlanExercises = async (
   planID: number,
   userID: string
 ): Promise<PlanExercise[]> => {
-  const plan = await em.findOne(Plan, { planID, user: {userID} });
+  const plan = await em.findOne(Plan, { planID, user: { userID } });
   if (!plan) throw new Error("Plan not found or unauthorized access");
 
-  // Fetch PlanExercise with populated Exercise relation
-  const planExercises = await em.find(PlanExercise, { plan }, { populate: ["exercise"] });
+  const planExercises = await em.find(PlanExercise, 
+    { plan }, 
+    { 
+      populate: ["exercise"], 
+      orderBy: { sequenceNum: "ASC" }
+    }
+  );
 
   // Add the exercise name to each PlanExercise
   return planExercises.map((planExercise) => ({
     ...planExercise,
-    exerciseName: planExercise.exercise.exerciseName, 
+    exerciseName: planExercise.exercise.exerciseName,
     exerciseDescription: planExercise.exercise.exerciseDescription,
     exerciseImage: planExercise.exercise.image,
   }));
 };
+
 
 
 export const addExerciseToPlan = async (

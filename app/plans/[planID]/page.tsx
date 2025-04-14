@@ -222,28 +222,41 @@ export default function EditPlanPage() {
 
   const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
     setPlanExercises((prev) => {
-      const current = prev.find((ex) => ex.id === exerciseId);
-      if (!current) return prev;
-
-      const targetSequence =
-        direction === "up" ? current.sequenceNum - 1 : current.sequenceNum + 1;
-
-      if (targetSequence < 1 || targetSequence > prev.length) return prev;
-
-      const other = prev.find((ex) => ex.sequenceNum === targetSequence);
-      if (!other) return prev;
-
-      const updatedExercises = prev.map((ex) => {
-        if (ex.id === current.id) {
-          return { ...ex, sequenceNum: targetSequence };
-        } else if (ex.id === other.id) {
-          return { ...ex, sequenceNum: current.sequenceNum };
-        }
-        return ex;
+      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
+      console.log(`Moving exercise with ID ${exerciseId}, current index: ${index}`);
+  
+      if (index === -1) {
+        console.log(`Exercise with ID ${exerciseId} not found.`);
+        return prev;
+      }
+  
+      const newExercises = [...prev];
+      console.log(`Exercise found at index ${index}. New list:`, newExercises);
+  
+      if (direction === "up" && index === 0) {
+        console.log(`Exercise is already at the top, no movement.`);
+        return prev;
+      }
+      if (direction === "down" && index === newExercises.length - 1) {
+        console.log(`Exercise is already at the bottom, no movement.`);
+        return prev;
+      }
+  
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      console.log(`Swapping exercise at index ${index} with exercise at index ${swapIndex}`);
+  
+      [newExercises[index], newExercises[swapIndex]] = [
+        newExercises[swapIndex],
+        newExercises[index],
+      ];
+  
+      const updatedExercises = newExercises.map((exercise, idx) => {
+        const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
+        console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
+        return updatedExercise;
       });
-
-      console.log("Updated exercises after move:", updatedExercises); // Log the updated exercises
-
+  
+      console.log("Updated exercises list:", updatedExercises);
       return updatedExercises;
     });
   };
