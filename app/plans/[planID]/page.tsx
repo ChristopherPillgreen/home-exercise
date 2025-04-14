@@ -173,10 +173,10 @@ const fetchPlan = async () => {
       exercises: planExercises.map((ex) => ({
         exerciseID: ex.exercise.exerciseID,
         sequenceNum: Number(ex.sequenceNum),
-        reps: ex.reps ? Number(ex.reps) : null,
-        sets: ex.sets ? Number(ex.sets) : null,
+        reps: Number(ex.reps),
+        sets: Number(ex.sets),
         duration: ex.duration === 'null' || ex.duration === null ? null : String(ex.duration),
-        time: ex.time ? String(ex.time) : null,
+        time: String(ex.time),
         description: String(ex.description),
       })),
     };
