@@ -44,11 +44,29 @@ export default function EditPlanPage() {
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
-  const [notificationfalse, setNotificationFalse] = useState<string | null>(
-    null
-  );
+  const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
+  const [planName, setPlanName] = useState<string | null>(null);
+  const maxExercises = 8;
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
+
+useEffect(() => {
+const fetchPlan = async () => {
+    try {
+      const response = await fetch(`/api/plan?planID=${planID}`);
+      if (!response.ok) throw new Error("Failed to fetch plan info");
+      const planData = await response.json();
+      setPlanName(planData.planName)
+    } catch (err) {
+      console.error("Error fetching plan name:", err);
+    }
+  };
+
+  if (planID) {
+    fetchPlan();
+  }
+}, [planID]);
+
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -148,44 +166,44 @@ export default function EditPlanPage() {
   };
 
   const savePlan = async () => {
-    setSaving(true);
-    try {
-      console.log("Current planExercises before sending:", planExercises);
+  setSaving(true);
+  try {
+    const payload = {
+      planID,
+      exercises: planExercises.map((ex) => ({
+        exerciseID: ex.exercise.exerciseID,
+        sequenceNum: Number(ex.sequenceNum),
+        reps: Number(ex.reps),
+        sets: Number(ex.sets),
+        duration: String(ex.duration),
+        time: ex.time ? String(ex.time) : null,
+        description: String(ex.description),
+      })),
+    };
 
-      const payload = {
-        planID,
-        exercises: planExercises.map((ex, idx) => ({
-          exerciseID: ex.exercise.exerciseID,
-          sequenceNum: ex.sequenceNum, // This is the updated sequence number
-          reps: Number(ex.reps),
-          sets: Number(ex.sets),
-          duration: String(ex.duration),
-          time: ex.time ? String(ex.time) : null,
-          description: String(ex.description),
-        })),
-      };
+    // 🔍 Log the full payload being sent
+    console.log(
+      "Saving exercises payload:",
+      JSON.stringify(payload, null, 2)
+    );
+    console.log("Current planExercises before sending:", planExercises);
 
-      console.log(
-        "Saving exercises payload:",
-        JSON.stringify(payload, null, 2)
-      );
+    const response = await fetch("/api/planexercise", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-      const response = await fetch("/api/planexercise", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) throw new Error("Failed to save plan");
-      setNotification("Plan saved successfully!");
-    } catch (err: any) {
-      console.error("Error saving plan:", err);
-      setNotificationFalse("Failed to save plan.");
-    } finally {
-      setSaving(false);
-      setTimeout(() => setNotification(null), 3000);
-    }
-  };
+    if (!response.ok) throw new Error("Failed to save plan");
+    setNotification("Plan saved successfully!");
+  } catch (err: any) {
+    console.error("Error saving plan:", err);
+    setNotificationFalse("Failed to save plan.");
+  } finally {
+    setSaving(false);
+    setTimeout(() => setNotification(null), 3000);
+  }
+};
 
   const handleExportOption = (option: string) => {
     if (option === "PDF") {
@@ -221,45 +239,46 @@ export default function EditPlanPage() {
   };
 
   const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
-    setPlanExercises((prev) => {
-      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
-      console.log(`Moving exercise with ID ${exerciseId}, current index: ${index}`);
-  
-      if (index === -1) {
-        console.log(`Exercise with ID ${exerciseId} not found.`);
-        return prev;
-      }
-  
-      const newExercises = [...prev];
-      console.log(`Exercise found at index ${index}. New list:`, newExercises);
-  
-      if (direction === "up" && index === 0) {
-        console.log(`Exercise is already at the top, no movement.`);
-        return prev;
-      }
-      if (direction === "down" && index === newExercises.length - 1) {
-        console.log(`Exercise is already at the bottom, no movement.`);
-        return prev;
-      }
-  
-      const swapIndex = direction === "up" ? index - 1 : index + 1;
-      console.log(`Swapping exercise at index ${index} with exercise at index ${swapIndex}`);
-  
-      [newExercises[index], newExercises[swapIndex]] = [
-        newExercises[swapIndex],
-        newExercises[index],
-      ];
-  
-      const updatedExercises = newExercises.map((exercise, idx) => {
-        const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
-        console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
-        return updatedExercise;
-      });
-  
-      console.log("Updated exercises list:", updatedExercises);
-      return updatedExercises;
+  setPlanExercises((prev) => {
+    const index = prev.findIndex((exercise) => exercise.id === exerciseId);
+    console.log(`Moving exercise with ID ${exerciseId}, current index: ${index}`);
+
+    if (index === -1) {
+      console.log(`Exercise with ID ${exerciseId} not found.`);
+      return prev;
+    }
+
+    const newExercises = [...prev];
+    console.log(`Exercise found at index ${index}. New list:`, newExercises);
+
+    if (direction === "up" && index === 0) {
+      console.log(`Exercise is already at the top, no movement.`);
+      return prev;
+    }
+    if (direction === "down" && index === newExercises.length - 1) {
+      console.log(`Exercise is already at the bottom, no movement.`);
+      return prev;
+    }
+
+    const swapIndex = direction === "up" ? index - 1 : index + 1;
+    console.log(`Swapping exercise at index ${index} with exercise at index ${swapIndex}`);
+
+    [newExercises[index], newExercises[swapIndex]] = [
+      newExercises[swapIndex],
+      newExercises[index],
+    ];
+
+    // Map and update the sequence numbers
+    const updatedExercises = newExercises.map((exercise, idx) => {
+      const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
+      console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
+      return updatedExercise;
     });
-  };
+
+    console.log("Updated exercises list:", updatedExercises);
+    return updatedExercises;
+  });
+};
 
   const jsonData = JSON.stringify(compactData);
   const base64Data = encodeURIComponent(btoa(jsonData));
