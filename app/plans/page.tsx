@@ -192,19 +192,19 @@ export default function PlansPage() {
     return <div className="text-red-500 text-center mt-4">{error}</div>;
 
   return (
-    <div className="container h-fit overflow-hidden">
-      <div className="ml-4 flex items-center justify-between w-screen">
+    <div className="container h-fit overflow-hidden w-full">
+      <div className="flex items-center justify-between w-full">
         <h1 className="flex font-bold text-[#7874AC] text-3xl">
           Your Plans
         </h1>
-        <div className="flex flex-row mr-10 p-4 w-full max-w-lg space-x-4 overflow-visible">
+        <div className="flex flex-row p-4 w-fit max-w-lg space-x-4">
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
           >
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center"
+              className="h-full px-4 bg-[#74ac85] text-white rounded-xl"
               >
               Create Plan
             </button>

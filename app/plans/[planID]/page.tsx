@@ -45,8 +45,6 @@ export default function EditPlanPage() {
   const router = useRouter();
   const { planID } = useParams();
   const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
-  const [planName, setPlanName] = useState<string | null>(null);
-  const maxExercises = 8;
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
 

@@ -18,6 +18,10 @@ type Exercise = {
   image: string;
 };
 
+type PlanExercise = {
+  exerciseID: number;
+};
+
 export default function Planner() {
   const [exercises, setExercises] = useState<Exercise[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,13 +34,15 @@ export default function Planner() {
   const { planID } = useParams(); // Get plan ID from URL
   const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
   const [notification, setNotification] = useState("");
+  const [notificationfalse, setNotificationfalse] = useState(""); // New state for limit notification
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null
   );
   const router = useRouter();
-
+  const [planExerciseCount, setPlanExerciseCount] = useState(0); // Track number of exercises in plan
   const [selectedCategoryID, setSelectedCategoryID] = useState<number | null>(null); // State to store selected category ID
+  const [currentPlanExercises, setCurrentPlanExercises] = useState<PlanExercise[]>([]); // Track current exercises in plan
 
   const handleOpenInfoModal = (exercise: Exercise) => {
     setSelectedExercise(exercise);
@@ -48,6 +54,28 @@ export default function Planner() {
     setSelectedExercise(null);
     setShowInfoModal(false);
   };
+
+  // Fetch existing exercises in the plan
+  const fetchPlanExercises = async () => {
+    try {
+      const planIDNumber = Number(planID);
+      if (isNaN(planIDNumber)) return;
+      
+      const response = await fetch(`/api/planexercise?planID=${planIDNumber}`);
+      if (!response.ok) throw new Error("Failed to fetch plan exercises.");
+      
+      const data = await response.json();
+      setPlanExerciseCount(data.length);
+      setCurrentPlanExercises(data); // Store the current exercises in the plan
+    } catch (err) {
+      console.error("Error fetching plan exercises:", err);
+    }
+  };
+
+  useEffect(() => {
+    // Fetch exercises in the plan when component mounts
+    fetchPlanExercises();
+  }, [planID]);
 
   useEffect(() => {
     const fetchExercises = async () => {
@@ -102,6 +130,21 @@ export default function Planner() {
 
   const handleAddExercise = async (exerciseID: number) => {
     try {
+      // Check if we've reached the limit
+      if (planExerciseCount >= 10) {
+        setNotificationfalse("You cannot exceed 10 exercises");
+        setTimeout(() => setNotificationfalse(""), 3000);
+        return;
+      }
+      
+      // Fixed duplicate check - compare with existing exercises in the plan
+      const isDuplicate = currentPlanExercises.some(exercise => exercise.exerciseID === exerciseID);
+      if (isDuplicate) {
+        setNotification("Cannot have duplicate exercises.");
+        setTimeout(() => setNotification(""), 3000);
+        return;
+      }
+
       const planIDNumber = Number(planID);
       if (isNaN(planIDNumber)) {
         alert("Invalid Plan ID.");
@@ -119,10 +162,12 @@ export default function Planner() {
       if (!response.ok) {
         throw new Error("Failed to add exercise to plan.");
       }
-
+      
+      // Update local state to reflect the new exercise
+      setPlanExerciseCount(prevCount => prevCount + 1);
+      setCurrentPlanExercises(prev => [...prev, { exerciseID }]);
       setNotification("Exercise added successfully!");
-      setTimeout(() => setNotification(""), 3000); // Clear notification after 3 seconds
-      // alert("Exercise added successfully!");
+      setTimeout(() => setNotification(""), 3000); 
     } catch (err) {
       console.error("Error adding exercise:", err);
       alert("Failed to add exercise.");
@@ -178,16 +223,24 @@ export default function Planner() {
   return (
   <>
     {notification && (
-      <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+      <div className={`fixed top-5 right-5 z-50 ${notification.includes("Cannot") ? "bg-[#793339]" : "bg-green-500"} text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300`}>
         {notification}
       </div>
     )}
-    <div className="container h-fit overflow-hidden">
-      <div className="ml-4 flex items-center justify-between w-screen">
-        <h1 className="flex font-bold text-[#7874AC] text-3xl">
-          Exercises
-        </h1>
-        <div className="flex flex-row mr-14 p-4 w-full max-w-lg space-x-4">
+    {notificationfalse && (
+      <div
+        className="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
+        style={{ backgroundColor: '#793339' }}
+      >
+        {notificationfalse}
+      </div>
+    )}
+    <div className="container h-fit w-full overflow-hidden">
+      <div className="flex items-center justify-between w-full">
+          <h1 className="flex font-bold text-[#7874AC] text-3xl">
+            Exercises
+          </h1>
+        <div className="flex p-4 w-fit max-w-lg space-x-4">
           {/* Back Button */}
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -195,7 +248,7 @@ export default function Planner() {
           >
             <button
               onClick={handleBackNavigation}
-              className="h-full px-4 bg-[#793339] text-white rounded-xl flex items-center justify-center overflow-hidden"
+              className="h-full w-fit px-4 bg-[#793339] text-white rounded-xl flex items-center justify-center overflow-hidden"
             >
               Back to Plan
             </button>
@@ -351,6 +404,7 @@ export default function Planner() {
           ))}
         </div>
       </div>
+
       {/* Pagination Dots for Exercises (alternative pagination) */}
       <div className="flex items-center justify-center mt-1 space-x-2">
         {[

@@ -140,17 +140,12 @@ export default function Planner() {
         {notification}
       </div>
     )}
-    <div className="container h-fit overflow-hidden">
-      <div className="ml-4 flex items-center justify-between w-screen">
+    <div className="container h-fit w-full overflow-hidden">
+      <div className="flex items-center justify-between w-full">
         <h1 className="flex font-bold text-[#7874AC] text-3xl">
           Exercises
         </h1>
-        <div className="flex flex-row mr-14 p-4 w-full max-w-lg space-x-4">
-          <motion.div
-            whileHover={{ scale: 1.1 }}
-            transition={{ duration: 0.2 }}
-          >
-          </motion.div>
+        <div className="flex flex-row p-4 w-fit max-w-lg space-x-4 mr-24">
           <motion.div
             whileHover={{ scale: 1.1 }}
             transition={{ duration: 0.2 }}
