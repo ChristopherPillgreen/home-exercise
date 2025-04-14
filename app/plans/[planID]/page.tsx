@@ -169,13 +169,13 @@ const fetchPlan = async () => {
   setSaving(true);
   try {
     const payload = {
-      planID: Number(planID),
+      planID,
       exercises: planExercises.map((ex) => ({
         exerciseID: ex.exercise.exerciseID,
         sequenceNum: Number(ex.sequenceNum),
-        reps: Number(ex.reps),
-        sets: Number(ex.sets),
-        duration: String(ex.duration),
+        reps: ex.reps ? Number(ex.reps) : null,
+        sets: ex.sets ? Number(ex.sets) : null,
+        duration: ex.duration === 'null' || ex.duration === null ? null : String(ex.duration),
         time: ex.time ? String(ex.time) : null,
         description: String(ex.description),
       })),
