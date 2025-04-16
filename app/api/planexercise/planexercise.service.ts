@@ -20,7 +20,6 @@ export const getPlanExercises = async (
     }
   );
 
-  // Add the exercise name to each PlanExercise
   return planExercises.map((planExercise) => ({
     ...planExercise,
     exerciseName: planExercise.exercise.exerciseName,
@@ -44,7 +43,6 @@ export const addExerciseToPlan = async (
   if (!plan) throw new Error("Plan not found");
   if (!exercise) throw new Error("Exercise not found");
 
-  // 🔒 Check for existing PlanExercise to prevent duplicates
   const existing = await em.findOne(PlanExercise, {
     plan,
     exercise,

@@ -1,4 +1,3 @@
-//import { getOrm } from '../../../mikro-orm.config';
 import { getOrm } from "mikro-orm.config";
 import { NextRequest, NextResponse } from "next/server";
 import {
@@ -17,26 +16,22 @@ interface UserData {
   userPassword: string;
 }
 
-// Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
   console.log("getQueryParam funct");
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
-
-// Helper: Handle errors
 function handleErrorResponse(error: any) {
   console.log("in route in handleErrorResponse");
   return NextResponse.json({ error: error.message }, { status: 500 });
 }
 
-// GET: Retrieve a user by ID or all users.
+
 export async function GET(request: NextRequest) {
   console.log("get function");
   const id = getQueryParam(request, "id");
 
   try {
-    //const orm = await getOrm(); // Retrieve the MikroORM instance
     const em = (await getOrm()).em.fork()
 
     console.log("EntityManager:", em);
@@ -64,7 +59,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Create a new user.
 export async function POST(request: NextRequest) {
   console.log("post");
   try {
@@ -84,7 +78,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Update an existing user by ID.
 export async function PUT(request: NextRequest) {
   console.log("put");
   const id = getQueryParam(request, "id");
@@ -107,7 +100,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Delete a user by ID.
 export async function DELETE(request: NextRequest) {
   console.log("delete");
   const id = getQueryParam(request, "id");

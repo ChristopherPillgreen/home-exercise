@@ -74,7 +74,7 @@ const config: Options<MySqlDriver> = {
   dbName: process.env.MYSQL_DATABASE || 'seniorproject',
   host: process.env.MYSQL_HOST || '127.0.0.1',
   user: process.env.MYSQL_USER || 'root',
-  password: process.env.MYSQL_PASSWORD || 'root_password',
+  password: process.env.MYSQL_ROOT_PASSWORD || 'root_password',
   driver: MySqlDriver,
   port: process.env.MYSQL_PORT ? parseInt(process.env.MYSQL_PORT, 10) : 3306,
   debug: true,

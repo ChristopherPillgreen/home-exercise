@@ -10,15 +10,14 @@ export const createUser = async (
     userLastName: string;
     userEmail: string;
     userPassword: string;
-    //plans: []
   }
 ): Promise<User> => {
-  const user = em.create(User, data); // Create a new user entity
-  await em.persistAndFlush(user); // Persist and flush the entity to the database
+  const user = em.create(User, data); 
+  await em.persistAndFlush(user); 
   return user;
 };
 
-// Get a User by ID
+
 export const getUserById = async (
   em: EntityManager,
   userID: string
@@ -26,13 +25,11 @@ export const getUserById = async (
   return await em.findOne(User, { userID }, { populate: ["plans"] });
 };
 
-// Get All Users
 export const getAllUsers = async (em: EntityManager): Promise<User[]> => {
   console.log("User entity:", User);
   return await em.find(User, {}, { populate: ["plans"] });
 };
 
-// Update a User
 export const updateUser = async (
   em: EntityManager,
   userID: string,
@@ -45,7 +42,6 @@ export const updateUser = async (
   return user;
 };
 
-// Delete a User
 export const deleteUser = async (
   em: EntityManager,
   userID: string
@@ -61,14 +57,12 @@ export const loginUser = async (
   userEmail: string,
   userPassword: string
 ): Promise<User | null> => {
-  // Find user by email
   const user = await em.findOne(User, { userEmail });
 
   if (!user) {
     throw new Error("User not found");
   }
 
-  // Check if the entered password matches the stored password
   if (user.userPassword !== userPassword) {
     throw new Error("Invalid password");
   }

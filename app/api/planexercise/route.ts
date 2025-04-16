@@ -10,15 +10,13 @@ import {
   removeExerciseFromPlan,
 } from './planexercise.service';
 
-// Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
-// GET: Retrieve all exercises for a plan
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions); // Move session retrieval inside the function
+  const session = await getServerSession(authOptions); 
 
   if (!session || !session.user) {
     return NextResponse.json({ message: 'User is not authenticated' }, { status: 401 });
@@ -38,9 +36,8 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Add an exercise to a plan
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions); // Move session retrieval inside the function
+  const session = await getServerSession(authOptions); 
 
   if (!session || !session.user) {
     return NextResponse.json({ message: 'User is not authenticated' }, { status: 401 });
@@ -62,7 +59,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Update an exercise in a plan
 export async function PUT(request: NextRequest) {
   const session = await getServerSession(authOptions);
 
@@ -87,7 +83,7 @@ export async function PUT(request: NextRequest) {
         Number(planID),
         exercise.exerciseID,
         session.user.id,
-        { ...exercise } // Spread all properties of exercise into update
+        { ...exercise } 
       );
       updatedExercises.push(updatedPlanExercise);
     }
@@ -99,9 +95,8 @@ export async function PUT(request: NextRequest) {
 }
 
 
-// DELETE: Remove an exercise from a plan
 export async function DELETE(request: NextRequest) {
-  const session = await getServerSession(authOptions); // Move session retrieval inside the function
+  const session = await getServerSession(authOptions); 
 
   if (!session || !session.user) {
     return NextResponse.json({ message: 'User is not authenticated' }, { status: 401 });

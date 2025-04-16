@@ -1,4 +1,4 @@
-import { loginUser } from "./login.service"; // Adjust the import path if needed
+import { loginUser } from "./login.service"; 
 import { getOrm } from "mikro-orm.config";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -10,7 +10,6 @@ function handleErrorResponse(error: any) {
   );
 }
 
-// POST: Login a user
 export async function POST(request: NextRequest) {
   try {
     const em = (await getOrm()).em.fork()
@@ -21,11 +20,10 @@ export async function POST(request: NextRequest) {
 
     const user = await loginUser(em, userEmail, userPassword);
 
-    // Check if user is null
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials" },
-        { status: 401 } // Unauthorized
+        { status: 401 } 
       );
     }
 

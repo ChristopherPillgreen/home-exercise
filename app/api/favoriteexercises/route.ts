@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOrm } from 'mikro-orm.config';
-//import { getOrm } from '../../../mikro-orm.config';
 import { 
   getFavoritesByUser, 
   addFavoriteExercise, 
   removeFavoriteExercise } from './favoriteexercises.service';
 
 
-// Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
-// GET: Retrieve all favorite exercises for a user
 export async function GET(request: NextRequest) {
   const userID = getQueryParam(request, 'userID');
   if (!userID) {
@@ -31,7 +28,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Add a new favorite exercise
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -41,7 +37,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'userID and exerciseID are required' }, { status: 400 });
     }
 
-    //const orm = await getOrm();
     const em = (await getOrm()).em.fork()
 
     const favorite = await addFavoriteExercise(em, String(userID), Number(exerciseID));
@@ -51,7 +46,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE: Remove a favorite exercise
 export async function DELETE(request: NextRequest) {
   const userID = getQueryParam(request, 'userID');
   const exerciseID = getQueryParam(request, 'exerciseID');
@@ -61,7 +55,6 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    //const orm = await getOrm();
     const em = (await getOrm()).em.fork()
 
     const success = await removeFavoriteExercise(em, String(userID), Number(exerciseID));
