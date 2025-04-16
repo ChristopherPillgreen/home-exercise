@@ -45,8 +45,9 @@ export default function EditPlanPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
-  const { planID } = useParams();
+  var { planID } = useParams();
   const decodedPlanId = decodePlanId(planID as string);
+
 
   const [notificationfalse, setNotificationFalse] = useState<string | null>(
     null
@@ -54,6 +55,15 @@ export default function EditPlanPage() {
   const [planName, setPlanName] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
+
+  const [currentExerciseID, setCurrentExerciseID] = useState(0);
+  const [currentPlanID, setCurrentPlanID] = useState(0);
+
+  const handleOpenConfirmation = (exerciseID: number, planID: number) => {
+    setCurrentExerciseID(exerciseID);
+    setCurrentPlanID(planID);
+    setShowConfirmation(true);
+  };
 
   useEffect(() => {
     if (!decodedPlanId) return;
@@ -128,7 +138,7 @@ export default function EditPlanPage() {
   const handleDeleteExercise = async (exerciseID: number, id: number) => {
     try {
       const response = await fetch(
-        `/api/planexercise?planID=${planID}&exerciseID=${exerciseID}`,
+        `/api/planexercise?planID=${decodedPlanId}&exerciseID=${exerciseID}`,
         {
           method: "DELETE",
           headers: {
@@ -169,7 +179,7 @@ export default function EditPlanPage() {
     setSaving(true);
     try {
       const payload = {
-        planID,
+        planID: decodedPlanId,
         exercises: planExercises.map((ex) => ({
           exerciseID: ex.exercise.exerciseID,
           sequenceNum: Number(ex.sequenceNum),
@@ -545,7 +555,7 @@ export default function EditPlanPage() {
                       transition={{ duration: 0.2 }}
                     >
                       <IoCloseCircle
-                        onClick={() => setShowConfirmation(true)}
+                        onClick={() => handleOpenConfirmation(exercise.exercise.exerciseID, exercise.id)}
                         color="#3D0814"
                         size={30}
                       />

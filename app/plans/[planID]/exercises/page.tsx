@@ -10,6 +10,7 @@ import {
   IoCloseCircle,
   IoInformationCircle,
 } from "react-icons/io5";
+import { decodePlanId } from "./../../../api/urlsqids";
 
 type Exercise = {
   exerciseID: number;
@@ -130,7 +131,7 @@ export default function Planner() {
         setTimeout(() => setNotificationfalse(""), 3000);
         return;
       }
-
+  
       const isDuplicate = currentPlanExercises.some(
         (exercise) => exercise.exerciseID === exerciseID
       );
@@ -139,25 +140,26 @@ export default function Planner() {
         setTimeout(() => setNotification(""), 3000);
         return;
       }
-
-      const planIDNumber = Number(planID);
-      if (isNaN(planIDNumber)) {
+  
+      // Use decodePlanId to decode the planID from the SQID format
+      const decodedPlanID = decodePlanId(planID as string);
+      if (decodedPlanID === null || isNaN(decodedPlanID)) {
         alert("Invalid Plan ID.");
         return;
       }
-
+  
       const response = await fetch(`/api/planexercise`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ planID: planIDNumber, exerciseID }),
+        body: JSON.stringify({ planID: decodedPlanID, exerciseID }),
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to add exercise to plan.");
       }
-
+  
       setPlanExerciseCount((prevCount) => prevCount + 1);
       setCurrentPlanExercises((prev) => [...prev, { exerciseID }]);
       setNotification("Exercise added successfully!");
@@ -168,6 +170,7 @@ export default function Planner() {
       setTimeout(() => setNotification(""), 3000);
     }
   };
+  
 
   const filteredExercises = exercises.filter(
     (exercise) =>
