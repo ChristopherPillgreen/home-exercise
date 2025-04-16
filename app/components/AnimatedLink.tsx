@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion } from "motion/react";
 
-// Utility function to generate lighter and darker shades of a color
 function generateGradientColors(baseColor: string): string[] {
   const lighten = (color: string, percent: number) => {
     const num = parseInt(color.replace("#", ""), 16);
@@ -42,15 +41,15 @@ export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkPr
 
   return (
     <motion.div
-      className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-md"
+      className="relative w-full h-20 flex items-center justify-center overflow-hidden rounded-xl shadow-md: hover:shadow-lg"
       style={{
         background: `linear-gradient(90deg, ${lightShade}, ${baseShade}, ${darkShade})`,
         backgroundSize: "200% 200%",
         animation: "gradientAnimation 3s ease infinite",
       }}
-      initial={{ x: "100vw", opacity: 0 }} // Slide in from the right
+      initial={{ x: "100vw", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      whileHover="hover" // Apply hover state
+      whileHover="hover"
       whileTap="tap"
       variants={buttonVariants}
       transition={{ type: "spring", stiffness: 50, damping: 10 }}
@@ -63,7 +62,7 @@ export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkPr
         >
           <path
             d="M10 10 H250 A10 10 0 0 1 260 20 V70 A10 10 0 0 1 250 80 H10 A10 0 0 1 0 70 V20 A10 10 0 0 1 10 10 Z"
-            fill="transparent" // Keep the path transparent to show the gradient background
+            fill="transparent"
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white transition-opacity duration-300 hover:opacity-80">

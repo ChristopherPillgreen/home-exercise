@@ -1,10 +1,10 @@
 export default function privacy() {
   return (
-    <div className="h-fit flex justify-center w-full">
+    <div className="h-fit flex justify-center w-full text-3xl">
       <div>
-        <text>
+        <h1>
           tbd.
-        </text>
+        </h1>
       </div>
     </div>
   );

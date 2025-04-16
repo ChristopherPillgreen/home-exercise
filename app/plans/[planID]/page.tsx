@@ -11,6 +11,7 @@ import {
   IoArrowUpCircle,
   IoCloseCircle,
 } from "react-icons/io5";
+import { decodePlanId } from "./../../api/urlsqids";
 
 interface PlanExercise {
   exercise: {
@@ -41,37 +42,42 @@ export default function EditPlanPage() {
   const [saving, setSaving] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
-  const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
+  const decodedPlanId = decodePlanId(planID as string);
+
+  const [notificationfalse, setNotificationFalse] = useState<string | null>(
+    null
+  );
   const [planName, setPlanName] = useState<string | null>(null);
-  const maxExercises = 8;
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
 
-useEffect(() => {
-const fetchPlan = async () => {
-    try {
-      const response = await fetch(`/api/plan?planID=${planID}`);
-      if (!response.ok) throw new Error("Failed to fetch plan info");
-      const planData = await response.json();
-      setPlanName(planData.planName)
-    } catch (err) {
-      console.error("Error fetching plan name:", err);
-    }
-  };
+  useEffect(() => {
+    if (!decodedPlanId) return;
 
-  if (planID) {
+    const fetchPlan = async () => {
+      try {
+        const response = await fetch(`/api/plan?planID=${decodedPlanId}`);
+        if (!response.ok) throw new Error("Failed to fetch plan info");
+        const planData = await response.json();
+        setPlanName(planData.planName);
+      } catch (err) {
+        console.error("Error fetching plan name:", err);
+      }
+    };
+
     fetchPlan();
-  }
-}, [planID]);
-
+  }, [decodedPlanId]);
 
   useEffect(() => {
+    if (!decodedPlanId) return;
+
     const fetchExercises = async () => {
       try {
-        const response = await fetch(`/api/planexercise?planID=${planID}`);
+        const response = await fetch(`/api/planexercise?planID=${decodedPlanId}`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -91,13 +97,8 @@ const fetchPlan = async () => {
       }
     };
 
-    if (planID) {
-      fetchExercises();
-    } else {
-      setError("Invalid Plan ID.");
-      setLoading(false);
-    }
-  }, [planID]);
+    fetchExercises();
+  }, [decodedPlanId]);
 
   const displayedExercises = planExercises.slice(
     currentPage * exercisesPerPage,
@@ -144,17 +145,16 @@ const fetchPlan = async () => {
             .filter((exercise) => exercise.id !== id)
             .map((exercise, index) => ({
               ...exercise,
-              sequenceNum: index + 1, // Recalculate sequenceNum
+              sequenceNum: index + 1,
             }));
 
-          // Adjust the current page if the current page is no longer valid
           const totalPages = Math.ceil(
             updatedExercises.length / exercisesPerPage
           );
           if (currentPage >= totalPages && currentPage > 0) {
             setCurrentPage(currentPage - 1);
           }
-
+          setShowConfirmation(false);
           return updatedExercises;
         });
       } else {
@@ -166,43 +166,46 @@ const fetchPlan = async () => {
   };
 
   const savePlan = async () => {
-  setSaving(true);
-  try {
-    const payload = {
-      planID,
-      exercises: planExercises.map((ex) => ({
-        exerciseID: ex.exercise.exerciseID,
-        sequenceNum: Number(ex.sequenceNum),
-        reps: Number(ex.reps),
-        sets: Number(ex.sets),
-        duration: ex.duration === 'null' || ex.duration === null ? null : String(ex.duration),
-        time: String(ex.time),
-        description: String(ex.description),
-      })),
-    };
+    setSaving(true);
+    try {
+      const payload = {
+        planID,
+        exercises: planExercises.map((ex) => ({
+          exerciseID: ex.exercise.exerciseID,
+          sequenceNum: Number(ex.sequenceNum),
+          reps: Number(ex.reps),
+          sets: Number(ex.sets),
+          duration:
+            ex.duration === "null" || ex.duration === null
+              ? null
+              : String(ex.duration),
+          time: String(ex.time),
+          description: String(ex.description),
+        })),
+      };
 
-    console.log(
-      "Saving exercises payload:",
-      JSON.stringify(payload, null, 2)
-    );
-    console.log("Current planExercises before sending:", planExercises);
+      console.log(
+        "Saving exercises payload:",
+        JSON.stringify(payload, null, 2)
+      );
+      console.log("Current planExercises before sending:", planExercises);
 
-    const response = await fetch("/api/planexercise", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      const response = await fetch("/api/planexercise", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) throw new Error("Failed to save plan");
-    setNotification("Plan saved successfully!");
-  } catch (err: any) {
-    console.error("Error saving plan:", err);
-    setNotificationFalse("Failed to save plan.");
-  } finally {
-    setSaving(false);
-    setTimeout(() => setNotification(null), 3000);
-  }
-};
+      if (!response.ok) throw new Error("Failed to save plan");
+      setNotification("Plan saved successfully!");
+    } catch (err: any) {
+      console.error("Error saving plan:", err);
+      setNotificationFalse("Failed to save plan.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
 
   const handleExportOption = (option: string) => {
     if (option === "PDF") {
@@ -238,46 +241,51 @@ const fetchPlan = async () => {
   };
 
   const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
-  setPlanExercises((prev) => {
-    const index = prev.findIndex((exercise) => exercise.id === exerciseId);
-    console.log(`Moving exercise with ID ${exerciseId}, current index: ${index}`);
+    setPlanExercises((prev) => {
+      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
+      console.log(
+        `Moving exercise with ID ${exerciseId}, current index: ${index}`
+      );
 
-    if (index === -1) {
-      console.log(`Exercise with ID ${exerciseId} not found.`);
-      return prev;
-    }
+      if (index === -1) {
+        console.log(`Exercise with ID ${exerciseId} not found.`);
+        return prev;
+      }
 
-    const newExercises = [...prev];
-    console.log(`Exercise found at index ${index}. New list:`, newExercises);
+      const newExercises = [...prev];
+      console.log(`Exercise found at index ${index}. New list:`, newExercises);
 
-    if (direction === "up" && index === 0) {
-      console.log(`Exercise is already at the top, no movement.`);
-      return prev;
-    }
-    if (direction === "down" && index === newExercises.length - 1) {
-      console.log(`Exercise is already at the bottom, no movement.`);
-      return prev;
-    }
+      if (direction === "up" && index === 0) {
+        console.log(`Exercise is already at the top, no movement.`);
+        return prev;
+      }
+      if (direction === "down" && index === newExercises.length - 1) {
+        console.log(`Exercise is already at the bottom, no movement.`);
+        return prev;
+      }
 
-    const swapIndex = direction === "up" ? index - 1 : index + 1;
-    console.log(`Swapping exercise at index ${index} with exercise at index ${swapIndex}`);
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      console.log(
+        `Swapping exercise at index ${index} with exercise at index ${swapIndex}`
+      );
 
-    [newExercises[index], newExercises[swapIndex]] = [
-      newExercises[swapIndex],
-      newExercises[index],
-    ];
+      [newExercises[index], newExercises[swapIndex]] = [
+        newExercises[swapIndex],
+        newExercises[index],
+      ];
 
-    // Map and update the sequence numbers
-    const updatedExercises = newExercises.map((exercise, idx) => {
-      const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
-      console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
-      return updatedExercise;
+      const updatedExercises = newExercises.map((exercise, idx) => {
+        const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
+        console.log(
+          `Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`
+        );
+        return updatedExercise;
+      });
+
+      console.log("Updated exercises list:", updatedExercises);
+      return updatedExercises;
     });
-
-    console.log("Updated exercises list:", updatedExercises);
-    return updatedExercises;
-  });
-};
+  };
 
   const jsonData = JSON.stringify(compactData);
   const base64Data = encodeURIComponent(btoa(jsonData));
@@ -298,15 +306,12 @@ const fetchPlan = async () => {
 
     let yOffset = 30;
 
-    // Sort planExercises by sequenceNum before the loop
     planExercises.sort((a, b) => a.sequenceNum - b.sequenceNum);
 
     planExercises.forEach((exercise) => {
-      // Reserve vertical space for image height if needed
       const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
       const imageHeight = 80;
-      const textBlockHeight = 80; // estimated
-      // Reset page if needed before starting exercise
+      const textBlockHeight = 80;
       if (yOffset + textBlockHeight > 270) {
         doc.addPage();
         yOffset = 20;
@@ -340,13 +345,19 @@ const fetchPlan = async () => {
       yOffset += 6;
 
       const desc = exercise.exercise.exerciseDescription;
-      const descriptionLines = doc.splitTextToSize(desc, 100); // narrower width for left side
+      const descriptionLines = doc.splitTextToSize(desc, 100);
       doc.text(descriptionLines, 14, yOffset);
       const descHeight = descriptionLines.length * 6;
 
-      // Draw image on the right side
-      const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
-      doc.addImage(cloudinaryImageUrl, "JPEG", imageX-50, yOffset-50, 100, 50);
+      const imageX = pageWidth - 14 - 50;
+      doc.addImage(
+        cloudinaryImageUrl,
+        "JPEG",
+        imageX - 50,
+        yOffset - 50,
+        100,
+        50
+      );
 
       yOffset += Math.max(descHeight, imageHeight) - 50;
 
@@ -366,22 +377,19 @@ const fetchPlan = async () => {
   return (
     <>
       {notification && (
-        <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+        <div className="fixed top-5 right-5 z-50 bg-[#004F2D] text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
           {notification}
         </div>
       )}
       {notificationfalse && (
-        <div
-          className="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
-          style={{ backgroundColor: "#793339" }}
-        >
+        <div className="fixed top-5 right-5 z-50 bg-[#7D1616] text-white px-6 py-3 rounded-lg  shadow-lg transition-opacity duration-300">
           {notificationfalse}
         </div>
       )}
 
-      <div className="container h-fit overflow-hidden">
+      <div className="container h-fit">
         <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
-          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap">
+          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap font-Noto_Sans">
             {planExercises[0]?.plan.planName}
           </h1>
           <div className="flex flex-wrap gap-4">
@@ -391,9 +399,9 @@ const fetchPlan = async () => {
             >
               <button
                 onClick={() => router.push(`/plans`)}
-                className="px-4 py-2 bg-[#793339] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
+                className="px-4 py-2 bg-[#7D1616] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
               >
-                Back to Plan
+                Back to Plans
               </button>
             </motion.div>
             <motion.div
@@ -402,7 +410,7 @@ const fetchPlan = async () => {
             >
               <button
                 onClick={() => router.push(`/plans/${planID}/exercises`)}
-                className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
+                className="h-full px-4 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center"
               >
                 Add Exercises
               </button>
@@ -414,7 +422,7 @@ const fetchPlan = async () => {
               <button
                 onClick={savePlan}
                 disabled={saving}
-                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap ${
+                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap ${
                   saving ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -429,7 +437,7 @@ const fetchPlan = async () => {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="px-4 py-2 bg-[#cf935c] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
+                  className="px-4 py-2 bg-[#58A870] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
                 >
                   Export as
                   <svg
@@ -479,7 +487,7 @@ const fetchPlan = async () => {
               >
                 <IoCloseCircle
                   onClick={() => setShowQRCode(false)}
-                  color="#793339"
+                  color="#3D0814"
                   size={30}
                 />
               </motion.div>
@@ -500,14 +508,13 @@ const fetchPlan = async () => {
 
         <div className="w-full px-4 py-6 flex justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {/* Your actual exercise cards */}
             {displayedExercises
               .slice()
               .sort((a, b) => a.sequenceNum - b.sequenceNum)
               .map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
+                  className="border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
                     <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
@@ -518,7 +525,7 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoArrowUpCircle
-                        color="#74ac85"
+                        color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "up")}
                       />
@@ -528,7 +535,7 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoArrowDownCircle
-                        color="#74ac85"
+                        color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "down")}
                       />
@@ -538,16 +545,49 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoCloseCircle
-                        onClick={() =>
-                          handleDeleteExercise(
-                            exercise.exercise.exerciseID,
-                            exercise.id
-                          )
-                        }
-                        color="#793339"
+                        onClick={() => setShowConfirmation(true)}
+                        color="#3D0814"
                         size={30}
                       />
                     </motion.div>
+                    {showConfirmation && (
+                      <div className="fixed inset-0 bg-[#7D1616] bg-opacity-25 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                            Are you sure you want to delete this exercise?
+                          </h3>
+                          <div className="flex justify-center space-x-4">
+                            <motion.div
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <button
+                                onClick={() =>
+                                  handleDeleteExercise(
+                                    exercise.exercise.exerciseID,
+                                    exercise.id
+                                  )
+                                }
+                                className="bg-[#7D1616] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
+                              >
+                                Yes, Delete
+                              </button>
+                            </motion.div>
+                            <motion.div
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <button
+                                onClick={() => setShowConfirmation(false)}
+                                className="bg-[#58A870] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
+                              >
+                                No, Cancel
+                              </button>
+                            </motion.div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {exercise.exercise.image ? (
@@ -563,83 +603,87 @@ const fetchPlan = async () => {
                       <span className="text-gray-500">No Image</span>
                     </div>
                   )}
-                  <div className="mt-2 text-sm text-gray-700 overflow-y-auto">
-                    <div className="flex flex-row justify-start gap-1 mt-2">
+                  <div className="mt-2 text-sm text-gray-700">
+                    <div className="flex flex-row justify-between gap-1 mt-2">
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
-                          Repititions
+                          Reps
                         </button>
                         <input
-                          id={`reps-input-${exercise.id}`} // Unique ID for the input box
+                          id="reps-input"
                           type="number"
                           value={exercise.reps ?? 0}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "reps")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          className="w-[10vh] border rounded-xl shadow-md rounded-l-none p-2"
                           min="0"
+                          title="Enter the number of repetitions"
+                          placeholder="Reps"
                         />
                       </div>
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
                           Duration
                         </button>
                         <input
-                          id={`duration-input-${exercise.id}`}
+                          id={`duration-input`}
                           type="text"
                           value={exercise.duration ?? ""}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "duration")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
-                          placeholder="0 sec"
+                          className="w-[20vh] border rounded-xl shadow-md rounded-l-none p-2"
+                          placeholder="0 seconds"
                         />
                       </div>
                     </div>
 
-                    <div className="flex flex-row justify-start gap-1 mt-2">
+                    <div className="flex flex-row justify-between gap-1 mt-2">
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Sets
                         </button>
                         <input
-                          id={`sets-input-${exercise.id}`}
+                          id="sets-input"
                           type="number"
                           value={exercise.sets ?? 0}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "sets")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          className="w-[10vh] border rounded-xl rounded-l-none p-2"
                           min="0"
+                          placeholder="1 set"
                         />
                       </div>
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Time
                         </button>
                         <select
-                          id={`time-select-${exercise.id}`}
-                          value={exercise.time ?? "1 time / day"} // Default value
+                          id="time-select"
+                          title="Time"
+                          value={exercise.time ?? "1 time / day"}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "time")
                           }
-                          className=" border rounded-xl rounded-l-none p-2"
+                          className="w-[20vh] border rounded-xl rounded-l-none p-2"
                         >
                           <option value="1 time / day">1 time / day</option>
                           <option value="2 times / day">2 times / day</option>
@@ -653,10 +697,10 @@ const fetchPlan = async () => {
                     <div className="flex flex-row justify-start gap-0 mt-4">
                       <button
                         type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] text-white font-semibold"
                         disabled
                       >
-                        Description:
+                        Description
                       </button>
                       <textarea
                         value={exercise.description}
@@ -665,13 +709,13 @@ const fetchPlan = async () => {
                         }
                         className="border rounded-xl rounded-l-none p-2 w-full resize-none"
                         maxLength={500}
+                        placeholder="Exercise Description"
                       />
                     </div>
                   </div>
                 </div>
               ))}
 
-            {/* Placeholder cards */}
             {Array.from({
               length: exercisesPerPage - displayedExercises.length,
             }).map((_, i) => (
@@ -687,7 +731,6 @@ const fetchPlan = async () => {
           </div>
         </div>
 
-        {/* Pagination Dots */}
         <div className="flex items-center justify-center space-x-2">
           {[...Array(Math.ceil(planExercises.length / exercisesPerPage))].map(
             (_, index) => (
@@ -697,8 +740,9 @@ const fetchPlan = async () => {
                 transition={{ duration: 0.2 }}
               >
                 <button
+                  title="button"
                   onClick={() => setCurrentPage(index)}
-                  className={`w-3 h-3 rounded-full ${
+                  className={`w-3 h-3 rounded-full shadow-md hover:shadow-lg ${
                     currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
                   }`}
                 />
