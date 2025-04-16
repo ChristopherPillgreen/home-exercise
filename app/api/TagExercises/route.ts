@@ -7,13 +7,12 @@ import {
   removeTagFromExercise,
 } from './TagExercises.service';
 
-// Helper: Parse query parameters
+
 function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
-// GET: Retrieve tags for an exercise or exercises for a tag
 export async function GET(request: NextRequest) {
   const exerciseID = getQueryParam(request, 'exerciseID');
   const tagID = getQueryParam(request, 'tagID');
@@ -37,7 +36,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Add a tag to an exercise
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -56,7 +55,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// DELETE: Remove a tag from an exercise
 export async function DELETE(request: NextRequest) {
   const exerciseID = getQueryParam(request, 'exerciseID');
   const tagID = getQueryParam(request, 'tagID');

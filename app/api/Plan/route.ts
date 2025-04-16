@@ -14,13 +14,11 @@ import {
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { EntityManager } from '@mikro-orm/mysql';
 
-// Helper: Parse query parameters
 function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
-// GET: Fetch a plan by ID or all plans
 export async function GET(request: NextRequest) {
   const em = (await getOrm()).em.fork()
   const id = getQueryParam(request, 'id');
@@ -47,7 +45,6 @@ export async function GET(request: NextRequest) {
 }
 
 
-// POST: Create a new plan
 export async function POST(request: NextRequest) {
   const em = (await getOrm()).em.fork()
   const body = await request.json();
@@ -66,7 +63,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Update an existing plan or add an exercise to a plan
 
 export async function PUT(request: NextRequest) {
   console.log("PUT handler triggered");
@@ -74,7 +70,6 @@ export async function PUT(request: NextRequest) {
   const body = await request.json();
   console.log("body", body);
 
-  // Destructure planID and exerciseID, along with the rest of the update data.
   const { planID, exerciseID, ...data } = body;
 
   if (!planID) {
@@ -84,7 +79,6 @@ export async function PUT(request: NextRequest) {
     );
   }
 
-  // If exerciseID is provided, update the join table or add the exercise to the plan.
   if (exerciseID) {
     try {
       const updatedPlanExercise = await addExerciseToPlan(
@@ -99,7 +93,6 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
   } else {
-    // Otherwise, update just the plan.
     try {
       const updatedPlan = await updatePlan(em, Number(planID), data);
       return NextResponse.json(updatedPlan, { status: 200 });
@@ -148,6 +141,5 @@ export async function DELETE(request: NextRequest){
   }
 }
 
-// GET: Fetch exercises for a specific plan
 
 

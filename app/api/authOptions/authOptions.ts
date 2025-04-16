@@ -4,7 +4,6 @@ import { JWT } from "next-auth/jwt";
 import { User } from "@entities/User.entity";
 import { getOrm } from "mikro-orm.config";
 
-// Extend the session and user interfaces to include extra fields
 declare module "next-auth" {
   interface User {
     id: string;
@@ -23,7 +22,6 @@ declare module "next-auth" {
   }
 }
 
-// Custom JWT interface
 interface CustomToken extends JWT {
   sub: string;
   email: string;
@@ -32,7 +30,6 @@ interface CustomToken extends JWT {
   lastName: string;
 }
 
-// NextAuth configuration
 export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
@@ -49,38 +46,37 @@ export const authOptions: NextAuthOptions = {
         const lastName = nameParts[nameParts.length - 1] || "";
 
         try {
-          // Get MikroORM instance and fork the EntityManager for context-specific actions
+          
           const orm = await getOrm();
-          const em = orm.em.fork(); // Fork EntityManager to avoid global context issues
+          const em = orm.em.fork(); 
 
-          // Use profile.sub as the unique Google ID for the user
-          const userID = profile?.sub; // This should be the Google user ID
+          
+          const userID = profile?.sub;
 
           if (!userID) {
             console.error("Google ID (profile.sub) is missing");
-            return false; // Reject login if Google ID is not available
+            return false; 
           }
 
-          // Check if user exists in DB
           const existingUser = await em.findOne(User, { userEmail: email });
 
           if (!existingUser) {
-            // Create a new user in the database
+            
             const newUser = em.create(User, {
-              userID: userID, // Use profile.sub here as userID
+              userID: userID, 
               userEmail: email || "",
               userFirstName: firstName,
               userLastName: lastName,
-              userPassword: "defaultPassword", // Handle default password appropriately
+              userPassword: "defaultPassword", 
             });
             await em.persistAndFlush(newUser);
           }
         } catch (error) {
           console.error("Error checking/creating user:", error);
-          return false; // Reject login if there's a DB error
+          return false; 
         }
       }
-      return true; // Allow login
+      return true; 
     },
 
     async session({ session, token }: { session: Session; token: JWT }) {
@@ -108,7 +104,7 @@ export const authOptions: NextAuthOptions = {
         const firstName = nameParts.slice(0, -1).join(" ");
         const lastName = nameParts[nameParts.length - 1] || "";
 
-        (token as CustomToken).sub = profile.sub || ""; // Google ID
+        (token as CustomToken).sub = profile.sub || ""; 
         (token as CustomToken).email = profile.email || "";
         (token as CustomToken).name = profile.name || "";
         (token as CustomToken).firstName = firstName;
@@ -118,6 +114,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: "/auth/signin", // Customize your sign-in page
+    signIn: "/auth/signin", 
   },
 };

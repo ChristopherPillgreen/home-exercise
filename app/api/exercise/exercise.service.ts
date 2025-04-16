@@ -4,12 +4,10 @@ import { TagExercises } from '@entities/TagExercise.entity';
 import { PlanExercise } from '@entities/PlanExercise.entity';
 import { FavoriteExercise } from '@entities/FavoriteExercise.entity';
 
-// Get all exercises
 
 export async function getAllExercises(em: EntityManager) {
 
   console.log('getAllExercises');
-  //console.log("Exercises returned by API:", await em.find(Exercise, {}));
 
   try {
     return await em.find(Exercise, {}, {
@@ -21,7 +19,6 @@ export async function getAllExercises(em: EntityManager) {
   
 }
 
-// Get a specific exercise by ID
 export async function getExerciseById(em: EntityManager, exerciseID: number) {
   console.log('get by ID');
   try {
@@ -39,7 +36,6 @@ export async function getExerciseById(em: EntityManager, exerciseID: number) {
   }
 }
 
-// Create a new exercise
 export async function createExercise(
   
   em: EntityManager,
@@ -55,7 +51,6 @@ export async function createExercise(
   }
 }
 
-// Update an exercise by ID
 export async function updateExercise(
   em: EntityManager,
   exerciseID: number,
@@ -75,7 +70,6 @@ export async function updateExercise(
   }
 }
 
-// Delete an exercise by ID
 export async function deleteExercise(em: EntityManager, exerciseID: number) {
   try {
     

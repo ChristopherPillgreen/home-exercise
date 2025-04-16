@@ -2,13 +2,12 @@ import { getOrm } from 'mikro-orm.config';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAllTags, getTagById, createTag, updateTag, deleteTag } from './Tag.service';
 
-// Helper: Parse query parameters
+
 function getQueryParam(request: NextRequest, param: string): string | null {
   const { searchParams } = new URL(request.url);
   return searchParams.get(param);
 }
 
-// GET: Retrieve all tags or a specific tag by ID
 export async function GET(request: NextRequest) {
   const id = getQueryParam(request, 'id');
   const withExercises = getQueryParam(request, 'withExercises') === 'true';
@@ -29,7 +28,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST: Create a new tag
+
 export async function POST(request: NextRequest) {
   try {
     const em = (await getOrm()).em.fork()
@@ -43,7 +42,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// PUT: Update a tag
+
 export async function PUT(request: NextRequest) {
   const id = getQueryParam(request, 'id');
   if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
@@ -60,7 +59,6 @@ export async function PUT(request: NextRequest) {
   }
 }
 
-// DELETE: Delete a tag
 export async function DELETE(request: NextRequest) {
   const id = getQueryParam(request, 'id');
   if (!id) return NextResponse.json({ message: 'ID is required' }, { status: 400 });
