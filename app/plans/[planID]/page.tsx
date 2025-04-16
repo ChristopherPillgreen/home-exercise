@@ -179,16 +179,13 @@ export default function EditPlanPage() {
     setSaving(true);
     try {
       const payload = {
-        planID: decodedPlanId,
+        planID: Number(decodedPlanId),
         exercises: planExercises.map((ex) => ({
           exerciseID: ex.exercise.exerciseID,
           sequenceNum: Number(ex.sequenceNum),
           reps: Number(ex.reps),
           sets: Number(ex.sets),
-          duration:
-            ex.duration === "null" || ex.duration === null
-              ? null
-              : String(ex.duration),
+          duration: String(ex.duration),
           time: String(ex.time),
           description: String(ex.description),
         })),
@@ -560,7 +557,7 @@ export default function EditPlanPage() {
                         size={30}
                       />
                     </motion.div>
-                    {showConfirmation && (
+                    {showConfirmation && currentExerciseID === exercise.exercise.exerciseID && (
                       <div className="fixed inset-0 bg-[#7D1616] bg-opacity-25 flex items-center justify-center z-50">
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                           <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
@@ -647,7 +644,11 @@ export default function EditPlanPage() {
                         <input
                           id={`duration-input`}
                           type="text"
-                          value={exercise.duration ?? ""}
+                          value={
+                            exercise.duration === "Null" || exercise.duration === "null"
+                              ? "0 seconds"
+                              : exercise.duration
+                          }                           
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "duration")
                           }

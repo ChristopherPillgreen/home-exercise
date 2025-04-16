@@ -7,7 +7,6 @@ import { motion } from "motion/react";
 import { IoCloseCircle, IoCog } from "react-icons/io5";
 import { encodePlanId } from "./../api/urlsqids";
 
-
 type Plan = {
   planID: number;
   planName: string;
@@ -98,7 +97,8 @@ export default function PlansPage() {
       const data = await response.json();
       setShowCreateModal(false);
       setNewPlanName("");
-      router.push(`/plans/${data.planID}`);
+      const nplanid = encodePlanId(data.planID);
+      router.push(`/plans/${nplanid}`);
     } catch (error) {
       console.error("Error creating plan:", error);
       setError("Failed to create plan.");

@@ -309,6 +309,16 @@
           "length": 255,
           "mappedType": "string"
         },
+        "plan_description": {
+          "name": "plan_description",
+          "type": "varchar(255)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 255,
+          "mappedType": "string"
+        },
         "user_user_id": {
           "name": "user_user_id",
           "type": "varchar(255)",
@@ -404,23 +414,23 @@
         },
         "duration": {
           "name": "duration",
-          "type": "int",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
         },
         "time": {
           "name": "time",
-          "type": "int",
+          "type": "varchar(255)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
-          "mappedType": "integer"
+          "length": 255,
+          "mappedType": "string"
         },
         "description": {
           "name": "description",
