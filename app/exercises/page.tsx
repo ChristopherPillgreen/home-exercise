@@ -1,12 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
 import {
-  IoAddCircle,
   IoCloseCircle,
   IoInformationCircle,
 } from "react-icons/io5";
@@ -23,27 +20,22 @@ export default function Planner() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(0); // Current page index
-  const [currentInterval, setCurrentInterval] = useState(0); // Current interval index
+  const [currentPage, setCurrentPage] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const exercisesPerPage = 6; // Number of exercises per page
-  const { planID } = useParams(); // Get plan ID from URL
-  const totalPages = Math.ceil(exercises.length / exercisesPerPage); // Total number of pages
+  const exercisesPerPage = 6;
   const [notification, setNotification] = useState("");
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(
     null
   );
-  const router = useRouter();
 
-  const [selectedCategoryID, setSelectedCategoryID] = useState<number | null>(null); // State to store selected category ID
+  const [selectedCategoryID, setSelectedCategoryID] = useState<number | null>(null);
 
   const handleOpenInfoModal = (exercise: Exercise) => {
     setSelectedExercise(exercise);
     setShowInfoModal(true);
   };
 
-  // Function to close the modal
   const handleCloseInfoModal = () => {
     setSelectedExercise(null);
     setShowInfoModal(false);
@@ -94,10 +86,6 @@ export default function Planner() {
       console.error("Error searching for exercises:", error);
       setError("Failed to search for exercises.");
     }
-  };
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen((prev) => !prev);
   };
 
   const filteredExercises = exercises.filter((exercise) =>

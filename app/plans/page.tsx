@@ -189,10 +189,10 @@ export default function PlansPage() {
 
   if (loading) return <div className="text-center mt-4">Loading plans...</div>;
   if (error)
-    return <div className="text-red-500 text-center mt-4">{error}</div>;
+    return <div className="text-[#7D1616] text-center mt-4">{error}</div>;
 
   return (
-    <div className="container h-fit overflow-hidden w-full">
+    <div className="container h-fit w-full">
       <div className="flex items-center justify-between w-full">
         <h1 className="flex font-bold text-[#7874AC] text-3xl">
           Your Plans
@@ -204,7 +204,7 @@ export default function PlansPage() {
           >
             <button
               onClick={() => setShowCreateModal(true)}
-              className="h-full px-4 bg-[#74ac85] text-white rounded-xl"
+              className="h-full px-4 shadow-md hover:shadow:lg bg-[#58A870] text-white rounded-xl"
               >
               Create Plan
             </button>
@@ -216,7 +216,7 @@ export default function PlansPage() {
             <input
               type="text"
               placeholder="Search..."
-              className="h-full w-full px-3 rounded-xl border border-[#74ac85] focus:outline-none focus:ring-2 focus:ring-[#7874ac] text-sm"
+              className="h-full w-full px-3 rounded-xl shadow-md hover:shadow:lg border border-[#58A870] focus:outline-none focus:ring-2 focus:ring-[#004F2D] text-sm"
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
             />
@@ -224,9 +224,8 @@ export default function PlansPage() {
         </div>
       </div>
 
-      {/* Create Plan Modal  */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-purple-100 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#7874ac] bg-opacity-25 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
               Create a New Plan
@@ -237,18 +236,13 @@ export default function PlansPage() {
                 handleCreatePlan();
               }}
             >
-              <motion.div
-                whileHover={{ scale: 1.08 }}
-                transition={{ duration: 0.2 }}
-              >
                 <input
                   type="text"
-                  className="w-full border border-[#74ac85] p-2 rounded-xl mb-4 focus:outline-none focus:ring focus:ring-[#7874AC]"
+                  className="w-full border border-[#58A870] p-2 rounded-xl shadow-md hover:shadow:lg mb-4 focus:outline-none focus:ring focus:ring-[#004F2D]"
                   placeholder="Enter plan name..."
                   value={newPlanName}
                   onChange={(e) => setNewPlanName(e.target.value)}
                 />
-              </motion.div>
               <div className="flex justify-end space-x-4">
                 <motion.div
                   whileHover={{ scale: 1.1 }}
@@ -256,7 +250,7 @@ export default function PlansPage() {
                 >
                   <button
                     type="submit"
-                    className="bg-[#74ac85] text-white px-4 py-2 rounded-xl"
+                    className="bg-[#58A870] text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl"
                   >
                     Create
                   </button>
@@ -271,7 +265,7 @@ export default function PlansPage() {
                       setShowCreateModal(false);
                       setNewPlanName("");
                     }}
-                    className="bg-[#793339] text-white px-4 py-2 rounded-xl"
+                    className="bg-[#7D1616] text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl"
                   >
                     Cancel
                   </button>
@@ -282,9 +276,8 @@ export default function PlansPage() {
         </div>
       )}
 
-      {/* Confirmation Modal */}
       {showConfirmation && (
-        <div className="fixed inset-0 bg-red-50 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#7D1616] bg-opacity-25 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
             <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
               Are you sure you want to delete this plan?
@@ -296,7 +289,7 @@ export default function PlansPage() {
               >
                 <button
                   onClick={handleRemovePlan}
-                  className="bg-[#793339] text-white py-2 px-4 rounded-xl"
+                  className="bg-[#7D1616] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
                 >
                   Yes, Delete
                 </button>
@@ -307,7 +300,7 @@ export default function PlansPage() {
               >
                 <button
                   onClick={closeConfirmationPopup}
-                  className="bg-[#74ac85] text-white py-2 px-4 rounded-xl"
+                  className="bg-[#58A870] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
                 >
                   No, Cancel
                 </button>
@@ -317,9 +310,8 @@ export default function PlansPage() {
         </div>
       )}
 
-      {/* Settings Modal */}
       {showSettings && (
-        <div className="fixed inset-0 bg-purple-100 bg-opacity-75 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[#7874ac] bg-opacity-25 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
             <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
               Edit Plan
@@ -330,9 +322,10 @@ export default function PlansPage() {
               </label>
               <input
                 type="text"
-                className="w-full border border-[#74ac85] p-2 rounded-xl focus:outline-none focus:ring focus:ring-[#7874AC]"
+                className="w-full border border-[#58A870] p-2 rounded-xl shadow-md hover:shadow:lg focus:outline-none focus:ring focus:ring-[#004F2D]"
                 value={editPlanName}
                 onChange={(e) => setEditPlanName(e.target.value)}
+                placeholder="Enter plan name..."
               />
             </div>
             <div className="mb-4">
@@ -340,7 +333,7 @@ export default function PlansPage() {
                 Description
               </label>
               <textarea
-                className="w-full border border-[#74ac85] p-2 rounded-xl focus:outline-none focus:ring focus:ring-[#7874AC] resize-none"
+                className="w-full border border-[#58A870] p-2 rounded-xl shadow-md hover:shadow:lg focus:outline-none focus:ring focus:ring-[#004F2D] resize-none"
                 rows={4}
                 value={editPlanDescription ? editPlanDescription : ""}
                 onChange={(e) => setEditPlanDescription(e.target.value)}
@@ -355,7 +348,7 @@ export default function PlansPage() {
               >
                 <button
                   onClick={handleSaveChanges}
-                  className="bg-[#74ac85] text-white px-4 py-2 rounded-xl"
+                  className="bg-[#58A870] text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl"
                 >
                   Save
                 </button>
@@ -366,7 +359,7 @@ export default function PlansPage() {
               >
                 <button
                   onClick={closeSettingsPopup}
-                  className="bg-[#793339] text-white px-4 py-2 rounded-xl"
+                  className="bg-[#7D1616] text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl"
                 >
                   Cancel
                 </button>
@@ -380,11 +373,10 @@ export default function PlansPage() {
         {displayedPlans.map((plan) => (
           <div
             key={plan.planID}
-            className="relative flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow hover:box-border hover:border-[#7874AC] transition cursor-pointer"
+            className="relative flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow-md hover:shadow:xl hover:box-border hover:border-[#7874AC] transition cursor-pointer"
             onClick={() => router.push(`/plans/${plan.planID}`)}
           >
-            {/* Top half with white background */}
-            <div className="bg-white p-2 rounded-t-xl h-[30%] flex items-center">
+            <div className="bg-[white] p-2 rounded-t-xl h-[30%] flex items-center">
               <h2 className="text-xl font-semibold">
                 {plan.planName.length > 26
                   ? `${plan.planName.slice(0, 24)}...`
@@ -392,7 +384,6 @@ export default function PlansPage() {
               </h2>
             </div>
 
-            {/* Bottom half with description */}
             <div className="bg-gray-100 p-2 rounded-b-xl h-[70%] flex">
               <p className="relative justify-start text-gray-600">
                 {plan.planDescription
@@ -403,7 +394,6 @@ export default function PlansPage() {
               </p>
             </div>
 
-            {/* Settings button inside the card */}
             <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
@@ -411,15 +401,14 @@ export default function PlansPage() {
             >
               <IoCog
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering the card click
+                  e.stopPropagation();
                   openSettingsPopup(plan.planID);
                 }}
-                color="#00768c"
+                color="#004F2D"
                 size={30}
               />
             </motion.div>
 
-            {/* Delete button inside the card */}
             <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
@@ -427,28 +416,26 @@ export default function PlansPage() {
             >
               <IoCloseCircle
                 onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering the card click
+                  e.stopPropagation();
                   openConfirmationPopup(plan.planID);
                 }}
-                color="#793339"
+                color="#3D0814"
                 size={30}
               />
             </motion.div>
           </div>
         ))}
 
-        {/* Placeholder cards to fill layout */}
         {Array.from({ length: plansPerPage - displayedPlans.length }).map(
           (_, i) => (
             <div
               key={`placeholder-${i}`}
-              className="flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow bg-gray-100"
+              className="flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow-md bg-gray-100"
             ></div>
           )
         )}
       </div>
 
-      {/* Pagination Dots */}
       <div className="flex items-center justify-center mt-1 space-x-2">
         {[...Array(Math.ceil(filteredPlans.length / plansPerPage))].map(
           (_, index) => (
@@ -460,10 +447,10 @@ export default function PlansPage() {
               <button
                 key={`dot-${index}`}
                 onClick={() => setCurrentPage(index)}
-                className={`w-3 h-3 rounded-full ${
+                className={`w-3 h-3 rounded-full shadow-md hover:shadow:lg ${
                   currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
                 }`}
-              />
+              >{}</button>
             </motion.div>
           )
         )}

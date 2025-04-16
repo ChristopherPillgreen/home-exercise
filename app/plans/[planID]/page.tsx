@@ -46,7 +46,6 @@ export default function EditPlanPage() {
   const { planID } = useParams();
   const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
   const [planName, setPlanName] = useState<string | null>(null);
-  const maxExercises = 8;
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
 
@@ -144,10 +143,9 @@ const fetchPlan = async () => {
             .filter((exercise) => exercise.id !== id)
             .map((exercise, index) => ({
               ...exercise,
-              sequenceNum: index + 1, // Recalculate sequenceNum
+              sequenceNum: index + 1,
             }));
 
-          // Adjust the current page if the current page is no longer valid
           const totalPages = Math.ceil(
             updatedExercises.length / exercisesPerPage
           );
@@ -267,7 +265,6 @@ const fetchPlan = async () => {
       newExercises[index],
     ];
 
-    // Map and update the sequence numbers
     const updatedExercises = newExercises.map((exercise, idx) => {
       const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
       console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
@@ -298,15 +295,12 @@ const fetchPlan = async () => {
 
     let yOffset = 30;
 
-    // Sort planExercises by sequenceNum before the loop
     planExercises.sort((a, b) => a.sequenceNum - b.sequenceNum);
 
     planExercises.forEach((exercise) => {
-      // Reserve vertical space for image height if needed
       const cloudinaryImageUrl = `https://res.cloudinary.com/kineticare/image/upload/${exercise.exercise.image}`;
       const imageHeight = 80;
-      const textBlockHeight = 80; // estimated
-      // Reset page if needed before starting exercise
+      const textBlockHeight = 80;
       if (yOffset + textBlockHeight > 270) {
         doc.addPage();
         yOffset = 20;
@@ -340,12 +334,11 @@ const fetchPlan = async () => {
       yOffset += 6;
 
       const desc = exercise.exercise.exerciseDescription;
-      const descriptionLines = doc.splitTextToSize(desc, 100); // narrower width for left side
+      const descriptionLines = doc.splitTextToSize(desc, 100);
       doc.text(descriptionLines, 14, yOffset);
       const descHeight = descriptionLines.length * 6;
 
-      // Draw image on the right side
-      const imageX = pageWidth - 14 - 50; // 14 margin from right, 50 is width
+      const imageX = pageWidth - 14 - 50;
       doc.addImage(cloudinaryImageUrl, "JPEG", imageX-50, yOffset-50, 100, 50);
 
       yOffset += Math.max(descHeight, imageHeight) - 50;
@@ -366,22 +359,21 @@ const fetchPlan = async () => {
   return (
     <>
       {notification && (
-        <div className="fixed top-5 right-5 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
+        <div className="fixed top-5 right-5 z-50 bg-[#004F2D] text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
           {notification}
         </div>
       )}
       {notificationfalse && (
         <div
-          className="fixed top-5 right-5 z-50 text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
-          style={{ backgroundColor: "#793339" }}
+          className="fixed top-5 right-5 z-50 bg-[#7D1616] text-white px-6 py-3 rounded-lg  shadow-lg transition-opacity duration-300"
         >
           {notificationfalse}
         </div>
       )}
 
-      <div className="container h-fit overflow-hidden">
+      <div className="container h-fit">
         <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
-          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap">
+          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap font-Noto_Sans">
             {planExercises[0]?.plan.planName}
           </h1>
           <div className="flex flex-wrap gap-4">
@@ -391,7 +383,7 @@ const fetchPlan = async () => {
             >
               <button
                 onClick={() => router.push(`/plans`)}
-                className="px-4 py-2 bg-[#793339] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
+                className="px-4 py-2 bg-[#7D1616] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
               >
                 Back to Plan
               </button>
@@ -402,7 +394,7 @@ const fetchPlan = async () => {
             >
               <button
                 onClick={() => router.push(`/plans/${planID}/exercises`)}
-                className="h-full px-4 bg-[#74ac85] text-white rounded-xl flex items-center justify-center overflow-hidden"
+                className="h-full px-4 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center"
               >
                 Add Exercises
               </button>
@@ -414,7 +406,7 @@ const fetchPlan = async () => {
               <button
                 onClick={savePlan}
                 disabled={saving}
-                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap ${
+                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap ${
                   saving ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -429,7 +421,7 @@ const fetchPlan = async () => {
                 <button
                   type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="px-4 py-2 bg-[#cf935c] text-white rounded-xl flex items-center justify-center min-w-fit whitespace-nowrap"
+                  className="px-4 py-2 bg-[#58A870] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
                 >
                   Export as
                   <svg
@@ -479,7 +471,7 @@ const fetchPlan = async () => {
               >
                 <IoCloseCircle
                   onClick={() => setShowQRCode(false)}
-                  color="#793339"
+                  color="#3D0814"
                   size={30}
                 />
               </motion.div>
@@ -500,14 +492,13 @@ const fetchPlan = async () => {
 
         <div className="w-full px-4 py-6 flex justify-center">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {/* Your actual exercise cards */}
             {displayedExercises
               .slice()
               .sort((a, b) => a.sequenceNum - b.sequenceNum)
               .map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
+                  className="border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
                     <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
@@ -518,7 +509,7 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoArrowUpCircle
-                        color="#74ac85"
+                        color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "up")}
                       />
@@ -528,7 +519,7 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoArrowDownCircle
-                        color="#74ac85"
+                        color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "down")}
                       />
@@ -544,7 +535,7 @@ const fetchPlan = async () => {
                             exercise.id
                           )
                         }
-                        color="#793339"
+                        color="#3D0814"
                         size={30}
                       />
                     </motion.div>
@@ -563,83 +554,87 @@ const fetchPlan = async () => {
                       <span className="text-gray-500">No Image</span>
                     </div>
                   )}
-                  <div className="mt-2 text-sm text-gray-700 overflow-y-auto">
-                    <div className="flex flex-row justify-start gap-1 mt-2">
+                  <div className="mt-2 text-sm text-gray-700">
+                    <div className="flex flex-row justify-between gap-1 mt-2">
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
-                          Repititions
+                          Reps
                         </button>
                         <input
-                          id={`reps-input-${exercise.id}`} // Unique ID for the input box
+                          id="reps-input"
                           type="number"
                           value={exercise.reps ?? 0}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "reps")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          className="w-[10vh] border rounded-xl shadow-md rounded-l-none p-2"
                           min="0"
+                          title="Enter the number of repetitions"
+                          placeholder="Reps"
                         />
                       </div>
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
                           Duration
                         </button>
                         <input
-                          id={`duration-input-${exercise.id}`}
+                          id={`duration-input`}
                           type="text"
                           value={exercise.duration ?? ""}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "duration")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
-                          placeholder="0 sec"
+                          className="w-[20vh] border rounded-xl shadow-md rounded-l-none p-2"
+                          placeholder="0 seconds"
                         />
                       </div>
                     </div>
 
-                    <div className="flex flex-row justify-start gap-1 mt-2">
+                    <div className="flex flex-row justify-between gap-1 mt-2">
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Sets
                         </button>
                         <input
-                          id={`sets-input-${exercise.id}`}
+                          id="sets-input"
                           type="number"
                           value={exercise.sets ?? 0}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "sets")
                           }
-                          className="w-2/3 border rounded-xl rounded-l-none p-2"
+                          className="w-[10vh] border rounded-xl rounded-l-none p-2"
                           min="0"
+                          placeholder="1 set"
                         />
                       </div>
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Time
                         </button>
                         <select
-                          id={`time-select-${exercise.id}`}
-                          value={exercise.time ?? "1 time / day"} // Default value
+                          id="time-select"
+                          title="Time"
+                          value={exercise.time ?? "1 time / day"}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "time")
                           }
-                          className=" border rounded-xl rounded-l-none p-2"
+                          className="w-[20vh] border rounded-xl rounded-l-none p-2"
                         >
                           <option value="1 time / day">1 time / day</option>
                           <option value="2 times / day">2 times / day</option>
@@ -653,10 +648,10 @@ const fetchPlan = async () => {
                     <div className="flex flex-row justify-start gap-0 mt-4">
                       <button
                         type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#b9633a] text-white font-semibold"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] text-white font-semibold"
                         disabled
                       >
-                        Description:
+                        Description
                       </button>
                       <textarea
                         value={exercise.description}
@@ -665,13 +660,13 @@ const fetchPlan = async () => {
                         }
                         className="border rounded-xl rounded-l-none p-2 w-full resize-none"
                         maxLength={500}
+                        placeholder="Exercise Description"
                       />
                     </div>
                   </div>
                 </div>
               ))}
 
-            {/* Placeholder cards */}
             {Array.from({
               length: exercisesPerPage - displayedExercises.length,
             }).map((_, i) => (
@@ -687,7 +682,6 @@ const fetchPlan = async () => {
           </div>
         </div>
 
-        {/* Pagination Dots */}
         <div className="flex items-center justify-center space-x-2">
           {[...Array(Math.ceil(planExercises.length / exercisesPerPage))].map(
             (_, index) => (
@@ -697,8 +691,9 @@ const fetchPlan = async () => {
                 transition={{ duration: 0.2 }}
               >
                 <button
+                  title="button"
                   onClick={() => setCurrentPage(index)}
-                  className={`w-3 h-3 rounded-full ${
+                  className={`w-3 h-3 rounded-full shadow-md hover:shadow-lg ${
                     currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
                   }`}
                 />

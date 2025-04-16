@@ -1,6 +1,7 @@
 "use client";
 
 import { CldImage } from "next-cloudinary";
+import { motion } from "motion/react";
 
 export default function Confirm() {
   return (
@@ -22,25 +23,26 @@ export default function Confirm() {
           the unique needs of their patients.
         </p>
         <p className="text-lg font-bold text-gray-600 dark:text-gray-400 mb-6">
-          Please note that users should seek
-          professional advice before attempting any exercises or programs found
-          on the site.
+          Please note that users should seek professional advice before
+          attempting any exercises or programs found on the site.
         </p>
         <div className="flex justify-center space-x-4">
-          <a
-            href="/home"
-            className="inline-block text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-600 transition-all duration-300"
-            style={{ backgroundColor: "#7076af" }}
+          <motion.div
+            whileHover={{ scale: 1.2 }}
+            transition={{ duration: 0.1 }}
+            className="bg-[#7076af] inline-block text-white font-semibold py-2 px-4 rounded-xl"
           >
-            I Agree
-          </a>
-          <a
-            href="/"
-            className="inline-block text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition-all duration-300"
-            style={{ backgroundColor: "#af7076" }}
+            <a href="/home">I Agree</a>
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.1 }}
+            transition={{ duration: 0.2 }}
+            className="bg-[#7d1616] inline-block text-white font-semibold py-2 px-4 rounded-xl"
           >
+          <a href="/">
             I Do NOT Agree
           </a>
+          </motion.div>
         </div>
       </div>
     </div>
