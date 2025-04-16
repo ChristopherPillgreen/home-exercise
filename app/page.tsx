@@ -29,7 +29,7 @@ export default function Open() {
                 <div className="absolute transform sm:left-1/2 sm:top-0 sm:translate-x-8 lg:left-1/2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-8">
                   <div className="flex items-center space-x-6 lg:space-x-8">
                     <div className="h-fit flex flex-wrap gap-8 relative">
-                      <div className="h-fit flex flex-wrap gap-12 relative">
+                      <div className="grid grid-cols-3 grid-rows-2 gap-8">
                         {Array.from({ length: 6 }).map((_, index) => {
                           const colorClasses = [
                             "bg-[#7076af]",
@@ -41,7 +41,7 @@ export default function Open() {
                           return (
                             <motion.div
                               key={index}
-                              whileHover={{ scale: 1.5 }}
+                              whileHover={{ scale: 1.1 }}
                               transition={{ duration: 0.4 }}
                               className={`h-[25vh] w-[25vh] overflow-hidden rounded-xl ${
                                 colorClasses[index % colorClasses.length]

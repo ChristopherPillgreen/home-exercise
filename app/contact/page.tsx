@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
+import { motion } from 'motion/react'
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -16,19 +17,9 @@ export default function ContactPage() {
   return (
     <div className="h-fit w-full">
       <div className="flex justify-center">
-      <div className="bg-white p-4 rounded-lg shadow-lg w-fit max-w-2xl">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Contact Us
-        </h1>
-
-        <p className="text-gray-700 text-lg mb-4">
-          We'd love to hear from you! If you have any questions or need
-          assistance, feel free to reach out to us using the contact details
-          below:
-        </p>
-
+      <div className="bg-white p-4 rounded-lg shadow-lg w-full max-w-2xl">
         <div className="mb-6">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+          <h2 className="text-2xl font-semibold text-[#7874AC] mb-2">
             Kineticare Support
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -41,7 +32,7 @@ export default function ContactPage() {
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 shadow-md hover:shadow:lg rounded-md"
                 required
               />
             </div>
@@ -54,7 +45,7 @@ export default function ContactPage() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-md hover:shadow:lg"
                 required
               />
             </div>
@@ -66,17 +57,22 @@ export default function ContactPage() {
                 id="message"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-md hover:shadow:lg resize-none"
                 rows={4}
                 required
               />
             </div>
+            <motion.div
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.2 }}
+              className="px-4 py-2 bg-[#58A870] text-white  w-fit rounded-xl shadow-md hover:shadow-lg"
+            >
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
             >
               Submit
             </button>
+            </motion.div>
           </form>
         </div>
       </div>

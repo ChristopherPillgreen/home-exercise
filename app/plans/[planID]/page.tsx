@@ -11,6 +11,7 @@ import {
   IoArrowUpCircle,
   IoCloseCircle,
 } from "react-icons/io5";
+import { decodePlanId } from "./../../api/urlsqids";
 
 interface PlanExercise {
   exercise: {
@@ -41,36 +42,42 @@ export default function EditPlanPage() {
   const [saving, setSaving] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [notification, setNotification] = useState<string | null>(null);
   const router = useRouter();
   const { planID } = useParams();
-  const [notificationfalse, setNotificationFalse] = useState<string | null>(null);
+  const decodedPlanId = decodePlanId(planID as string);
+
+  const [notificationfalse, setNotificationFalse] = useState<string | null>(
+    null
+  );
   const [planName, setPlanName] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const exercisesPerPage = 3;
 
-useEffect(() => {
-const fetchPlan = async () => {
-    try {
-      const response = await fetch(`/api/plan?planID=${planID}`);
-      if (!response.ok) throw new Error("Failed to fetch plan info");
-      const planData = await response.json();
-      setPlanName(planData.planName)
-    } catch (err) {
-      console.error("Error fetching plan name:", err);
-    }
-  };
+  useEffect(() => {
+    if (!decodedPlanId) return;
 
-  if (planID) {
+    const fetchPlan = async () => {
+      try {
+        const response = await fetch(`/api/plan?planID=${decodedPlanId}`);
+        if (!response.ok) throw new Error("Failed to fetch plan info");
+        const planData = await response.json();
+        setPlanName(planData.planName);
+      } catch (err) {
+        console.error("Error fetching plan name:", err);
+      }
+    };
+
     fetchPlan();
-  }
-}, [planID]);
-
+  }, [decodedPlanId]);
 
   useEffect(() => {
+    if (!decodedPlanId) return;
+
     const fetchExercises = async () => {
       try {
-        const response = await fetch(`/api/planexercise?planID=${planID}`);
+        const response = await fetch(`/api/planexercise?planID=${decodedPlanId}`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -90,13 +97,8 @@ const fetchPlan = async () => {
       }
     };
 
-    if (planID) {
-      fetchExercises();
-    } else {
-      setError("Invalid Plan ID.");
-      setLoading(false);
-    }
-  }, [planID]);
+    fetchExercises();
+  }, [decodedPlanId]);
 
   const displayedExercises = planExercises.slice(
     currentPage * exercisesPerPage,
@@ -152,7 +154,7 @@ const fetchPlan = async () => {
           if (currentPage >= totalPages && currentPage > 0) {
             setCurrentPage(currentPage - 1);
           }
-
+          setShowConfirmation(false);
           return updatedExercises;
         });
       } else {
@@ -164,43 +166,46 @@ const fetchPlan = async () => {
   };
 
   const savePlan = async () => {
-  setSaving(true);
-  try {
-    const payload = {
-      planID,
-      exercises: planExercises.map((ex) => ({
-        exerciseID: ex.exercise.exerciseID,
-        sequenceNum: Number(ex.sequenceNum),
-        reps: Number(ex.reps),
-        sets: Number(ex.sets),
-        duration: ex.duration === 'null' || ex.duration === null ? null : String(ex.duration),
-        time: String(ex.time),
-        description: String(ex.description),
-      })),
-    };
+    setSaving(true);
+    try {
+      const payload = {
+        planID,
+        exercises: planExercises.map((ex) => ({
+          exerciseID: ex.exercise.exerciseID,
+          sequenceNum: Number(ex.sequenceNum),
+          reps: Number(ex.reps),
+          sets: Number(ex.sets),
+          duration:
+            ex.duration === "null" || ex.duration === null
+              ? null
+              : String(ex.duration),
+          time: String(ex.time),
+          description: String(ex.description),
+        })),
+      };
 
-    console.log(
-      "Saving exercises payload:",
-      JSON.stringify(payload, null, 2)
-    );
-    console.log("Current planExercises before sending:", planExercises);
+      console.log(
+        "Saving exercises payload:",
+        JSON.stringify(payload, null, 2)
+      );
+      console.log("Current planExercises before sending:", planExercises);
 
-    const response = await fetch("/api/planexercise", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+      const response = await fetch("/api/planexercise", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) throw new Error("Failed to save plan");
-    setNotification("Plan saved successfully!");
-  } catch (err: any) {
-    console.error("Error saving plan:", err);
-    setNotificationFalse("Failed to save plan.");
-  } finally {
-    setSaving(false);
-    setTimeout(() => setNotification(null), 3000);
-  }
-};
+      if (!response.ok) throw new Error("Failed to save plan");
+      setNotification("Plan saved successfully!");
+    } catch (err: any) {
+      console.error("Error saving plan:", err);
+      setNotificationFalse("Failed to save plan.");
+    } finally {
+      setSaving(false);
+      setTimeout(() => setNotification(null), 3000);
+    }
+  };
 
   const handleExportOption = (option: string) => {
     if (option === "PDF") {
@@ -236,45 +241,51 @@ const fetchPlan = async () => {
   };
 
   const handleMoveExercise = (exerciseId: number, direction: "up" | "down") => {
-  setPlanExercises((prev) => {
-    const index = prev.findIndex((exercise) => exercise.id === exerciseId);
-    console.log(`Moving exercise with ID ${exerciseId}, current index: ${index}`);
+    setPlanExercises((prev) => {
+      const index = prev.findIndex((exercise) => exercise.id === exerciseId);
+      console.log(
+        `Moving exercise with ID ${exerciseId}, current index: ${index}`
+      );
 
-    if (index === -1) {
-      console.log(`Exercise with ID ${exerciseId} not found.`);
-      return prev;
-    }
+      if (index === -1) {
+        console.log(`Exercise with ID ${exerciseId} not found.`);
+        return prev;
+      }
 
-    const newExercises = [...prev];
-    console.log(`Exercise found at index ${index}. New list:`, newExercises);
+      const newExercises = [...prev];
+      console.log(`Exercise found at index ${index}. New list:`, newExercises);
 
-    if (direction === "up" && index === 0) {
-      console.log(`Exercise is already at the top, no movement.`);
-      return prev;
-    }
-    if (direction === "down" && index === newExercises.length - 1) {
-      console.log(`Exercise is already at the bottom, no movement.`);
-      return prev;
-    }
+      if (direction === "up" && index === 0) {
+        console.log(`Exercise is already at the top, no movement.`);
+        return prev;
+      }
+      if (direction === "down" && index === newExercises.length - 1) {
+        console.log(`Exercise is already at the bottom, no movement.`);
+        return prev;
+      }
 
-    const swapIndex = direction === "up" ? index - 1 : index + 1;
-    console.log(`Swapping exercise at index ${index} with exercise at index ${swapIndex}`);
+      const swapIndex = direction === "up" ? index - 1 : index + 1;
+      console.log(
+        `Swapping exercise at index ${index} with exercise at index ${swapIndex}`
+      );
 
-    [newExercises[index], newExercises[swapIndex]] = [
-      newExercises[swapIndex],
-      newExercises[index],
-    ];
+      [newExercises[index], newExercises[swapIndex]] = [
+        newExercises[swapIndex],
+        newExercises[index],
+      ];
 
-    const updatedExercises = newExercises.map((exercise, idx) => {
-      const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
-      console.log(`Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`);
-      return updatedExercise;
+      const updatedExercises = newExercises.map((exercise, idx) => {
+        const updatedExercise = { ...exercise, sequenceNum: idx + 1 };
+        console.log(
+          `Updated exercise ID ${exercise.id} sequence number: ${updatedExercise.sequenceNum}`
+        );
+        return updatedExercise;
+      });
+
+      console.log("Updated exercises list:", updatedExercises);
+      return updatedExercises;
     });
-
-    console.log("Updated exercises list:", updatedExercises);
-    return updatedExercises;
-  });
-};
+  };
 
   const jsonData = JSON.stringify(compactData);
   const base64Data = encodeURIComponent(btoa(jsonData));
@@ -339,7 +350,14 @@ const fetchPlan = async () => {
       const descHeight = descriptionLines.length * 6;
 
       const imageX = pageWidth - 14 - 50;
-      doc.addImage(cloudinaryImageUrl, "JPEG", imageX-50, yOffset-50, 100, 50);
+      doc.addImage(
+        cloudinaryImageUrl,
+        "JPEG",
+        imageX - 50,
+        yOffset - 50,
+        100,
+        50
+      );
 
       yOffset += Math.max(descHeight, imageHeight) - 50;
 
@@ -364,9 +382,7 @@ const fetchPlan = async () => {
         </div>
       )}
       {notificationfalse && (
-        <div
-          className="fixed top-5 right-5 z-50 bg-[#7D1616] text-white px-6 py-3 rounded-lg  shadow-lg transition-opacity duration-300"
-        >
+        <div className="fixed top-5 right-5 z-50 bg-[#7D1616] text-white px-6 py-3 rounded-lg  shadow-lg transition-opacity duration-300">
           {notificationfalse}
         </div>
       )}
@@ -385,7 +401,7 @@ const fetchPlan = async () => {
                 onClick={() => router.push(`/plans`)}
                 className="px-4 py-2 bg-[#7D1616] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
               >
-                Back to Plan
+                Back to Plans
               </button>
             </motion.div>
             <motion.div
@@ -529,16 +545,49 @@ const fetchPlan = async () => {
                       transition={{ duration: 0.2 }}
                     >
                       <IoCloseCircle
-                        onClick={() =>
-                          handleDeleteExercise(
-                            exercise.exercise.exerciseID,
-                            exercise.id
-                          )
-                        }
+                        onClick={() => setShowConfirmation(true)}
                         color="#3D0814"
                         size={30}
                       />
                     </motion.div>
+                    {showConfirmation && (
+                      <div className="fixed inset-0 bg-[#7D1616] bg-opacity-25 flex items-center justify-center z-50">
+                        <div className="bg-white p-6 rounded-lg shadow-lg">
+                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                            Are you sure you want to delete this exercise?
+                          </h3>
+                          <div className="flex justify-center space-x-4">
+                            <motion.div
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <button
+                                onClick={() =>
+                                  handleDeleteExercise(
+                                    exercise.exercise.exerciseID,
+                                    exercise.id
+                                  )
+                                }
+                                className="bg-[#7D1616] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
+                              >
+                                Yes, Delete
+                              </button>
+                            </motion.div>
+                            <motion.div
+                              whileHover={{ scale: 1.1 }}
+                              transition={{ duration: 0.2 }}
+                            >
+                              <button
+                                onClick={() => setShowConfirmation(false)}
+                                className="bg-[#58A870] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
+                              >
+                                No, Cancel
+                              </button>
+                            </motion.div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {exercise.exercise.image ? (

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { motion } from "motion/react";
 import { IoCloseCircle, IoCog } from "react-icons/io5";
+import { encodePlanId } from "./../api/urlsqids";
+
 
 type Plan = {
   planID: number;
@@ -374,8 +376,8 @@ export default function PlansPage() {
           <div
             key={plan.planID}
             className="relative flex-1 min-w-[20%] max-w-[30%] h-[30vh] border rounded-xl shadow-md hover:shadow:xl hover:box-border hover:border-[#7874AC] transition cursor-pointer"
-            onClick={() => router.push(`/plans/${plan.planID}`)}
-          >
+            onClick={() => router.push(`/plans/${encodePlanId(plan.planID)}`)}
+            >
             <div className="bg-[white] p-2 rounded-t-xl h-[30%] flex items-center">
               <h2 className="text-xl font-semibold">
                 {plan.planName.length > 26
