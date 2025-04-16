@@ -131,7 +131,7 @@ export default function Planner() {
         setTimeout(() => setNotificationfalse(""), 3000);
         return;
       }
-  
+
       const isDuplicate = currentPlanExercises.some(
         (exercise) => exercise.exerciseID === exerciseID
       );
@@ -140,14 +140,14 @@ export default function Planner() {
         setTimeout(() => setNotification(""), 3000);
         return;
       }
-  
+
       // Use decodePlanId to decode the planID from the SQID format
       const decodedPlanID = decodePlanId(planID as string);
       if (decodedPlanID === null || isNaN(decodedPlanID)) {
         alert("Invalid Plan ID.");
         return;
       }
-  
+
       const response = await fetch(`/api/planexercise`, {
         method: "POST",
         headers: {
@@ -155,11 +155,11 @@ export default function Planner() {
         },
         body: JSON.stringify({ planID: decodedPlanID, exerciseID }),
       });
-  
+
       if (!response.ok) {
         throw new Error("Failed to add exercise to plan.");
       }
-  
+
       setPlanExerciseCount((prevCount) => prevCount + 1);
       setCurrentPlanExercises((prev) => [...prev, { exerciseID }]);
       setNotification("Exercise added successfully!");
@@ -170,7 +170,6 @@ export default function Planner() {
       setTimeout(() => setNotification(""), 3000);
     }
   };
-  
 
   const filteredExercises = exercises.filter(
     (exercise) =>
@@ -226,15 +225,13 @@ export default function Planner() {
         </div>
       )}
       {notificationfalse && (
-        <div
-          className="fixed top-5 right-5 z-50 bg-[#3D0814] text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300"
-        >
+        <div className="fixed top-5 right-5 z-50 bg-[#3D0814] text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
           {notificationfalse}
         </div>
       )}
       <div className="container h-fit w-full">
         <div className="flex items-center justify-between w-full">
-          <h1 className="flex font-bold text-[#7874AC] text-3xl">Exercises</h1>
+          <h1 className="flex font-bold text-[#7874AC] text-3xl ml-10">Exercises</h1>
           <div className="flex p-4 w-fit max-w-lg space-x-4">
             <motion.div
               whileHover={{ scale: 1.1 }}
@@ -262,9 +259,9 @@ export default function Planner() {
           </div>
         </div>
 
-        <div className="flex">
-          <div className="w-1/5 h-auto pr-4">
-            <ul className="h-[62vh] bg-gray-100 border border-gray-300 rounded-xl shadow">
+        <div className="flex h-[65vh] px-4 ">
+          <div className="w-1/5 h-full pr-4">
+            <ul className="h-full bg-gray-100 border border-gray-300 rounded-xl shadow-md">
               <li
                 className="px-4 py-4 hover:bg-[#58A870] hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
                 onClick={() => handleClick(1)}
@@ -316,85 +313,91 @@ export default function Planner() {
             </ul>
           </div>
 
-          <div className="w-4/5 grid grid-cols-3 gap-4">
+          <div className="w-4/5 relative grid grid-cols-3 gap-4">
             {displayedExercises.map((exercise) => (
               <div
                 key={exercise.exerciseID}
-                className="relative w-full border rounded-xl shadow-md hover:shadow:lg hover:border-[#7874AC] transition cursor-pointer"
+                className="aspect-[3/2] h-full w-full relative rounded-xl overflow-hidden border shadow-md hover:shadow-lg hover:border-[#7874AC] transition cursor-pointer"
               >
-                <div className="bg-white p-2 rounded-t-xl h-[20%] flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">
-                    {exercise.exerciseName.length > 26
-                      ? `${exercise.exerciseName.slice(0, 24)}...`
-                      : exercise.exerciseName}
-                  </h2>
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-2 right-10"
-                  >
-                    <IoInformationCircle
-                      onClick={() => handleOpenInfoModal(exercise)}
-                      color="#004F2D"
-                      size={30}
-                    />
-                  </motion.div>
-                  {showInfoModal && selectedExercise && (
-                    <div className="fixed inset-0 bg-[#7874ac] bg-opacity-25 flex items-center justify-center z-50">
-                      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-                        <div className="flex flex-row justify-between">
-                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
-                            {selectedExercise.exerciseName}
-                          </h3>
-                          <motion.div
-                            whileHover={{ scale: 1.1 }}
-                            transition={{ duration: 0.2 }}
-                            className="top-2 right-2"
-                          >
-                            <IoCloseCircle
-                              onClick={() => handleCloseInfoModal()}
-                              color="#3D0814"
-                              size={30}
-                            />
-                          </motion.div>
+                <div className="absolute inset-0 flex flex-col">
+                  {/* Top 1/5 Bar */}
+                  <div className="flex items-center justify-between p-2 bg-white h-1/5 rounded-t-xl z-10">
+                    <h2 className="text-[#7874AC] text-xl font-semibold">
+                      {exercise.exerciseName.length > 26
+                        ? `${exercise.exerciseName.slice(0, 24)}...`
+                        : exercise.exerciseName}
+                    </h2>
+                    <div className="flex flex-end flex-row">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <IoInformationCircle
+                        onClick={() => handleOpenInfoModal(exercise)}
+                        color="#004F2D"
+                        size={30}
+                      />
+                    </motion.div>
+
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.2 }}
+                      className="relative"
+                    >
+                      <IoAddCircle
+                        onClick={() => handleAddExercise(exercise.exerciseID)}
+                        color="#58A870"
+                        size={30}
+                      />
+                    </motion.div>
+                    {showInfoModal && selectedExercise && (
+                        <div className="fixed inset-0 bg-[#7874ac] bg-opacity-10 flex items-center justify-center z-50">
+                          <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+                            <div className="flex flex-row justify-between">
+                              <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                                {selectedExercise.exerciseName}
+                              </h3>
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.2 }}
+                                className="top-2 right-2"
+                              >
+                                <IoCloseCircle
+                                  onClick={() => handleCloseInfoModal()}
+                                  color="#3D0814"
+                                  size={30}
+                                />
+                              </motion.div>
+                            </div>
+                            <div className="flex justify-center mb-4">
+                              <CldImage
+                                width="250"
+                                height="250"
+                                src={selectedExercise.image}
+                                sizes="50vw"
+                                alt={selectedExercise.exerciseName}
+                                className="w-full h-auto object-contain mb-4 p-3"
+                              />
+                            </div>
+                            <p className="text-gray-600 mb-4">
+                              {selectedExercise.exerciseDescription}
+                            </p>
+                          </div>
                         </div>
-                        <div className="flex justify-center mb-4">
-                          <CldImage
-                            width="250"
-                            height="250"
-                            src={selectedExercise.image}
-                            sizes="50vw"
-                            alt={selectedExercise.exerciseName}
-                            className="w-full h-auto object-contain mb-4 p-3"
-                          />
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                          {selectedExercise.exerciseDescription}
-                        </p>
-                      </div>
+                      )}
                     </div>
-                  )}
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                    className="absolute top-2 right-2"
-                  >
-                    <IoAddCircle
-                      onClick={() => handleAddExercise(exercise.exerciseID)}
-                      color="#58A870"
-                      size={30}
+                  </div>
+
+                  {/* Bottom 4/5 Image Area */}
+                  <div className="h-4/5 bg-gray-200 flex items-end justify-center rounded-b-xl">
+                    <CldImage
+                      src={exercise.image}
+                      alt={exercise.exerciseName}
+                      fill
+                      className="mt-5 object-contain p-5"
                     />
-                  </motion.div>
-                </div>
-                <div className="h-[80%] flex justify-center items-center rounded-b-xl bg-gray-200">
-                  <CldImage
-                    width="250"
-                    height="250"
-                    src={exercise.image}
-                    sizes="50vw"
-                    alt={exercise.exerciseName}
-                    className="items-center w-auto h-full max-w-full max-h-full object-contain p-5"
-                  />
+                  </div>
                 </div>
               </div>
             ))}
@@ -404,31 +407,30 @@ export default function Planner() {
             }).map((_, i) => (
               <div
                 key={`placeholder-${i}`}
-                className="relative w-full h-[30vh] border rounded-xl shadow-md hover:border-[#7874AC] transition cursor-pointer flex flex-col"
+                className="aspect-[3/2] h-full w-full relative border rounded-xl shadow-md hover:border-[#7874AC] transition cursor-pointer flex flex-col"
               ></div>
             ))}
           </div>
         </div>
-
-        <div className="flex items-center justify-center mt-1 space-x-2">
-          {[
-            ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
-          ].map((_, index) => (
-            <motion.div
-              key={`dot-${index}`}
-              whileHover={{ scale: 1.2 }}
-              transition={{ duration: 0.2 }}
-            >
-              <button
-                onClick={() => setCurrentPage(index)}
-                title={`Go to page ${index + 1}`}
-                className={`w-3 h-3 rounded-full shadow-md hover:shadow-lg ${
-                  currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
-                }`}
-              />
-            </motion.div>
-          ))}
-        </div>
+        <div className="flex items-center justify-center">
+      {[
+        ...Array(Math.ceil(filteredExercises.length / exercisesPerPage)),
+      ].map((_, index) => (
+        <motion.div
+          key={`dot-${index}`}
+          whileHover={{ scale: 1.2 }}
+          transition={{ duration: 0.2 }}
+        >
+          <button
+            onClick={() => setCurrentPage(index)}
+            title={`Go to page ${index + 1}`}
+            className={`w-2 h-2 rounded-full shadow-md hover:shadow-lg ${
+              currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+            }`}
+          />
+        </motion.div>
+      ))}
+    </div>
       </div>
     </>
   );

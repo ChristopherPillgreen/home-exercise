@@ -396,10 +396,10 @@ export default function EditPlanPage() {
 
       <div className="container h-fit">
         <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
-          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap font-Noto_Sans">
+          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap font-Noto_Sans ml-16">
             {planExercises[0]?.plan.planName}
           </h1>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap gap-4 mr-16">
             <motion.div
               whileHover={{ scale: 1.1 }}
               transition={{ duration: 0.2 }}
@@ -521,7 +521,7 @@ export default function EditPlanPage() {
               .map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
+                  className="aspect-[4/5] h-full border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
                 >
                   <div className="flex items-center justify-between">
                     <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
@@ -615,7 +615,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
+                          className="w-[50px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
                           Reps
@@ -630,7 +630,7 @@ export default function EditPlanPage() {
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "reps")
                           }
-                          className="w-[10vh] border rounded-xl shadow-md rounded-l-none p-2"
+                          className="w-[75px] border rounded-xl shadow-md rounded-l-none p-2"
                           min="0"
                           title="Enter the number of repetitions"
                           placeholder="Reps"
@@ -639,7 +639,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[10vh] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
+                          className="w-[90px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
                           disabled
                         >
                           Duration
@@ -655,7 +655,7 @@ export default function EditPlanPage() {
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "duration")
                           }
-                          className="w-[20vh] border rounded-xl shadow-md rounded-l-none p-2"
+                          className="w-[120px] border rounded-xl shadow-md rounded-l-none p-2"
                           placeholder="0 seconds"
                         />
                       </div>
@@ -665,7 +665,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
+                          className="w-[50px] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Sets
@@ -680,7 +680,7 @@ export default function EditPlanPage() {
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "sets")
                           }
-                          className="w-[10vh] border rounded-xl rounded-l-none p-2"
+                          className="w-[75px] border rounded-xl rounded-l-none p-2"
                           min="0"
                           placeholder="1 set"
                         />
@@ -688,7 +688,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[10vh] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
+                          className="w-[90px] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
                           disabled
                         >
                           Time
@@ -700,7 +700,7 @@ export default function EditPlanPage() {
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "time")
                           }
-                          className="w-[20vh] border rounded-xl rounded-l-none p-2"
+                          className="w-[120px] border rounded-xl rounded-l-none p-2"
                         >
                           <option value="1 time / day">1 time / day</option>
                           <option value="2 times / day">2 times / day</option>
@@ -721,9 +721,12 @@ export default function EditPlanPage() {
                       </button>
                       <textarea
                         value={exercise.description}
-                        onChange={(e) =>
-                          handleInputChange(e, exercise.id, "description")
-                        }
+                        onChange={(e) => {
+                          const words = e.target.value.trim().split(/\s+/);
+                          if (words.length <= 25) {
+                            handleInputChange(e, exercise.id, "description");
+                          }
+                        }}
                         className="border rounded-xl rounded-l-none p-2 w-full resize-none"
                         maxLength={500}
                         placeholder="Exercise Description"
