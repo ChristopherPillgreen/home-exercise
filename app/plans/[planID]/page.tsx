@@ -624,6 +624,9 @@ export default function EditPlanPage() {
                           id="reps-input"
                           type="number"
                           value={exercise.reps ?? 0}
+                          step="1"
+                          onKeyDown={e => ['e','E','+','-','.'].includes(e.key) && e.preventDefault()}
+                          onWheel={e => e.currentTarget.blur()}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "reps")
                           }
@@ -671,6 +674,9 @@ export default function EditPlanPage() {
                           id="sets-input"
                           type="number"
                           value={exercise.sets ?? 0}
+                          step="1"
+                          onKeyDown={e => ['e','E','+','-','.'].includes(e.key) && e.preventDefault()}
+                          onWheel={e => e.currentTarget.blur()}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "sets")
                           }
