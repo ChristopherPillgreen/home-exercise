@@ -26,10 +26,10 @@ export default async function RootLayout({
   const session = await getServerSession(authOptions);
   return (
     <html lang="en" className={noto.className}>
-      <body className="flex flex-col min-h-screen">
+      <body className="flex flex-col h-screen">
         <SessionProviderWrapper session={session}>
           <NavWrapper />
-          <div className="flex-grow bg-gray-100 flex items-center justify-center">
+          <div className="flex flex-grow h-fit justify-center items-center bg-gray-100">
             {children}
           </div>
           <PageFooter />

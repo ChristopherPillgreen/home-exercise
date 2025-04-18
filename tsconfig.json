@@ -18,6 +18,7 @@
     "jsx": "preserve",
     "incremental": true,
     "target": "ES2017",
+    "forceConsistentCasingInFileNames": true,
     "paths": {
       "@entities/*": ["entities/*"],
       "@api/*": ["app/api/*"]

@@ -54,21 +54,7 @@ export default function AnimatedLink({ href, text, strokeColor }: AnimatedLinkPr
       variants={buttonVariants}
       transition={{ type: "spring", stiffness: 50, damping: 10 }}
     >
-      <Link href={href} className="relative w-full h-full">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 260 80"
-          className="absolute inset-0 w-full h-full"
-        >
-          <path
-            d="M10 10 H250 A10 10 0 0 1 260 20 V70 A10 10 0 0 1 250 80 H10 A10 0 0 1 0 70 V20 A10 10 0 0 1 10 10 Z"
-            fill="transparent"
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-white transition-opacity duration-300 hover:opacity-80">
-          {text}
-        </div>
-      </Link>
+      
     </motion.div>
   );
 }

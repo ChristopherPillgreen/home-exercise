@@ -16,7 +16,7 @@ export default function Nav() {
   };
 
   return (
-    <div className="flex mt-1 md:mb-1 flex-col md:flex-row justify-center items-center">
+    <div className="flex mt-1 md:mb-1 flex-col sm:flex-row justify-center items-center">
       <MotionImage
         onClick={() => window.location.href = "/home"}
         width={288}

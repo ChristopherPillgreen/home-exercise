@@ -7,16 +7,27 @@ export default function MotionImage({
   height,
   src,
   alt,
+  styling,
 }: {
   onClick?: () => void;
   width: number;
   height: number;
   src: string;
   alt: string;
+  styling?: string;
 }) {
   return (
-    <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }} className="md:mx-5">
-      <CldImage width={width} height={height} src={src} alt={alt} onClick={onClick}/>
+    <motion.div
+      whileHover={{ scale: 1.1 }}
+      transition={{ duration: 0.2 }}
+      className={styling}>
+      <CldImage
+        width={width}
+        height={height}
+        src={src}
+        alt={alt}
+        onClick={onClick}
+      />
     </motion.div>
   );
 }
