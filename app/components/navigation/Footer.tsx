@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-export function PageFooter() {
+export default function Footer() {
   const pathname = usePathname();
   const hiddenNavRoutes = ["/confirm"];
 

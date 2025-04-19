@@ -352,7 +352,7 @@ export default function Planner() {
                       />
                     </motion.div>
                     {showInfoModal && selectedExercise && (
-                        <div className="fixed inset-0 bg-[#7874ac] bg-opacity-10 flex items-center justify-center z-50">
+                        <div className="fixed inset-0 bg-[#7874ac]/10 flex items-center justify-center z-50">
                           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                             <div className="flex flex-row justify-between">
                               <h3 className="text-xl text-[#7874ac] font-semibold mb-4">

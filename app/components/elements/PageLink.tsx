@@ -1,8 +1,7 @@
 import { motion } from "motion/react";
+import {aProps} from "../types";
 
-interface PageLinkProps {
-  onClick?: () => void;
-  href?: string;
+interface PageLinkProps extends aProps {
   color: string;
   name: string;
   title?: string;
@@ -24,7 +23,7 @@ export default function PageLink({
       <a
         onClick={onClick}
         href={href}
-        className={`block h-full px-3 py-2 bg-[#${color}] text-white rounded-xl shadow-md hover:shadow-lg ${additionalStyling}`}
+        className={`block h-full px-3 py-2 ${color} text-white rounded-xl shadow-md hover:shadow-lg ${additionalStyling}`}
         rel="next"
         title={title}
         target={target}

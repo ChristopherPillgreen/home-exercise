@@ -7,7 +7,9 @@ import QRCode from "react-qr-code";
 import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
 import {
+  IoArrowBackCircle,
   IoArrowDownCircle,
+  IoArrowForwardCircle,
   IoArrowUpCircle,
   IoCloseCircle,
 } from "react-icons/io5";
@@ -417,7 +419,7 @@ export default function EditPlanPage() {
             >
               <button
                 onClick={() => router.push(`/plans/${planID}/exercises`)}
-                className="h-full px-4 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center"
+                className="h-full px-4 bg-deluge text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center"
               >
                 Add Exercises
               </button>
@@ -429,7 +431,7 @@ export default function EditPlanPage() {
               <button
                 onClick={savePlan}
                 disabled={saving}
-                className={`px-4 py-2 bg-[#7874AC] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap ${
+                className={`px-4 py-2 bg-deluge text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap ${
                   saving ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
@@ -485,7 +487,7 @@ export default function EditPlanPage() {
         </div>
 
         {showQRCode && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[40vh] max-w-md relative">
               <motion.div
                 whileHover={{ scale: 1.1 }}
@@ -531,7 +533,7 @@ export default function EditPlanPage() {
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <IoArrowUpCircle
+                      <IoArrowBackCircle
                         color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "up")}
@@ -541,7 +543,7 @@ export default function EditPlanPage() {
                       whileHover={{ scale: 1.1 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <IoArrowDownCircle
+                      <IoArrowForwardCircle
                         color="#004F2D"
                         size={30}
                         onClick={() => handleMoveExercise(exercise.id, "down")}
@@ -558,7 +560,7 @@ export default function EditPlanPage() {
                       />
                     </motion.div>
                     {showConfirmation && currentExerciseID === exercise.exercise.exerciseID && (
-                      <div className="fixed inset-0 bg-[#7D1616] bg-opacity-25 flex items-center justify-center z-50">
+                      <div className="fixed inset-0 bg-[#7D1616]/25 flex items-center justify-center z-50">
                         <div className="bg-white p-6 rounded-lg shadow-lg">
                           <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
                             Are you sure you want to delete this exercise?
@@ -615,7 +617,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[50px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
+                          className="w-[50px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-deluge text-white font-semibold"
                           disabled
                         >
                           Reps
@@ -639,7 +641,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[90px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-[#7874AC] text-white font-semibold"
+                          className="w-[90px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-deluge text-white font-semibold"
                           disabled
                         >
                           Duration
@@ -665,7 +667,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[50px] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
+                          className="w-[50px] px-2 py-1 rounded-xl rounded-r-none bg-deluge shadow-md text-white font-semibold"
                           disabled
                         >
                           Sets
@@ -688,7 +690,7 @@ export default function EditPlanPage() {
                       <div className="flex flex-row gap-0 mt-2">
                         <button
                           type="button"
-                          className="w-[90px] px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] shadow-md text-white font-semibold"
+                          className="w-[90px] px-2 py-1 rounded-xl rounded-r-none bg-deluge shadow-md text-white font-semibold"
                           disabled
                         >
                           Time
@@ -714,7 +716,7 @@ export default function EditPlanPage() {
                     <div className="flex flex-row justify-start gap-0 mt-4">
                       <button
                         type="button"
-                        className="px-2 py-1 rounded-xl rounded-r-none bg-[#7874AC] text-white font-semibold"
+                        className="px-2 py-1 rounded-xl rounded-r-none bg-deluge text-white font-semibold"
                         disabled
                       >
                         Description
@@ -763,7 +765,7 @@ export default function EditPlanPage() {
                   title="button"
                   onClick={() => setCurrentPage(index)}
                   className={`w-3 h-3 rounded-full shadow-md hover:shadow-lg ${
-                    currentPage === index ? "bg-[#7874AC]" : "bg-gray-300"
+                    currentPage === index ? "bg-deluge" : "bg-gray-300"
                   }`}
                 />
               </motion.div>

@@ -1,5 +1,14 @@
 import { motion } from "motion/react";
 import { CldImage } from "next-cloudinary";
+import {aProps} from "../types";
+
+interface MotionImageProps extends aProps {
+  width: number;
+  height: number;
+  src: string;
+  alt: string;
+  styling?: string;
+};
 
 export default function MotionImage({
   onClick,
@@ -8,14 +17,7 @@ export default function MotionImage({
   src,
   alt,
   styling,
-}: {
-  onClick?: () => void;
-  width: number;
-  height: number;
-  src: string;
-  alt: string;
-  styling?: string;
-}) {
+}: MotionImageProps) {
   return (
     <motion.div
       whileHover={{ scale: 1.1 }}

@@ -1,7 +1,6 @@
 "use client";
 
-import PageLink from "app/components/PageLink";
-import MotionImage from "app/components/MotionImage";
+import { MotionImage, PageLink } from "../components";
 
 export default function Home() {
   const LinkStyling =
@@ -11,27 +10,27 @@ export default function Home() {
       <div className="flex flex-col w-[50vh] justify-center space-y-5 md:space-y-10">
         <PageLink
           href="/start"
-          color="7874AC"
+          color="bg-deluge"
           name="Getting Started"
           title="Start your journey with us"
           additionalStyling={LinkStyling}
         />
         <PageLink
           href="/about"
-          color="7874AC"
+          color="bg-deluge"
           name="About Us"
           title="Learn more about Kineticare"
           additionalStyling={LinkStyling}
         />
         <PageLink
           href="/contact"
-          color="7D1616"
+          color="bg-falu-red"
           name="Contact Us"
           title="Connect with us"
           additionalStyling={LinkStyling}
         />
       </div>
-      <div className="space-y-5 md:space-y-10 w-[50vh]">
+      <div className="w-[50vh]">
         <MotionImage
           onClick={() => (window.location.href = "/home")}
           width={427}
