@@ -7,6 +7,8 @@ import { TagExercises } from '@entities/TagExercise.entity';
 import { User } from '@entities/User.entity';
 import { MikroORM, Options } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const config: Options<MySqlDriver> = {
   // entities: ['./dist/entities/*.js'], // Compiled entities for production
