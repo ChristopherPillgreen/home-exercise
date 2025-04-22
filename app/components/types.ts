@@ -1,5 +1,11 @@
+
+import React, { ChangeEvent } from 'react';
+
+
 export interface InputProps {
-    onChange: (value: string) => void;
+    compChange?: (value: string) => React.ReactNode;
+    voidChange?: (value: string) => void;
+    stringChange?: (e: ChangeEvent<HTMLInputElement>) => void;
     value?: string;
 }
 

@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { motion } from "motion/react";
 import { IoCloseCircle, IoCog } from "react-icons/io5";
 import { encodePlanId } from "./../api/urlsqids";
-import { CreatePlan, DeletePlan, Loading, EditPlan, PageLink, AnimatedSearch } from "app/components";
+import { CreatePlan, DeletePlan, Loading, EditPlan, PageLink, AnimatedInput } from "app/components";
 
 type Plan = {
   planID: number;
@@ -204,10 +204,11 @@ export default function PlansPage() {
               name="Create Plan"
               title="Create a new plan"
             />
-            <AnimatedSearch
-              onChange={handleSearch}
+            <AnimatedInput
+              voidChange={handleSearch}
               value={query}
               additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+              placeholder="Search..."
             />
           </div>
         </div>
@@ -229,60 +230,16 @@ export default function PlansPage() {
           onClose={closeConfirmationPopup}
         />
 
-        {showSettings && (
-          <div className="fixed inset-0 bg-deluge/25 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
-              <h3 className="text-xl text-deluge font-semibold mb-4">
-                Edit Plan
-              </h3>
-              <div className="mb-4">
-                <label className="block text-deluge mb-1 font-medium">
-                  Plan Name
-                </label>
-                <input
-                  type="text"
-                  className="w-full border border-ocean-green p-2 rounded-xl shadow-md hover:shadow:lg focus:outline-none focus:ring focus:ring-british-racing-green"
-                  value={editPlanName}
-                  onChange={(e) => setEditPlanName(e.target.value)}
-                  placeholder="Enter plan name..."
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block text-deluge mb-1 font-medium">
-                  Description
-                </label>
-                <textarea
-                  className="w-full border border-ocean-green p-2 rounded-xl shadow-md hover:shadow:lg focus:outline-none focus:ring focus:ring-british-racing-green resize-none"
-                  rows={4}
-                  value={editPlanDescription ? editPlanDescription : ""}
-                  onChange={(e) => setEditPlanDescription(e.target.value)}
-                  maxLength={150}
-                  placeholder="Enter plan description..."
-                />
-              </div>
-              <div className="flex justify-end space-x-4">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}>
-                  <button
-                    onClick={handleSaveChanges}
-                    className="bg-ocean-green text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl">
-                    Save
-                  </button>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.2 }}>
-                  <button
-                    onClick={closeSettingsPopup}
-                    className="bg-falu-red text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl">
-                    Cancel
-                  </button>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-        )}
+        <EditPlan
+          isOpen={showSettings}
+          onClose={closeSettingsPopup}
+          onSave={handleSaveChanges}
+          planName={editPlanName}
+          setPlanName={setEditPlanName}
+          planDescription={editPlanDescription}
+          setPlanDescription={setEditPlanDescription}
+        />
+
 
         <div className="relative flex flex-wrap justify-between gap-4">
           {displayedPlans.map((plan) => (

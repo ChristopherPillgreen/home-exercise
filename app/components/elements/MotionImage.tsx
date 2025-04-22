@@ -1,6 +1,6 @@
-import { motion } from "motion/react";
 import { CldImage } from "next-cloudinary";
-import {aProps} from "../types";
+import { aProps } from "../types";
+import { HoverMotion } from "../";
 
 interface MotionImageProps extends aProps {
   width: number;
@@ -8,7 +8,7 @@ interface MotionImageProps extends aProps {
   src: string;
   alt: string;
   styling?: string;
-};
+}
 
 export default function MotionImage({
   onClick,
@@ -19,10 +19,7 @@ export default function MotionImage({
   styling,
 }: MotionImageProps) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.1 }}
-      transition={{ duration: 0.2 }}
-      className={styling}>
+    <HoverMotion additionalStyling={styling}>
       <CldImage
         width={width}
         height={height}
@@ -30,6 +27,6 @@ export default function MotionImage({
         alt={alt}
         onClick={onClick}
       />
-    </motion.div>
+    </HoverMotion>
   );
 }

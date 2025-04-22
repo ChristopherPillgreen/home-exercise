@@ -1,5 +1,5 @@
-import { motion } from "motion/react";
 import { ModalProps } from "../types";
+import { AnimatedInput, HoverMotion } from "../";
 
 interface CreatePlanProps extends ModalProps {
   onSubmit: (planName: string) => void;
@@ -25,26 +25,21 @@ export default function CreatePlan({
             e.preventDefault();
             onSubmit(planName);
           }}>
-          <input
-            type="text"
-            className="w-full border border-ocean-green p-2 rounded-xl shadow-md hover:shadow:lg mb-4 focus:outline-none focus:ring-british-racing-green"
-            placeholder="Enter plan name..."
+          <AnimatedInput 
+            voidChange={setPlanName}
             value={planName}
-            onChange={(e) => setPlanName(e.target.value)}
+            additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+            placeholder="Enter plan name..."
           />
           <div className="flex justify-end space-x-4">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}>
+            <HoverMotion>
               <button
                 type="submit"
                 className="bg-ocean-green text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl">
                 Create
               </button>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}>
+            </HoverMotion>
+            <HoverMotion>
               <button
                 type="button"
                 onClick={() => {onClose();
@@ -52,7 +47,7 @@ export default function CreatePlan({
                 className="bg-falu-red text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl">
                 Cancel
               </button>
-            </motion.div>
+              </HoverMotion>
           </div>
         </form>
       </div>
