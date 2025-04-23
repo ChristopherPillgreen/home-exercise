@@ -1,15 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
 import {
-  IoAddCircle,
   IoCloseCircle,
   IoInformationCircle,
 } from "react-icons/io5";
+import { PageLink, AnimatedInput } from "app/components";
 
 type Exercise = {
   exerciseID: number;
@@ -99,7 +97,6 @@ export default function Planner() {
     currentPage * exercisesPerPage,
     (currentPage + 1) * exercisesPerPage
   );
-
   if (loading) return <div>Loading exercises...</div>;
   if (error) return <div>{error}</div>;
 
@@ -131,18 +128,12 @@ export default function Planner() {
             Exercises
           </h1>
           <div className="flex p-4 w-fit max-w-lg space-x-4">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <input
-                type="text"
-                placeholder="Search..."
-                className="h-full w-full px-4 rounded-xl shadow-md hover:shadow-lg border border-[#58A870] focus:outline-none focus:ring-2 focus:ring-[#004F2D] text-sm"
-                value={query}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
-            </motion.div>
+            <AnimatedInput
+              voidChange={handleSearch}
+              value={query}
+              additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+              placeholder="Search..."
+            />
           </div>
         </div>
 
@@ -151,50 +142,42 @@ export default function Planner() {
             <ul className="h-full bg-gray-100 border border-gray-300 rounded-xl shadow-md">
               <li
                 className="px-4 py-4 hover:bg-[#58A870] hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(1)}
-              >
+                onClick={() => handleClick(1)}>
                 Cervical
               </li>
               <li
                 className="px-4 py-3 hover:bg-[#58A870] hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(2)}
-              >
+                onClick={() => handleClick(2)}>
                 Oral Motor
               </li>
               <li
                 className="px-4 py-4 hover:bg-[#58A870] hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(3)}
-              >
+                onClick={() => handleClick(3)}>
                 Shoulder
               </li>
               <li
                 className="px-4 py-4 hover:bg-[#58A870] hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(4)}
-              >
+                onClick={() => handleClick(4)}>
                 Elbow & Hand
               </li>
               <li
                 className="px-4 py-4 hover:bg-[#58A870]  hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(5)}
-              >
+                onClick={() => handleClick(5)}>
                 Back
               </li>
               <li
                 className="px-4 py-5 hover:bg-[#58A870]  hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(6)}
-              >
+                onClick={() => handleClick(6)}>
                 Hip & Knee
               </li>
               <li
                 className="px-4 py-4 hover:bg-[#58A870]  hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(7)}
-              >
+                onClick={() => handleClick(7)}>
                 Lower Body Strength
               </li>
               <li
                 className="px-4 py-4 hover:bg-[#58A870]  hover:shadow-lg hover:rounded-xl hover:text-white cursor-pointer"
-                onClick={() => handleClick(8)}
-              >
+                onClick={() => handleClick(8)}>
                 Upper Body Strength
               </li>
             </ul>
@@ -204,8 +187,7 @@ export default function Planner() {
             {displayedExercises.map((exercise) => (
               <div
                 key={exercise.exerciseID}
-                className="aspect-[3/2] h-full w-full relative rounded-xl overflow-hidden border shadow-md hover:shadow-lg hover:border-[#7874AC] transition cursor-pointer"
-              >
+                className="aspect-[3/2] h-full w-full relative rounded-xl overflow-hidden border shadow-md hover:shadow-lg hover:border-[#7874AC] transition cursor-pointer">
                 <div className="absolute inset-0 flex flex-col">
                   {/* Top 1/5 Bar */}
                   <div className="flex items-center justify-between p-2 bg-white h-1/5 rounded-t-xl z-10">
@@ -218,8 +200,7 @@ export default function Planner() {
                       <motion.div
                         whileHover={{ scale: 1.1 }}
                         transition={{ duration: 0.2 }}
-                        className="relative"
-                      >
+                        className="relative">
                         <IoInformationCircle
                           onClick={() => handleOpenInfoModal(exercise)}
                           color="#004F2D"
@@ -227,7 +208,7 @@ export default function Planner() {
                         />
                       </motion.div>
                       {showInfoModal && selectedExercise && (
-                        <div className="fixed inset-0 bg-[#7874ac] bg-opacity-10 flex items-center justify-center z-50">
+                        <div className="fixed inset-0 bg-[#7874ac]/10 flex items-center justify-center z-50">
                           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                             <div className="flex flex-row justify-between">
                               <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
@@ -236,8 +217,7 @@ export default function Planner() {
                               <motion.div
                                 whileHover={{ scale: 1.1 }}
                                 transition={{ duration: 0.2 }}
-                                className="top-2 right-2"
-                              >
+                                className="top-2 right-2">
                                 <IoCloseCircle
                                   onClick={() => handleCloseInfoModal()}
                                   color="#3D0814"
@@ -282,8 +262,7 @@ export default function Planner() {
             }).map((_, i) => (
               <div
                 key={`placeholder-${i}`}
-                className="aspect-[3/2] h-full w-full relative border rounded-xl shadow-md hover:border-[#7874AC] transition cursor-pointer flex flex-col"
-              ></div>
+                className="aspect-[3/2] h-full w-full relative border rounded-xl shadow-md hover:border-[#7874AC] transition cursor-pointer flex flex-col"></div>
             ))}
           </div>
         </div>
@@ -294,8 +273,7 @@ export default function Planner() {
             <motion.div
               key={`dot-${index}`}
               whileHover={{ scale: 1.2 }}
-              transition={{ duration: 0.2 }}
-            >
+              transition={{ duration: 0.2 }}>
               <button
                 onClick={() => setCurrentPage(index)}
                 title={`Go to page ${index + 1}`}

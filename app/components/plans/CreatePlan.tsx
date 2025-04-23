@@ -1,5 +1,6 @@
 import { ModalProps } from "../types";
-import { AnimatedInput, HoverMotion } from "../";
+import { AnimatedInput, HoverMotion, PageLink } from "../";
+import StaticInput from "../elements/StaticInput";
 
 interface CreatePlanProps extends ModalProps {
   onSubmit: (planName: string) => void;
@@ -18,20 +19,24 @@ export default function CreatePlan({
     <div className="fixed inset-0 bg-deluge/25 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg">
         <h3 className="text-xl text-deluge font-semibold mb-4">
-          Create a New Plan
+          Create A Plan
         </h3>
+        <div className="mb-4">
+          <label className="block text-deluge mb-1 font-medium">
+            Plan Name
+          </label>
+          <StaticInput
+            stringChange={setPlanName}
+            value={planName}
+            placeholder="Enter plan name..."
+          />
+        </div>
         <form
           onSubmit={(e) => {
             e.preventDefault();
             onSubmit(planName);
           }}>
-          <AnimatedInput 
-            voidChange={setPlanName}
-            value={planName}
-            additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
-            placeholder="Enter plan name..."
-          />
-          <div className="flex justify-end space-x-4">
+          <div className="flex justify-center space-x-4">
             <HoverMotion>
               <button
                 type="submit"
@@ -39,15 +44,12 @@ export default function CreatePlan({
                 Create
               </button>
             </HoverMotion>
-            <HoverMotion>
-              <button
-                type="button"
-                onClick={() => {onClose();
-                }}
-                className="bg-falu-red text-white shadow-md hover:shadow:lg px-4 py-2 rounded-xl">
-                Cancel
-              </button>
-              </HoverMotion>
+            <PageLink
+              onClick={onClose}
+              color="bg-falu-red"
+              name="Cancel"
+              title="Cancel"
+            />
           </div>
         </form>
       </div>

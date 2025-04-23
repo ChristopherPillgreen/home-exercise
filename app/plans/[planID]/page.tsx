@@ -8,12 +8,16 @@ import { CldImage } from "next-cloudinary";
 import { motion } from "motion/react";
 import {
   IoArrowBackCircle,
-  IoArrowDownCircle,
   IoArrowForwardCircle,
-  IoArrowUpCircle,
   IoCloseCircle,
 } from "react-icons/io5";
 import { decodePlanId } from "./../../api/urlsqids";
+import {
+  Loading,
+  CustomNotification,
+  PageLink,
+  ExportPlan,
+} from "app/components";
 
 interface PlanExercise {
   exercise: {
@@ -49,7 +53,6 @@ export default function EditPlanPage() {
   const router = useRouter();
   var { planID } = useParams();
   const decodedPlanId = decodePlanId(planID as string);
-
 
   const [notificationfalse, setNotificationFalse] = useState<string | null>(
     null
@@ -89,7 +92,9 @@ export default function EditPlanPage() {
 
     const fetchExercises = async () => {
       try {
-        const response = await fetch(`/api/planexercise?planID=${decodedPlanId}`);
+        const response = await fetch(
+          `/api/planexercise?planID=${decodedPlanId}`
+        );
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -378,111 +383,33 @@ export default function EditPlanPage() {
     doc.save(`${planExercises[0]?.plan.planName}.pdf`);
   };
 
-  if (loading)
-    return <div className="text-center mt-4">Loading exercises...</div>;
-  if (error)
-    return <div className="text-red-500 text-center mt-4">{error}</div>;
-
   return (
-    <>
-      {notification && (
-        <div className="fixed top-5 right-5 z-50 bg-[#004F2D] text-white px-6 py-3 rounded-lg shadow-lg transition-opacity duration-300">
-          {notification}
-        </div>
-      )}
-      {notificationfalse && (
-        <div className="fixed top-5 right-5 z-50 bg-[#7D1616] text-white px-6 py-3 rounded-lg  shadow-lg transition-opacity duration-300">
-          {notificationfalse}
-        </div>
-      )}
-
-      <div className="container h-fit">
-        <div className="w-full px-4 pt-4 flex items-center justify-between flex-wrap gap-4">
-          <h1 className="font-bold text-[#7874AC] text-3xl whitespace-nowrap font-Noto_Sans ml-16">
+    <div className="container h-full w-full">
+      <Loading loading={loading} what="plan exercises" error={error}>
+        <CustomNotification message={notification} bgcolor="ocean-green" />
+        <CustomNotification message={notificationfalse} bgcolor="falu-red" />
+        <div className="flex items-center justify-between w-full">
+          <h1 className="flex font-bold text-deluge ml-1 sm:ml-0 text-xl sm:text-3xl">
             {planExercises[0]?.plan.planName}
           </h1>
-          <div className="flex flex-wrap gap-4 mr-16">
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <button
-                onClick={() => router.push(`/plans`)}
-                className="px-4 py-2 bg-[#7D1616] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
-              >
-                Back to Plans
-              </button>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <button
-                onClick={() => router.push(`/plans/${planID}/exercises`)}
-                className="h-full px-4 bg-deluge text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center"
-              >
-                Add Exercises
-              </button>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <button
-                onClick={savePlan}
-                disabled={saving}
-                className={`px-4 py-2 bg-deluge text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap ${
-                  saving ? "opacity-50 cursor-not-allowed" : ""
-                }`}
-              >
-                {saving ? "Saving..." : "Save Plan"}
-              </button>
-            </motion.div>
-            <motion.div
-              whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="px-4 py-2 bg-[#58A870] text-white rounded-xl shadow-md hover:shadow:lg flex items-center justify-center min-w-fit whitespace-nowrap"
-                >
-                  Export as
-                  <svg
-                    className="ml-2 w-5 h-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-                {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
-                    <div className="py-1">
-                      <button
-                        onClick={() => handleExportOption("PDF")}
-                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                      >
-                        PDF
-                      </button>
-                      <button
-                        onClick={() => handleExportOption("QR Code")}
-                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
-                      >
-                        QR Code
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+          <div className="flex flex-row p-2 space-x-4">
+            <PageLink href="/plans" color="bg-falu-red" name="Back to Plans" />
+            <PageLink
+              onClick={() => router.push(`/plans/${planID}/exercises`)}
+              color="bg-deluge"
+              name="Add Exercises"
+            />
+            <PageLink onClick={savePlan} color="bg-deluge" name="Save Plan" />
+            <PageLink
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              color="bg-ocean-green"
+              name="Export"
+            />
+            <ExportPlan
+              isOpen={dropdownOpen}
+              handleExportOption={handleExportOption}
+              onClose={() => setDropdownOpen(false)}
+            />
           </div>
         </div>
 
@@ -492,8 +419,7 @@ export default function EditPlanPage() {
               <motion.div
                 whileHover={{ scale: 1.1 }}
                 transition={{ duration: 0.2 }}
-                className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold"
-              >
+                className="absolute top-2 right-2 text-gray-600 hover:text-black text-xl font-bold">
                 <IoCloseCircle
                   onClick={() => setShowQRCode(false)}
                   color="#3D0814"
@@ -523,16 +449,14 @@ export default function EditPlanPage() {
               .map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="aspect-[4/5] h-full border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between"
-                >
+                  className="aspect-[4/5] h-full border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
                       {exercise.exercise.exerciseName}
                     </h1>
                     <motion.div
                       whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                      transition={{ duration: 0.2 }}>
                       <IoArrowBackCircle
                         color="#004F2D"
                         size={30}
@@ -541,8 +465,7 @@ export default function EditPlanPage() {
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                      transition={{ duration: 0.2 }}>
                       <IoArrowForwardCircle
                         color="#004F2D"
                         size={30}
@@ -551,59 +474,60 @@ export default function EditPlanPage() {
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.2 }}
-                    >
+                      transition={{ duration: 0.2 }}>
                       <IoCloseCircle
-                        onClick={() => handleOpenConfirmation(exercise.exercise.exerciseID, exercise.id)}
+                        onClick={() =>
+                          handleOpenConfirmation(
+                            exercise.exercise.exerciseID,
+                            exercise.id
+                          )
+                        }
                         color="#3D0814"
                         size={30}
                       />
                     </motion.div>
-                    {showConfirmation && currentExerciseID === exercise.exercise.exerciseID && (
-                      <div className="fixed inset-0 bg-[#7D1616]/25 flex items-center justify-center z-50">
-                        <div className="bg-white p-6 rounded-lg shadow-lg">
-                          <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
-                            Are you sure you want to delete this exercise?
-                          </h3>
-                          <div className="flex justify-center space-x-4">
-                            <motion.div
-                              whileHover={{ scale: 1.1 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <button
-                                onClick={() =>
-                                  handleDeleteExercise(
-                                    exercise.exercise.exerciseID,
-                                    exercise.id
-                                  )
-                                }
-                                className="bg-[#7D1616] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
-                              >
-                                Yes, Delete
-                              </button>
-                            </motion.div>
-                            <motion.div
-                              whileHover={{ scale: 1.1 }}
-                              transition={{ duration: 0.2 }}
-                            >
-                              <button
-                                onClick={() => setShowConfirmation(false)}
-                                className="bg-[#58A870] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg"
-                              >
-                                No, Cancel
-                              </button>
-                            </motion.div>
+                    {showConfirmation &&
+                      currentExerciseID === exercise.exercise.exerciseID && (
+                        <div className="fixed inset-0 bg-[#7D1616]/25 flex items-center justify-center z-50">
+                          <div className="bg-white p-6 rounded-lg shadow-lg">
+                            <h3 className="text-xl text-[#7874ac] font-semibold mb-4">
+                              Are you sure you want to delete this exercise?
+                            </h3>
+                            <div className="flex justify-center space-x-4">
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.2 }}>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteExercise(
+                                      exercise.exercise.exerciseID,
+                                      exercise.id
+                                    )
+                                  }
+                                  className="bg-[#7D1616] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg">
+                                  Yes, Delete
+                                </button>
+                              </motion.div>
+                              <motion.div
+                                whileHover={{ scale: 1.1 }}
+                                transition={{ duration: 0.2 }}>
+                                <button
+                                  onClick={() => setShowConfirmation(false)}
+                                  className="bg-[#58A870] text-white py-2 px-4 rounded-xl shadow-md hover:shadow:lg">
+                                  No, Cancel
+                                </button>
+                              </motion.div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      )}
                   </div>
 
                   {exercise.exercise.image ? (
                     <CldImage
                       src={exercise.exercise.image}
-                      width="300"
-                      height="200"
+                      width="100"
+                      height="50"
                       alt={exercise.exercise.exerciseName}
                       className="w-full h-36 object-contain mt-2 rounded"
                     />
@@ -618,8 +542,7 @@ export default function EditPlanPage() {
                         <button
                           type="button"
                           className="w-[50px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-deluge text-white font-semibold"
-                          disabled
-                        >
+                          disabled>
                           Reps
                         </button>
                         <input
@@ -627,8 +550,11 @@ export default function EditPlanPage() {
                           type="number"
                           value={exercise.reps ?? 0}
                           step="1"
-                          onKeyDown={e => ['e','E','+','-','.'].includes(e.key) && e.preventDefault()}
-                          onWheel={e => e.currentTarget.blur()}
+                          onKeyDown={(e) =>
+                            ["e", "E", "+", "-", "."].includes(e.key) &&
+                            e.preventDefault()
+                          }
+                          onWheel={(e) => e.currentTarget.blur()}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "reps")
                           }
@@ -642,18 +568,18 @@ export default function EditPlanPage() {
                         <button
                           type="button"
                           className="w-[90px] px-2 py-1 rounded-xl shadow-md rounded-r-none bg-deluge text-white font-semibold"
-                          disabled
-                        >
+                          disabled>
                           Duration
                         </button>
                         <input
                           id={`duration-input`}
                           type="text"
                           value={
-                            exercise.duration === "Null" || exercise.duration === "null"
+                            exercise.duration === "Null" ||
+                            exercise.duration === "null"
                               ? "0 seconds"
                               : exercise.duration
-                          }                           
+                          }
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "duration")
                           }
@@ -668,8 +594,7 @@ export default function EditPlanPage() {
                         <button
                           type="button"
                           className="w-[50px] px-2 py-1 rounded-xl rounded-r-none bg-deluge shadow-md text-white font-semibold"
-                          disabled
-                        >
+                          disabled>
                           Sets
                         </button>
                         <input
@@ -677,8 +602,11 @@ export default function EditPlanPage() {
                           type="number"
                           value={exercise.sets ?? 0}
                           step="1"
-                          onKeyDown={e => ['e','E','+','-','.'].includes(e.key) && e.preventDefault()}
-                          onWheel={e => e.currentTarget.blur()}
+                          onKeyDown={(e) =>
+                            ["e", "E", "+", "-", "."].includes(e.key) &&
+                            e.preventDefault()
+                          }
+                          onWheel={(e) => e.currentTarget.blur()}
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "sets")
                           }
@@ -691,8 +619,7 @@ export default function EditPlanPage() {
                         <button
                           type="button"
                           className="w-[90px] px-2 py-1 rounded-xl rounded-r-none bg-deluge shadow-md text-white font-semibold"
-                          disabled
-                        >
+                          disabled>
                           Time
                         </button>
                         <select
@@ -702,8 +629,7 @@ export default function EditPlanPage() {
                           onChange={(e) =>
                             handleInputChange(e, exercise.id, "time")
                           }
-                          className="w-[120px] border rounded-xl rounded-l-none p-2"
-                        >
+                          className="w-[120px] border rounded-xl rounded-l-none p-2">
                           <option value="1 time / day">1 time / day</option>
                           <option value="2 times / day">2 times / day</option>
                           <option value="3 times / day">3 times / day</option>
@@ -717,8 +643,7 @@ export default function EditPlanPage() {
                       <button
                         type="button"
                         className="px-2 py-1 rounded-xl rounded-r-none bg-deluge text-white font-semibold"
-                        disabled
-                      >
+                        disabled>
                         Description
                       </button>
                       <textarea
@@ -743,11 +668,10 @@ export default function EditPlanPage() {
             }).map((_, i) => (
               <div
                 key={`placeholder-${i}`}
-                className="border p-4 rounded-xl shadow bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400"
-              >
-                <div className="flex flex-1 justify-center items-center w-full min-h-[200px] min-w-[450px]">
-                  <span className="text-center">Empty Slot</span>
-                </div>
+                className="aspect-[4/5] h-full border p-4 rounded-xl shadow-md bg-white min-h-[60vh] max-h-fit flex flex-col justify-center items-center text-gray-400">
+                  <div className="flex-1 flex justify-center items-center w-full">
+                    <span className="text-center">Empty Slot</span>
+                  </div>
               </div>
             ))}
           </div>
@@ -759,8 +683,7 @@ export default function EditPlanPage() {
               <motion.div
                 key={`dot-${index}`}
                 whileHover={{ scale: 1.2 }}
-                transition={{ duration: 0.2 }}
-              >
+                transition={{ duration: 0.2 }}>
                 <button
                   title="button"
                   onClick={() => setCurrentPage(index)}
@@ -772,7 +695,7 @@ export default function EditPlanPage() {
             )
           )}
         </div>
-      </div>
-    </>
+      </Loading>
+    </div>
   );
 }
