@@ -1,5 +1,5 @@
 import { ModalProps } from "../types";
-import { AnimatedInput, HoverMotion, PageLink } from "../";
+import { HoverMotion, PageLink } from "../";
 import StaticInput from "../elements/StaticInput";
 
 interface CreatePlanProps extends ModalProps {

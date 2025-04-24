@@ -228,10 +228,10 @@ export default function Planner() {
           {notificationfalse}
         </div>
       )}
-      <div className="container h-fit w-full">
-        <div className="flex items-center justify-between w-full">
-          <h1 className="flex font-bold text-[#7874AC] text-3xl ml-10">
-            Exercises
+    <div className="container h-full w-full">
+    <div className="flex items-center justify-between w-full">
+      <h1 className="flex font-bold text-deluge ml-1 sm:ml-0 text-xl sm:text-3xl">
+        Exercises
           </h1>
           <div className="flex p-4 w-fit max-w-lg space-x-4">
             <PageLink
@@ -243,7 +243,7 @@ export default function Planner() {
             <AnimatedInput
               voidChange={handleSearch}
               value={query}
-              additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+              additionalStyling="w-[15vh] sm:w-fit bg-white text-black border border-ocean-green focus:ring focus:ring-ocean-green"
               placeholder="Search..."
             />
           </div>
@@ -299,7 +299,7 @@ export default function Planner() {
             {displayedExercises.map((exercise) => (
               <div
                 key={exercise.exerciseID}
-                className="aspect-[3/2] h-full w-full relative rounded-xl overflow-hidden border shadow-md hover:shadow-lg hover:border-[#7874AC] transition cursor-pointer">
+                className="aspect-[3/2] h-full w-full relative rounded-xl overflow-hidden border shadow-md hover:shadow-lg hover:border-deluge hover:box-border hover:border transition cursor-pointer">
                 <div className="absolute inset-0 flex flex-col">
                   {/* Top 1/5 Bar */}
                   <div className="flex items-center justify-between p-2 bg-white h-1/5 rounded-t-xl z-10">

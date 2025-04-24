@@ -223,6 +223,7 @@ export default function EditPlanPage() {
 
   const handleExportOption = (option: string) => {
     if (option === "PDF") {
+      setDropdownOpen(false)
       if (planExercises.length === 0) {
         setNotificationFalse("No exercises to export.");
         setTimeout(() => setNotification(null), 3000);
@@ -230,6 +231,7 @@ export default function EditPlanPage() {
       }
       generatePDF();
     } else if (option === "QR Code") {
+      setDropdownOpen(false)
       if (planExercises.length === 0) {
         setNotificationFalse("No exercises to export.");
         setTimeout(() => setNotification(null), 3000);
@@ -414,7 +416,7 @@ export default function EditPlanPage() {
         </div>
 
         {showQRCode && (
-          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 bg-deluge/25 z-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-[40vh] max-w-md relative">
               <motion.div
                 whileHover={{ scale: 1.1 }}
@@ -449,7 +451,7 @@ export default function EditPlanPage() {
               .map((exercise) => (
                 <div
                   key={exercise.id}
-                  className="aspect-[4/5] h-full border p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between">
+                  className="aspect-[4/5] h-full border hover:border-deluge hover:box-border hover:border  p-4 rounded-xl shadow-md hover:shadow-lg bg-white min-h-[60vh] max-h-fit flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <h1 className="flex-1 font-semibold text-[#7874AC] text-2xl px-3 rounded">
                       {exercise.exercise.exerciseName}

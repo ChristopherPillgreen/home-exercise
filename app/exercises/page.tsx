@@ -121,17 +121,22 @@ export default function Planner() {
   };
 
   return (
-    <>
-      <div className="container h-fit w-full">
-        <div className="flex items-center justify-between w-full">
-          <h1 className="flex font-bold text-[#7874AC] text-3xl ml-10">
+    <div className="container h-full w-full">
+    <div className="flex items-center justify-between w-full">
+      <h1 className="flex font-bold text-deluge ml-1 sm:ml-0 text-xl sm:text-3xl">
             Exercises
           </h1>
           <div className="flex p-4 w-fit max-w-lg space-x-4">
+            <PageLink
+              href="/plans"
+              color="bg-ocean-green"
+              name="Go to Plans"
+              title="Go to Plans"
+            />
             <AnimatedInput
               voidChange={handleSearch}
               value={query}
-              additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+              additionalStyling="w-[15vh] sm:w-fit bg-white text-black border border-ocean-green focus:ring focus:ring-ocean-green"
               placeholder="Search..."
             />
           </div>
@@ -285,6 +290,5 @@ export default function Planner() {
           ))}
         </div>
       </div>
-    </>
   );
 }

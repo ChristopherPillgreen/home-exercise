@@ -207,7 +207,7 @@ export default function PlansPage() {
             <AnimatedInput
               voidChange={handleSearch}
               value={query}
-              additionalStyling="w-[15vh] sm:w-fit bg-ocean-green text-white"
+              additionalStyling="w-[15vh] sm:w-fit bg-white text-black border border-ocean-green focus:ring focus:ring-ocean-green"
               placeholder="Search..."
             />
           </div>
@@ -245,7 +245,7 @@ export default function PlansPage() {
           {displayedPlans.map((plan) => (
             <div
               key={plan.planID}
-              className="relative flex-1 mt-2 sm:mt-0 min-w-[50%] sm:min-w-[20%] sm:max-w-[30%] h-[30vh] border rounded-xl shadow-md hover:shadow:xl hover:box-border hover:border-deluge transition cursor-pointer"
+              className="relative flex-1 mt-2 sm:mt-0 min-w-[50%] sm:min-w-[20%] sm:max-w-[30%] h-[30vh] border rounded-xl shadow-md hover:shadow:xl hover:box-border hover:border-deluge hover:border transition cursor-pointer"
               onClick={() =>
                 router.push(`/plans/${encodePlanId(plan.planID)}`)
               }>
