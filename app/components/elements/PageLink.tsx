@@ -1,11 +1,10 @@
 import { motion } from "motion/react";
-import {aProps} from "../types";
+import { LinkProps } from "../types";
 
-interface PageLinkProps extends aProps {
+interface PageLinkProps extends LinkProps {
   color: string;
   name: string;
   title?: string;
-  target?: string;
   additionalStyling?: string;
 }
 
@@ -15,21 +14,32 @@ export default function PageLink({
   color,
   name,
   title,
-  target,
   additionalStyling,
 }: PageLinkProps) {
-  return (
-    <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
-      <a
+  if (href === undefined) {
+    return(
+      <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
+      <button
         onClick={onClick}
-        href={href}
-        className={`block h-full px-3 py-2 ${color} text-white rounded-xl shadow-md hover:shadow-lg ${additionalStyling}`}
+        className={`cursor-pointer block h-full px-3 py-2 ${color} text-white rounded-xl shadow-md hover:shadow-lg ${additionalStyling}`}
         rel="next"
-        title={title}
-        target={target}
-      >
+        title={title}>
         {name}
-      </a>
+      </button>
     </motion.div>
-  );
+    );
+  } else {
+    return (
+      <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.2 }}>
+        <a
+          onClick={onClick}
+          href={href}
+          className={`cursor-pointer block h-full px-3 py-2 ${color} text-white rounded-xl shadow-md hover:shadow-lg ${additionalStyling}`}
+          rel="next"
+          title={title}>
+          {name}
+        </a>
+      </motion.div>
+    );
+  }
 }

@@ -1,8 +1,8 @@
 import { CldImage } from "next-cloudinary";
-import { aProps } from "../types";
+import { LinkProps } from "../types";
 import { HoverMotion } from "../";
 
-interface MotionImageProps extends aProps {
+interface MotionImageProps extends LinkProps {
   width: number;
   height: number;
   src: string;
@@ -26,6 +26,7 @@ export default function MotionImage({
         src={src}
         alt={alt}
         onClick={onClick}
+        priority
       />
     </HoverMotion>
   );

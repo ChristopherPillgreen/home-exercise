@@ -1,19 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { Metadata } from "next";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { motion } from "motion/react";
-import { IoCloseCircle, IoCog } from "react-icons/io5";
 import { encodePlanId } from "./../api/urlsqids";
-import { CreatePlan, DeletePlan, Loading, EditPlan, PageLink, AnimatedInput } from "app/components";
-
-type Plan = {
-  planID: number;
-  planName: string;
-  planDescription: string;
-  image: string;
-};
+import type { Plan } from "app/components/types";
+import {
+  CreatePlan,
+  DeletePlan,
+  Loading,
+  EditPlan,
+  PageLink,
+  AnimatedInput,
+  PlanCard,
+  PaginationDots,
+  PlansFetcher
+} from "app/components";
 
 export default function PlansPage() {
   const router = useRouter();
@@ -31,32 +34,6 @@ export default function PlansPage() {
   const plansPerPage = 8;
   const [editPlanName, setEditPlanName] = useState("");
   const [editPlanDescription, setEditPlanDescription] = useState("");
-
-  useEffect(() => {
-    if (status === "loading") return;
-    if (!session?.user) {
-      setError("You must be logged in to view plans.");
-      setLoading(false);
-      return;
-    }
-
-    const fetchPlans = async () => {
-      try {
-        const response = await fetch(`/api/Plan?userID=${session.user.id}`);
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-        setPlans(data);
-      } catch (err) {
-        console.error("Error fetching plans:", err);
-        setError("Failed to fetch plans.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlans();
-  }, [session, status]);
 
   const handleSearch = async (searchQuery: string) => {
     setQuery(searchQuery);
@@ -82,7 +59,7 @@ export default function PlansPage() {
 
   const handleCreatePlan = async () => {
     if (!session?.user || !newPlanName.trim()) return;
-
+  
     try {
       const response = await fetch("/api/Plan", {
         method: "POST",
@@ -92,19 +69,20 @@ export default function PlansPage() {
           userID: session.user.id,
         }),
       });
-
-      if (!response.ok)
-        throw new Error(`HTTP error! status: ${response.status}`);
+  
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+  
       const data = await response.json();
       setShowCreateModal(false);
       setNewPlanName("");
-      const nplanid = encodePlanId(data.planID);
-      router.push(`/plans/${nplanid}`);
+      const encoded = encodePlanId(data.planID);
+      router.push(`/plans/${encoded}`);
     } catch (error) {
       console.error("Error creating plan:", error);
       setError("Failed to create plan.");
     }
   };
+  
 
   const openConfirmationPopup = (planID: number) => {
     setSelectedPlanID(planID);
@@ -215,8 +193,8 @@ export default function PlansPage() {
 
         <CreatePlan
           isOpen={showCreateModal}
-          onClose={
-            () => {setShowCreateModal(false)
+          onClose={() => {
+            setShowCreateModal(false);
             setNewPlanName("");
           }}
           onSubmit={handleCreatePlan}
@@ -240,61 +218,16 @@ export default function PlansPage() {
           setPlanDescription={setEditPlanDescription}
         />
 
-
         <div className="relative flex flex-wrap justify-between gap-4">
           {displayedPlans.map((plan) => (
-            <div
+            <PlanCard
               key={plan.planID}
-              className="relative flex-1 mt-2 sm:mt-0 min-w-[50%] sm:min-w-[20%] sm:max-w-[30%] h-[30vh] border rounded-xl shadow-md hover:shadow:xl hover:box-border hover:border-deluge hover:border transition cursor-pointer"
-              onClick={() =>
-                router.push(`/plans/${encodePlanId(plan.planID)}`)
-              }>
-              <div className="bg-[white] p-2 rounded-t-xl h-[30%] flex items-center">
-                <h2 className="text-xl font-semibold">
-                  {plan.planName.length > 26
-                    ? `${plan.planName.slice(0, 24)}...`
-                    : plan.planName}
-                </h2>
-              </div>
-
-              <div className="bg-gray-100 p-2 rounded-b-xl h-[70%] flex">
-                <p className="relative justify-start text-gray-600">
-                  {plan.planDescription
-                    ? plan.planDescription.length > 140
-                      ? `${plan.planDescription.slice(0, 140)}...`
-                      : plan.planDescription
-                    : ""}
-                </p>
-              </div>
-
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-2 right-10">
-                <IoCog
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openSettingsPopup(plan.planID);
-                  }}
-                  color="#004F2D"
-                  size={30}
-                />
-              </motion.div>
-
-              <motion.div
-                whileHover={{ scale: 1.1 }}
-                transition={{ duration: 0.2 }}
-                className="absolute top-2 right-2">
-                <IoCloseCircle
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openConfirmationPopup(plan.planID);
-                  }}
-                  color="#3D0814"
-                  size={30}
-                />
-              </motion.div>
-            </div>
+              planID={plan.planID}
+              planName={plan.planName}
+              planDescription={plan.planDescription}
+              onEdit={openSettingsPopup}
+              onDelete={openConfirmationPopup}
+            />
           ))}
 
           {Array.from({ length: plansPerPage - displayedPlans.length }).map(
@@ -306,26 +239,18 @@ export default function PlansPage() {
           )}
         </div>
 
-        <div className="flex items-center justify-center mt-1 space-x-2">
-          {[...Array(Math.ceil(filteredPlans.length / plansPerPage))].map(
-            (_, index) => (
-              <motion.div
-                key={`dot-${index}`}
-                whileHover={{ scale: 1.2 }}
-                transition={{ duration: 0.2 }}>
-                <button
-                  key={`dot-${index}`}
-                  onClick={() => setCurrentPage(index)}
-                  className={`w-3 h-3 rounded-full shadow-md hover:shadow:lg ${
-                    currentPage === index ? "bg-deluge" : "bg-gray-300"
-                  }`}>
-                  {}
-                </button>
-              </motion.div>
-            )
-          )}
-        </div>
+        <PaginationDots
+          totalPages={Math.ceil(filteredPlans.length / plansPerPage)}
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
       </Loading>
+
+      <PlansFetcher
+        onPlansFetched={setPlans}
+        onLoadingChange={setLoading}
+        onError={setError}
+      />
     </div>
   );
 }

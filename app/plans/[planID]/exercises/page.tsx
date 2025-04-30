@@ -368,7 +368,7 @@ export default function Planner() {
                   </div>
 
                   {/* Bottom 4/5 Image Area */}
-                  <div className="h-4/5 bg-gray-200 flex items-end justify-center rounded-b-xl">
+                  <div className="relative h-4/5 bg-gray-200 flex items-end justify-center rounded-b-xl">
                     <CldImage
                       src={exercise.image}
                       alt={exercise.exerciseName}

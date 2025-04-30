@@ -9,7 +9,7 @@ export interface InputProps {
     value?: string;
 }
 
-export interface aProps {
+export interface LinkProps {
     onClick?: () => void;
     href?: string;
 }
@@ -18,3 +18,10 @@ export interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
+
+export type Plan = {
+    planID: number;
+    planName: string;
+    planDescription: string;
+    image: string;
+};

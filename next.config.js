@@ -1,16 +1,11 @@
-// next.config.js
 const webpack = require('webpack');
 
-/** @type {import('next').NextConfig} */
+/**
+ * @type {import('next').NextConfig} 
+ */
 const nextConfig = {
-  // swcMinify: true,
-  // compiler: {
-  //   keepClassNames: true,
-  // },
   output: 'standalone',
-  
   webpack: (config, { dev, isServer }) => {
-    // Provide fallbacks for both server and client builds
     
     config.optimization.minimize = false;
     
@@ -23,7 +18,6 @@ const nextConfig = {
       mariadb: false,
     };
 
-    // Use IgnorePlugin to completely ignore these modules
     config.plugins.push(
       new webpack.IgnorePlugin({ resourceRegExp: /^oracledb$/ }),
       new webpack.IgnorePlugin({ resourceRegExp: /^pg-query-stream$/ }),
@@ -35,14 +29,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-
-
-// /** @type {import('next').NextConfig} */
-// module.exports = {
-//   webpack: (config, { dev, isServer }) => {
-//     // Provide fallbacks for both server and client builds
-    
-//     config.optimization.minimize = false;
-//     return config;
-//   },
-// };

@@ -41,7 +41,7 @@ export default function EditPlan({
           <textarea
             className="w-full border border-ocean-green p-2 rounded-xl shadow-md hover:shadow:lg focus:outline-none focus:ring focus:ring-british-racing-green resize-none"
             rows={4}
-            value={planDescription}
+            value={planDescription ?? ''}
             onChange={(e) => setPlanDescription(e.target.value)}
             maxLength={150}
             placeholder="Enter plan description..."
